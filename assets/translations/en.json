@@ -4,7 +4,7 @@
   "common": {
     "next": "Next",
     "skip": "Skip",
-    "get_started": "Get Started",
+    "get_started": "Get Started & Make Impact",
     "cancel": "Cancel",
     "confirm": "Confirm",
     "save": "Save",
@@ -16,12 +16,18 @@
     "retry": "Try Again"
   },
   "onboarding": {
-    "title_1": "Generous Giving",
-    "desc_1": "Direct your donations with full transparency to certified campaigns and families in need.",
-    "title_2": "Dignified Support",
-    "desc_2": "Request food packages, medical assistance, and educational aid with total privacy and dignity.",
-    "title_3": "Field Volunteers",
-    "desc_3": "Join our network of on-ground heroes to deliver aid directly to those who need it most."
+    "title_1": "Sustainable & Trusted Giving",
+    "desc_1": "Direct your donations with full transparency to verified relief projects and families in need with regular impact reports.",
+    "title_2": "Support with Dignity",
+    "desc_2": "Request food packages, medical assistance, and educational aid with total privacy, ease, and utmost dignity.",
+    "title_3": "Field Volunteers Network",
+    "desc_3": "Join our on-ground volunteer network to deliver aid directly and be part of creating genuine, tangible change.",
+    "chip_transparency": "100% Transparent",
+    "chip_impact": "Lasting Impact",
+    "chip_privacy": "Full Privacy",
+    "chip_dignity": "Dignified Care",
+    "chip_field": "Direct Aid",
+    "chip_community": "Active Hands"
   },
   "auth": {
     "welcome_back": "Welcome Back",
