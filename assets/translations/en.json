@@ -1,0 +1,47 @@
+{
+  "app_name": "Qout",
+  "app_tagline": "Together for Sustainable Impact",
+  "common": {
+    "next": "Next",
+    "skip": "Skip",
+    "get_started": "Get Started",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "language": "Language",
+    "arabic": "العربية",
+    "english": "English",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Try Again"
+  },
+  "onboarding": {
+    "title_1": "Generous Giving",
+    "desc_1": "Direct your donations with full transparency to certified campaigns and families in need.",
+    "title_2": "Dignified Support",
+    "desc_2": "Request food packages, medical assistance, and educational aid with total privacy and dignity.",
+    "title_3": "Field Volunteers",
+    "desc_3": "Join our network of on-ground heroes to deliver aid directly to those who need it most."
+  },
+  "auth": {
+    "welcome_back": "Welcome Back",
+    "login_subtitle": "Sign in to continue making an impact",
+    "email": "Email Address",
+    "password": "Password",
+    "forgot_password": "Forgot Password?",
+    "login": "Sign In",
+    "register": "Create Account",
+    "dont_have_account": "Don't have an account?",
+    "already_have_account": "Already have an account?",
+    "choose_role": "Select Your Role",
+    "role_donor": "Donor",
+    "role_donor_desc": "Support campaigns and track your donations",
+    "role_beneficiary": "Beneficiary",
+    "role_beneficiary_desc": "Submit assistance requests and track aid status",
+    "role_volunteer": "Volunteer",
+    "role_volunteer_desc": "Join field distribution and verification missions",
+    "full_name": "Full Name",
+    "phone": "Phone Number",
+    "city": "City / Region"
+  }
+}
