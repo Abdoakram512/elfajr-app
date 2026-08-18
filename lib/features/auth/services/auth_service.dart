@@ -1,26 +1,54 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import '../models/user_model.dart';
 import '../models/user_role.dart';
 
 class AuthService {
-  final FirebaseAuth _firebaseAuth;
-  final FirebaseFirestore _firestore;
+  final FirebaseAuth? _authOverride;
+  final FirebaseFirestore? _firestoreOverride;
 
   AuthService({
     FirebaseAuth? firebaseAuth,
     FirebaseFirestore? firestore,
-  })  : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
-        _firestore = firestore ?? FirebaseFirestore.instance;
+  })  : _authOverride = firebaseAuth,
+        _firestoreOverride = firestore;
 
-  User? get currentFirebaseUser => _firebaseAuth.currentUser;
+  bool get isFirebaseInitialized => Firebase.apps.isNotEmpty;
+
+  FirebaseAuth? get _firebaseAuth {
+    if (_authOverride != null) return _authOverride;
+    if (isFirebaseInitialized) {
+      return FirebaseAuth.instance;
+    }
+    return null;
+  }
+
+  FirebaseFirestore? get _firestore {
+    if (_firestoreOverride != null) return _firestoreOverride;
+    if (isFirebaseInitialized) {
+      return FirebaseFirestore.instance;
+    }
+    return null;
+  }
+
+  User? get currentFirebaseUser => _firebaseAuth?.currentUser;
 
   Future<UserModel?> getCurrentUserData() async {
-    final user = currentFirebaseUser;
+    final auth = _firebaseAuth;
+    final store = _firestore;
+
+    if (auth == null || store == null) {
+      debugPrint('Firebase is not initialized yet. Running in offline UI mode.');
+      return null;
+    }
+
+    final user = auth.currentUser;
     if (user == null) return null;
 
     try {
-      final doc = await _firestore.collection('users').doc(user.uid).get();
+      final doc = await store.collection('users').doc(user.uid).get();
       if (doc.exists && doc.data() != null) {
         return UserModel.fromMap(doc.data()!, documentId: doc.id);
       }
@@ -34,8 +62,23 @@ class AuthService {
     required String email,
     required String password,
   }) async {
+    final auth = _firebaseAuth;
+    final store = _firestore;
+
+    if (auth == null || store == null) {
+      // Demo / Mock fallback if Firebase config is not connected yet
+      debugPrint('Firebase not connected. Simulating demo login for testing.');
+      return UserModel(
+        uid: 'demo_user_123',
+        email: email.trim(),
+        name: email.split('@').first,
+        role: UserRole.donor,
+        createdAt: DateTime.now(),
+      );
+    }
+
     try {
-      final credential = await _firebaseAuth.signInWithEmailAndPassword(
+      final credential = await auth.signInWithEmailAndPassword(
         email: email.trim(),
         password: password,
       );
@@ -45,11 +88,10 @@ class AuthService {
         throw Exception('User credential is null.');
       }
 
-      final doc = await _firestore.collection('users').doc(user.uid).get();
+      final doc = await store.collection('users').doc(user.uid).get();
       if (doc.exists && doc.data() != null) {
         return UserModel.fromMap(doc.data()!, documentId: doc.id);
       } else {
-        // Fallback default user model if firestore document was not found
         final defaultUser = UserModel(
           uid: user.uid,
           email: user.email ?? email,
@@ -57,7 +99,7 @@ class AuthService {
           role: UserRole.donor,
           createdAt: DateTime.now(),
         );
-        await _firestore.collection('users').doc(user.uid).set(defaultUser.toMap());
+        await store.collection('users').doc(user.uid).set(defaultUser.toMap());
         return defaultUser;
       }
     } on FirebaseAuthException catch (e) {
@@ -76,8 +118,27 @@ class AuthService {
     String? city,
     String? extraDetails,
   }) async {
+    final auth = _firebaseAuth;
+    final store = _firestore;
+
+    if (auth == null || store == null) {
+      // Demo / Mock fallback if Firebase config is not connected yet
+      debugPrint('Firebase not connected. Simulating demo registration for testing.');
+      return UserModel(
+        uid: 'demo_user_new',
+        email: email.trim(),
+        name: name.trim(),
+        phone: phone?.trim(),
+        role: role,
+        isApproved: role != UserRole.volunteer,
+        city: city?.trim(),
+        extraDetails: extraDetails?.trim(),
+        createdAt: DateTime.now(),
+      );
+    }
+
     try {
-      final credential = await _firebaseAuth.createUserWithEmailAndPassword(
+      final credential = await auth.createUserWithEmailAndPassword(
         email: email.trim(),
         password: password,
       );
@@ -87,10 +148,8 @@ class AuthService {
         throw Exception('Failed to create user.');
       }
 
-      // Update Firebase Auth display name
       await user.updateDisplayName(name.trim());
 
-      // Volunteers start as isApproved: false until reviewed
       final isApproved = role != UserRole.volunteer;
 
       final userModel = UserModel(
@@ -105,9 +164,7 @@ class AuthService {
         createdAt: DateTime.now(),
       );
 
-      // Save user profile in Firestore
-      await _firestore.collection('users').doc(user.uid).set(userModel.toMap());
-
+      await store.collection('users').doc(user.uid).set(userModel.toMap());
       return userModel;
     } on FirebaseAuthException catch (e) {
       throw _mapFirebaseAuthError(e);
@@ -117,8 +174,14 @@ class AuthService {
   }
 
   Future<void> sendPasswordResetEmail({required String email}) async {
+    final auth = _firebaseAuth;
+    if (auth == null) {
+      debugPrint('Firebase not connected. Simulating reset email.');
+      return;
+    }
+
     try {
-      await _firebaseAuth.sendPasswordResetEmail(email: email.trim());
+      await auth.sendPasswordResetEmail(email: email.trim());
     } on FirebaseAuthException catch (e) {
       throw _mapFirebaseAuthError(e);
     } catch (e) {
@@ -127,7 +190,10 @@ class AuthService {
   }
 
   Future<void> signOut() async {
-    await _firebaseAuth.signOut();
+    final auth = _firebaseAuth;
+    if (auth != null) {
+      await auth.signOut();
+    }
   }
 
   String _mapFirebaseAuthError(FirebaseAuthException e) {
