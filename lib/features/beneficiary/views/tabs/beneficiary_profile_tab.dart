@@ -22,16 +22,10 @@ class BeneficiaryProfileTab extends StatelessWidget {
     final user = authState is Authenticated ? authState.user : null;
     final isArabic = context.locale.languageCode == 'ar';
 
-    final displayName = user?.name.isNotEmpty == true
-        ? user!.name
-        : 'أحمد سعيد الغامدي';
-    final displayEmail = user?.email.isNotEmpty == true
-        ? user!.email
-        : 'ahmed.alghamdi@qout.org';
-    final displayPhone = user?.phone?.isNotEmpty == true
-        ? user!.phone!
-        : '+966 55 123 4567';
-    final displayCity = user?.city?.isNotEmpty == true ? user!.city! : 'الرياض';
+    final displayName = user?.name.isNotEmpty == true ? user!.name : 'مستفيد معتمد';
+    final displayEmail = user?.email.isNotEmpty == true ? user!.email : '-';
+    final displayPhone = user?.phone?.isNotEmpty == true ? user!.phone! : '-';
+    final displayCity = user?.city?.isNotEmpty == true ? user!.city! : 'المدينة';
 
     return BlocBuilder<BeneficiaryCubit, BeneficiaryState>(
       builder: (context, state) {
@@ -163,7 +157,7 @@ class BeneficiaryProfileTab extends StatelessWidget {
                     _buildInfoRow(
                       icon: Icons.credit_card_outlined,
                       label: 'رقم الهوية الوطنية',
-                      value: card?.nationalId ?? '1089283746',
+                      value: card?.nationalId ?? '-',
                     ),
                     _buildDivider(),
                     _buildInfoRow(
@@ -181,7 +175,7 @@ class BeneficiaryProfileTab extends StatelessWidget {
                     _buildInfoRow(
                       icon: Icons.family_restroom_outlined,
                       label: 'أفراد الأسرة المسجلين',
-                      value: '${card?.familyCount ?? 5} أفراد',
+                      value: card != null ? '${card.familyCount} أفراد' : '-',
                     ),
                   ],
                 ),
@@ -284,7 +278,121 @@ class BeneficiaryProfileTab extends StatelessWidget {
                     ),
                     _buildDivider(),
                     InkWell(
-                      onTap: () => _showHelpDialog(context),
+                      onTap: () => context.push(RouteNames.aboutUs),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: AppColors.primarySubtle,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(
+                                Icons.info_outline_rounded,
+                                size: 18,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                            const Gap(12),
+                            const Text(
+                              'عن منصة قُوت',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textPrimaryLight,
+                              ),
+                            ),
+                            const Spacer(),
+                            const Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              size: 14,
+                              color: AppColors.textMutedLight,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    _buildDivider(),
+                    InkWell(
+                      onTap: () => context.push(RouteNames.faq),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: AppColors.primarySubtle,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(
+                                Icons.quiz_outlined,
+                                size: 18,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                            const Gap(12),
+                            const Text(
+                              'الأسئلة الشائعة',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textPrimaryLight,
+                              ),
+                            ),
+                            const Spacer(),
+                            const Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              size: 14,
+                              color: AppColors.textMutedLight,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    _buildDivider(),
+                    InkWell(
+                      onTap: () => context.push(RouteNames.termsPrivacy),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: AppColors.primarySubtle,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(
+                                Icons.verified_user_outlined,
+                                size: 18,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                            const Gap(12),
+                            const Text(
+                              'الشروط وسياسة الخصوصية',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textPrimaryLight,
+                              ),
+                            ),
+                            const Spacer(),
+                            const Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              size: 14,
+                              color: AppColors.textMutedLight,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    _buildDivider(),
+                    InkWell(
+                      onTap: () => context.push(RouteNames.contactSupport),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         child: Row(
@@ -423,23 +531,36 @@ class BeneficiaryProfileTab extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 18, color: AppColors.textMutedLight),
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Icon(icon, size: 18, color: AppColors.textMutedLight),
+          ),
           const Gap(10),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 13,
-              color: AppColors.textSecondaryLight,
+          Expanded(
+            flex: 5,
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontSize: 13,
+                color: AppColors.textSecondaryLight,
+                height: 1.3,
+              ),
             ),
           ),
-          const Spacer(),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
-              color: valueColor ?? AppColors.textPrimaryLight,
+          const Gap(10),
+          Flexible(
+            flex: 6,
+            child: Text(
+              value,
+              textAlign: TextAlign.end,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                color: valueColor ?? AppColors.textPrimaryLight,
+                height: 1.3,
+              ),
             ),
           ),
         ],
@@ -449,50 +570,6 @@ class BeneficiaryProfileTab extends StatelessWidget {
 
   Widget _buildDivider() {
     return const Divider(height: 1, color: AppColors.borderLight);
-  }
-
-  void _showHelpDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Row(
-          children: [
-            Icon(Icons.headset_mic_rounded, color: AppColors.primary),
-            Gap(10),
-            Text('مركز الرعاية والدعم'),
-          ],
-        ),
-        content: const Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'فريق الدعم الفني والإغاثي في قوت جاهز لخدمتك والرد على استفسارات الصرف على مدار الساعة.',
-              style: TextStyle(fontSize: 13, height: 1.4),
-            ),
-            Gap(14),
-            Text(
-              '📞 الرقم الموحد: 8001234567\n✉️ البريد: support@qout.org',
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-                height: 1.5,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text(
-              'إغلاق',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   void _confirmLogout(BuildContext context) {

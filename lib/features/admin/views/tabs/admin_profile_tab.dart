@@ -24,16 +24,12 @@ class AdminProfileTab extends StatelessWidget {
 
     final displayName = user?.name.isNotEmpty == true
         ? user!.name
-        : 'أحمد بن عبد العزيز المنصور';
-    final displayEmail = user?.email.isNotEmpty == true
-        ? user!.email
-        : 'director.mansoor@qout.org';
-    final displayPhone = user?.phone?.isNotEmpty == true
-        ? user!.phone!
-        : '+966 50 000 0000';
+        : 'المشرف العام';
+    final displayEmail = user?.email.isNotEmpty == true ? user!.email : '-';
+    final displayPhone = user?.phone?.isNotEmpty == true ? user!.phone! : '-';
     final displayCity = user?.city?.isNotEmpty == true
         ? user!.city!
-        : 'الرياض - المقر الرئيسي';
+        : 'المقر الرئيسي';
 
     return BlocBuilder<AdminCubit, AdminState>(
       builder: (context, state) {
@@ -282,6 +278,158 @@ class AdminProfileTab extends StatelessWidget {
                         ),
                       ),
                     ),
+                    _buildDivider(),
+                    InkWell(
+                      onTap: () => context.push(RouteNames.aboutUs),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: AppColors.primarySubtle,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(
+                                Icons.info_outline_rounded,
+                                size: 18,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                            const Gap(12),
+                            const Text(
+                              'عن منصة قُوت',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textPrimaryLight,
+                              ),
+                            ),
+                            const Spacer(),
+                            const Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              size: 14,
+                              color: AppColors.textMutedLight,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    _buildDivider(),
+                    InkWell(
+                      onTap: () => context.push(RouteNames.faq),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: AppColors.primarySubtle,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(
+                                Icons.quiz_outlined,
+                                size: 18,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                            const Gap(12),
+                            const Text(
+                              'الأسئلة الشائعة',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textPrimaryLight,
+                              ),
+                            ),
+                            const Spacer(),
+                            const Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              size: 14,
+                              color: AppColors.textMutedLight,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    _buildDivider(),
+                    InkWell(
+                      onTap: () => context.push(RouteNames.termsPrivacy),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: AppColors.primarySubtle,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(
+                                Icons.verified_user_outlined,
+                                size: 18,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                            const Gap(12),
+                            const Text(
+                              'الشروط واللوائح والخصوصية',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textPrimaryLight,
+                              ),
+                            ),
+                            const Spacer(),
+                            const Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              size: 14,
+                              color: AppColors.textMutedLight,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    _buildDivider(),
+                    InkWell(
+                      onTap: () => context.push(RouteNames.contactSupport),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: AppColors.primarySubtle,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(
+                                Icons.headset_mic_outlined,
+                                size: 18,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                            const Gap(12),
+                            const Text(
+                              'مركز الدعم وغرفة العمليات',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textPrimaryLight,
+                              ),
+                            ),
+                            const Spacer(),
+                            const Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              size: 14,
+                              color: AppColors.textMutedLight,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
 
@@ -293,7 +441,10 @@ class AdminProfileTab extends StatelessWidget {
                   height: 52,
                   child: OutlinedButton.icon(
                     onPressed: () => _confirmLogout(context),
-                    icon: const Icon(Icons.logout_rounded, color: AppColors.error),
+                    icon: const Icon(
+                      Icons.logout_rounded,
+                      color: AppColors.error,
+                    ),
                     label: Text(
                       'common.logout'.tr(),
                       style: const TextStyle(
@@ -303,7 +454,10 @@ class AdminProfileTab extends StatelessWidget {
                       ),
                     ),
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: AppColors.error, width: 1.2),
+                      side: const BorderSide(
+                        color: AppColors.error,
+                        width: 1.2,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
@@ -379,23 +533,36 @@ class AdminProfileTab extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 18, color: AppColors.textMutedLight),
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Icon(icon, size: 18, color: AppColors.textMutedLight),
+          ),
           const Gap(10),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 13,
-              color: AppColors.textSecondaryLight,
+          Expanded(
+            flex: 5,
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontSize: 13,
+                color: AppColors.textSecondaryLight,
+                height: 1.3,
+              ),
             ),
           ),
-          const Spacer(),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
-              color: valueColor ?? AppColors.textPrimaryLight,
+          const Gap(10),
+          Flexible(
+            flex: 6,
+            child: Text(
+              value,
+              textAlign: TextAlign.end,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                color: valueColor ?? AppColors.textPrimaryLight,
+                height: 1.3,
+              ),
             ),
           ),
         ],
@@ -413,7 +580,9 @@ class AdminProfileTab extends StatelessWidget {
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Text('تأكيد تسجيل الخروج'),
-        content: const Text('هل أنت متأكد من رغبتك في تسجيل الخروج من لوحة الإدارة؟'),
+        content: const Text(
+          'هل أنت متأكد من رغبتك في تسجيل الخروج من لوحة الإدارة؟',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),

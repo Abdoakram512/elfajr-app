@@ -24,22 +24,23 @@ class MerchantProfileTab extends StatelessWidget {
 
     final storeName = user?.storeName?.isNotEmpty == true
         ? user!.storeName!
-        : (user?.name.isNotEmpty == true ? user!.name : 'أسواق النخبة المركزية');
-    final displayEmail = user?.email.isNotEmpty == true
-        ? user!.email
-        : 'nokhba.markets@qout.org';
-    final displayPhone = user?.phone?.isNotEmpty == true
-        ? user!.phone!
-        : '+966 11 456 7890';
-    final displayCity = user?.city?.isNotEmpty == true
-        ? user!.city!
-        : 'الرياض';
+        : (user?.name.isNotEmpty == true ? user!.name : 'منفذ معتمد');
+    final displayEmail = user?.email.isNotEmpty == true ? user!.email : '-';
+    final displayPhone = user?.phone?.isNotEmpty == true ? user!.phone! : '-';
+    final displayCity = user?.city?.isNotEmpty == true ? user!.city! : 'المدينة';
     final commercialReg = user?.commercialReg?.isNotEmpty == true
         ? user!.commercialReg!
-        : '1010293847';
+        : '-';
 
     return BlocBuilder<MerchantCubit, MerchantState>(
       builder: (context, state) {
+        final totalBasketsDispensed = state.recentTransactions.fold<int>(
+          0,
+          (sum, item) => sum + item.foodBasketsDeducted,
+        );
+
+        final currencyFormatter = NumberFormat('#,###');
+
         return Scaffold(
           backgroundColor: AppColors.backgroundLight,
           appBar: AppBar(
@@ -201,21 +202,21 @@ class MerchantProfileTab extends StatelessWidget {
                     _buildInfoRow(
                       icon: Icons.receipt_long_rounded,
                       label: 'إجمالي العمليات الموثقة',
-                      value: '${state.recentTransactions.length + 140} عملية',
+                      value: '${state.todayTransactionsCount} عملية',
                       valueColor: AppColors.primary,
                     ),
                     _buildDivider(),
                     _buildInfoRow(
                       icon: Icons.payments_outlined,
                       label: 'إجمالي المبالغ المنصرفة',
-                      value: '48,500 ${'common.currency'.tr()}',
+                      value: '${currencyFormatter.format(state.todayDispensedAmount)} ${'common.currency'.tr()}',
                       valueColor: AppColors.primary,
                     ),
                     _buildDivider(),
                     _buildInfoRow(
                       icon: Icons.shopping_basket_outlined,
                       label: 'السلال الغذائية المصروفة',
-                      value: '86 سلة تموينية',
+                      value: '$totalBasketsDispensed سلة تموينية',
                       valueColor: AppColors.accentDark,
                     ),
                   ],
@@ -281,7 +282,121 @@ class MerchantProfileTab extends StatelessWidget {
                     ),
                     _buildDivider(),
                     InkWell(
-                      onTap: () => _showMerchantSupportDialog(context),
+                      onTap: () => context.push(RouteNames.aboutUs),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: AppColors.primarySubtle,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(
+                                Icons.info_outline_rounded,
+                                size: 18,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                            const Gap(12),
+                            const Text(
+                              'عن منصة قُوت',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textPrimaryLight,
+                              ),
+                            ),
+                            const Spacer(),
+                            const Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              size: 14,
+                              color: AppColors.textMutedLight,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    _buildDivider(),
+                    InkWell(
+                      onTap: () => context.push(RouteNames.faq),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: AppColors.primarySubtle,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(
+                                Icons.quiz_outlined,
+                                size: 18,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                            const Gap(12),
+                            const Text(
+                              'الأسئلة الشائعة',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textPrimaryLight,
+                              ),
+                            ),
+                            const Spacer(),
+                            const Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              size: 14,
+                              color: AppColors.textMutedLight,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    _buildDivider(),
+                    InkWell(
+                      onTap: () => context.push(RouteNames.termsPrivacy),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: AppColors.primarySubtle,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(
+                                Icons.verified_user_outlined,
+                                size: 18,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                            const Gap(12),
+                            const Text(
+                              'الشروط وسياسة الخصوصية',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textPrimaryLight,
+                              ),
+                            ),
+                            const Spacer(),
+                            const Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              size: 14,
+                              color: AppColors.textMutedLight,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    _buildDivider(),
+                    InkWell(
+                      onTap: () => context.push(RouteNames.contactSupport),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         child: Row(
@@ -414,23 +529,36 @@ class MerchantProfileTab extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 18, color: AppColors.textMutedLight),
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Icon(icon, size: 18, color: AppColors.textMutedLight),
+          ),
           const Gap(10),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 13,
-              color: AppColors.textSecondaryLight,
+          Expanded(
+            flex: 5,
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontSize: 13,
+                color: AppColors.textSecondaryLight,
+                height: 1.3,
+              ),
             ),
           ),
-          const Spacer(),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
-              color: valueColor ?? AppColors.textPrimaryLight,
+          const Gap(10),
+          Flexible(
+            flex: 6,
+            child: Text(
+              value,
+              textAlign: TextAlign.end,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                color: valueColor ?? AppColors.textPrimaryLight,
+                height: 1.3,
+              ),
             ),
           ),
         ],
@@ -440,43 +568,6 @@ class MerchantProfileTab extends StatelessWidget {
 
   Widget _buildDivider() {
     return const Divider(height: 1, color: AppColors.borderLight);
-  }
-
-  void _showMerchantSupportDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Row(
-          children: [
-            Icon(Icons.support_agent_rounded, color: AppColors.primary),
-            Gap(10),
-            Text('دعم منافذ الصرف والشركاء'),
-          ],
-        ),
-        content: const Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'قسم الشركاء ومنافذ الصرف جاهز لخدمتكم وتسوية المطالبات المالية وحل المشكلات التقنية لماسح الـ QR.',
-              style: TextStyle(fontSize: 13, height: 1.4),
-            ),
-            Gap(14),
-            Text(
-              '📞 الخط الساخن للتجار: 8009876543\n✉️ البريد: merchants@qout.org\n⏱️ ساعات الدعم: 24/7',
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, height: 1.5),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('إغلاق', style: TextStyle(fontWeight: FontWeight.bold)),
-          ),
-        ],
-      ),
-    );
   }
 
   void _confirmLogout(BuildContext context) {

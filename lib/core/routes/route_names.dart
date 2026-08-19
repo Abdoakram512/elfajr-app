@@ -6,10 +6,14 @@ abstract class RouteNames {
   static const String register = '/register';
   static const String forgotPassword = '/forgot-password';
 
-  // Role Dashboards
-  static const String donorDashboard = '/donor-dashboard';
+  // 3 Core Role Dashboards
   static const String beneficiaryDashboard = '/beneficiary-dashboard';
-  static const String volunteerDashboard = '/volunteer-dashboard';
   static const String merchantDashboard = '/merchant-dashboard';
   static const String adminDashboard = '/admin-dashboard';
+
+  // Informational & Support Pages (Dynamic from Firestore)
+  static const String aboutUs = '/about-us';
+  static const String faq = '/faq';
+  static const String termsPrivacy = '/terms-privacy';
+  static const String contactSupport = '/contact-support';
 }

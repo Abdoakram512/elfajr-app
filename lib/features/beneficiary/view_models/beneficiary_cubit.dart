@@ -1,56 +1,57 @@
+import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../app/service_locator.dart';
+import '../../auth/view_models/auth_cubit.dart';
+import '../../auth/view_models/auth_state.dart';
 import '../models/aid_card_model.dart';
+import '../repositories/beneficiary_repository.dart';
 import 'beneficiary_state.dart';
 
 class BeneficiaryCubit extends Cubit<BeneficiaryState> {
-  BeneficiaryCubit() : super(const BeneficiaryState()) {
-    loadInitialData();
+  final BeneficiaryRepository _repository;
+  StreamSubscription<AidCardModel?>? _cardSubscription;
+  StreamSubscription<List<BeneficiaryRedemptionItem>>? _redemptionsSubscription;
+
+  BeneficiaryCubit({BeneficiaryRepository? repository})
+      : _repository = repository ?? sl<BeneficiaryRepository>(),
+        super(const BeneficiaryState()) {
+    initDataStreams();
   }
 
   void setTab(int index) {
     emit(state.copyWith(currentTabIndex: index));
   }
 
-  void loadInitialData() {
-    final mockCard = AidCardModel(
-      cardId: 'QOUT-CARD-784920',
-      beneficiaryId: 'usr_ben_ahmed',
-      beneficiaryName: 'أحمد سعيد الغامدي',
-      nationalId: '1089283746',
-      familyCount: 5,
-      totalBalance: 600.0,
-      foodBasketsQuota: 2,
-      status: AidCardStatus.active,
-      expiresAt: DateTime.now().add(const Duration(days: 180)),
-      securityHash: 'sha256_mock_secure_token',
-    );
+  void initDataStreams() {
+    final authState = sl<AuthCubit>().state;
+    final user = authState is Authenticated ? authState.user : null;
 
-    final mockRedemptions = [
-      BeneficiaryRedemptionItem(
-        transactionId: 'TXN-RED-481920',
-        merchantStoreName: 'أسواق النخبة المركزية',
-        amountDeducted: 250.0,
-        foodBasketsDeducted: 1,
-        remainingBalance: 350.0,
-        remainingBaskets: 1,
-        timestamp: DateTime.now().subtract(const Duration(hours: 3)),
-        notes: 'صرف مواد تموينية وسلة غذائية',
-      ),
-      BeneficiaryRedemptionItem(
-        transactionId: 'TXN-RED-410982',
-        merchantStoreName: 'صيدليات الشفاء التخصصية',
-        amountDeducted: 150.0,
-        foodBasketsDeducted: 0,
-        remainingBalance: 600.0,
-        remainingBaskets: 2,
-        timestamp: DateTime.now().subtract(const Duration(days: 4)),
-        notes: 'صرف أدوية ومستلزمات علاجية',
-      ),
-    ];
+    final beneficiaryId = user?.uid ?? 'usr_ben_ahmed';
+    final cardId = user?.activeCardId ?? 'QOUT-CARD-784920';
 
-    emit(state.copyWith(
-      activeCard: mockCard,
-      redemptions: mockRedemptions,
-    ));
+    // 1. Subscribe to Live Aid Card from Firestore
+    _cardSubscription?.cancel();
+    _cardSubscription = _repository
+        .getActiveAidCard(beneficiaryId: beneficiaryId, cardId: cardId)
+        .listen((card) {
+      if (card != null) {
+        emit(state.copyWith(activeCard: card));
+      }
+    });
+
+    // 2. Subscribe to Live Redemptions from Firestore
+    _redemptionsSubscription?.cancel();
+    _redemptionsSubscription = _repository
+        .getRedemptionsHistory(beneficiaryId: beneficiaryId, cardId: cardId)
+        .listen((redemptions) {
+      emit(state.copyWith(redemptions: redemptions));
+    });
+  }
+
+  @override
+  Future<void> close() {
+    _cardSubscription?.cancel();
+    _redemptionsSubscription?.cancel();
+    return super.close();
   }
 }

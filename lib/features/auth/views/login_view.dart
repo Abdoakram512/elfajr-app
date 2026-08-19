@@ -35,33 +35,40 @@ class _LoginViewState extends State<LoginView> {
     _loadSavedCredentials();
   }
 
-  void _loadSavedCredentials() {
+  Future<void> _loadSavedCredentials() async {
     try {
       final prefs = sl<SharedPreferences>();
       final savedRememberMe =
           prefs.getBool(AppConstants.prefsKeyRememberMe) ?? true;
       final savedEmail = prefs.getString(AppConstants.prefsKeySavedEmail) ?? '';
 
-      setState(() {
-        _rememberMe = savedRememberMe;
-        if (savedRememberMe && savedEmail.isNotEmpty) {
-          _emailController.text = savedEmail;
-        }
-      });
+      if (mounted) {
+        setState(() {
+          _rememberMe = savedRememberMe;
+          if (savedRememberMe && savedEmail.isNotEmpty) {
+            _emailController.text = savedEmail;
+          }
+        });
+      }
     } catch (_) {}
   }
 
-  void _saveCredentialsState() {
+  Future<void> _toggleRememberMe() async {
+    final newValue = !_rememberMe;
+    setState(() {
+      _rememberMe = newValue;
+    });
+
     try {
       final prefs = sl<SharedPreferences>();
-      prefs.setBool(AppConstants.prefsKeyRememberMe, _rememberMe);
-      if (_rememberMe) {
-        prefs.setString(
+      await prefs.setBool(AppConstants.prefsKeyRememberMe, newValue);
+      if (!newValue) {
+        await prefs.remove(AppConstants.prefsKeySavedEmail);
+      } else if (_emailController.text.trim().isNotEmpty) {
+        await prefs.setString(
           AppConstants.prefsKeySavedEmail,
           _emailController.text.trim(),
         );
-      } else {
-        prefs.remove(AppConstants.prefsKeySavedEmail);
       }
     } catch (_) {}
   }
@@ -73,12 +80,26 @@ class _LoginViewState extends State<LoginView> {
     super.dispose();
   }
 
-  void _submitLogin() {
+  Future<void> _submitLogin() async {
     if (_formKey.currentState?.validate() ?? false) {
-      _saveCredentialsState();
+      final email = _emailController.text.trim();
+      final password = _passwordController.text;
+
+      try {
+        final prefs = sl<SharedPreferences>();
+        await prefs.setBool(AppConstants.prefsKeyRememberMe, _rememberMe);
+        if (_rememberMe) {
+          await prefs.setString(AppConstants.prefsKeySavedEmail, email);
+        } else {
+          await prefs.remove(AppConstants.prefsKeySavedEmail);
+        }
+      } catch (_) {}
+
+      if (!mounted) return;
       context.read<AuthCubit>().login(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
+        email: email,
+        password: password,
+        rememberMe: _rememberMe,
       );
     }
   }
@@ -128,44 +149,32 @@ class _LoginViewState extends State<LoginView> {
           backgroundColor: AppColors.backgroundLight,
           body: SafeArea(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Form(
                 key: _formKey,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Top Bar with Brand & Language Toggle
+                    const Gap(20),
+
+                    // Top Bar: Back button + Language Switcher
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // Brand Indicator
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: AppColors.primarySubtle,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.volunteer_activism_rounded,
-                                color: AppColors.primary,
-                                size: 22,
-                              ),
-                            ),
-                            const Gap(10),
-                            Text(
-                              'app_name'.tr(),
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                          ],
+                        IconButton(
+                          icon: const Icon(
+                            Icons.arrow_back_ios_new_rounded,
+                            size: 20,
+                          ),
+                          onPressed: () {
+                            if (context.canPop()) {
+                              context.pop();
+                            } else {
+                              context.go(RouteNames.roleSelection);
+                            }
+                          },
                         ),
-
-                        // Language Switcher
+                        // Language Switcher Button
                         InkWell(
                           onTap: () {
                             final newLocale = isArabic
@@ -182,61 +191,81 @@ class _LoginViewState extends State<LoginView> {
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: AppColors.borderLight,
-                                width: 1,
-                              ),
+                              border: Border.all(color: AppColors.borderLight),
                             ),
-                            child: Row(
-                              children: [
-                                const Icon(
-                                  Icons.language_rounded,
-                                  size: 16,
-                                  color: AppColors.primary,
-                                ),
-                                const Gap(6),
-                                Text(
-                                  isArabic ? 'English' : 'العربية',
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.primary,
-                                  ),
-                                ),
-                              ],
+                            child: Text(
+                              isArabic ? 'English' : 'العربية',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primary,
+                              ),
                             ),
                           ),
                         ),
                       ],
                     ),
 
-                    const Gap(36),
+                    const Gap(16),
 
-                    // Greeting Header
-                    Text(
-                          'auth.welcome_back'.tr(),
-                          style: const TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimaryLight,
+                    // Brand Logo Mark
+                    Center(
+                      child: Container(
+                        width: 72,
+                        height: 72,
+                        decoration: BoxDecoration(
+                          color: AppColors.primarySubtle,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: AppColors.primary.withValues(alpha: 0.15),
+                            width: 2,
                           ),
+                        ),
+                        child: Center(
+                          child: Image.asset(
+                            'assets/images/app_logo.png',
+                            width: 48,
+                            height: 48,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Icon(
+                                  Icons.spa_rounded,
+                                  size: 40,
+                                  color: AppColors.primary,
+                                ),
+                          ),
+                        ),
+                      ),
+                    ).animate().scale(
+                      duration: 400.ms,
+                      curve: Curves.easeOutBack,
+                    ),
+
+                    const Gap(24),
+
+                    // Title
+                    Text(
+                          'auth.login_title'.tr(),
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.headlineMedium
+                              ?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimaryLight,
+                              ),
                         )
                         .animate()
-                        .fadeIn(duration: 400.ms)
-                        .slideY(begin: 0.2, end: 0, duration: 400.ms),
+                        .fadeIn(duration: 300.ms)
+                        .slideY(begin: 0.2, end: 0),
 
                     const Gap(8),
 
+                    // Subtitle
                     Text(
-                          'auth.login_subtitle'.tr(),
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: AppColors.textSecondaryLight,
-                          ),
-                        )
-                        .animate()
-                        .fadeIn(delay: 100.ms, duration: 400.ms)
-                        .slideY(begin: 0.2, end: 0, duration: 400.ms),
+                      'auth.login_subtitle'.tr(),
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: AppColors.textSecondaryLight,
+                      ),
+                    ).animate().fadeIn(delay: 100.ms, duration: 300.ms),
 
                     const Gap(32),
 
@@ -292,11 +321,7 @@ class _LoginViewState extends State<LoginView> {
                       children: [
                         // Remember Me Checkbox
                         InkWell(
-                          onTap: () {
-                            setState(() {
-                              _rememberMe = !_rememberMe;
-                            });
-                          },
+                          onTap: _toggleRememberMe,
                           borderRadius: BorderRadius.circular(8),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(vertical: 4),
@@ -305,8 +330,8 @@ class _LoginViewState extends State<LoginView> {
                               children: [
                                 AnimatedContainer(
                                   duration: const Duration(milliseconds: 200),
-                                  width: 20,
-                                  height: 20,
+                                  width: 22,
+                                  height: 22,
                                   decoration: BoxDecoration(
                                     color: _rememberMe
                                         ? AppColors.primary
@@ -322,18 +347,22 @@ class _LoginViewState extends State<LoginView> {
                                   child: _rememberMe
                                       ? const Icon(
                                           Icons.check_rounded,
-                                          size: 14,
+                                          size: 16,
                                           color: Colors.white,
                                         )
                                       : null,
                                 ),
                                 const Gap(8),
                                 Text(
-                                  'auth.remember_me'.tr(),
-                                  style: const TextStyle(
+                                  'تذكرني',
+                                  style: TextStyle(
                                     fontSize: 13,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.textSecondaryLight,
+                                    fontWeight: _rememberMe
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                    color: _rememberMe
+                                        ? AppColors.textPrimaryLight
+                                        : AppColors.textSecondaryLight,
                                   ),
                                 ),
                               ],
@@ -341,7 +370,7 @@ class _LoginViewState extends State<LoginView> {
                           ),
                         ),
 
-                        // Forgot Password Link
+                        // Forgot Password
                         TextButton(
                           onPressed: () =>
                               context.push(RouteNames.forgotPassword),
@@ -353,9 +382,9 @@ class _LoginViewState extends State<LoginView> {
                           child: Text(
                             'auth.forgot_password'.tr(),
                             style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
                               color: AppColors.primary,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
                             ),
                           ),
                         ),
@@ -366,43 +395,43 @@ class _LoginViewState extends State<LoginView> {
 
                     // Login Button
                     PrimaryButton(
-                          text: 'auth.login'.tr(),
+                          text: 'auth.login_button'.tr(),
                           isLoading: isLoading,
                           onPressed: _submitLogin,
                         )
                         .animate()
                         .fadeIn(delay: 400.ms, duration: 400.ms)
-                        .slideY(begin: 0.2, end: 0),
+                        .slideY(begin: 0.1, end: 0),
 
                     const Gap(32),
 
-                    // Don't have an account? Sign up
-                    Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'auth.dont_have_account'.tr(),
+                    // Register Link
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'auth.dont_have_account'.tr(),
+                          style: const TextStyle(
+                            color: AppColors.textSecondaryLight,
+                            fontSize: 14,
+                          ),
+                        ),
+                        const Gap(4),
+                        GestureDetector(
+                          onTap: () => context.push(RouteNames.register),
+                          child: Text(
+                            'auth.register'.tr(),
                             style: const TextStyle(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.bold,
                               fontSize: 14,
-                              color: AppColors.textSecondaryLight,
                             ),
                           ),
-                          TextButton(
-                            onPressed: () =>
-                                context.push(RouteNames.roleSelection),
-                            child: Text(
-                              'auth.register'.tr(),
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                        ),
+                      ],
+                    ).animate().fadeIn(delay: 500.ms, duration: 300.ms),
+
+                    const Gap(24),
                   ],
                 ),
               ),

@@ -1,109 +1,87 @@
+import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../app/service_locator.dart';
+import '../repositories/admin_repository.dart';
 import 'admin_state.dart';
 
 class AdminCubit extends Cubit<AdminState> {
-  AdminCubit() : super(const AdminState()) {
-    loadInitialData();
+  final AdminRepository _repository;
+  StreamSubscription<Map<String, dynamic>>? _statsSubscription;
+  StreamSubscription<List<AdminRedemptionItem>>? _redemptionsSubscription;
+  StreamSubscription<List<AdminMerchantItem>>? _merchantsSubscription;
+
+  AdminCubit({AdminRepository? repository})
+      : _repository = repository ?? sl<AdminRepository>(),
+        super(const AdminState()) {
+    initDataStreams();
   }
 
   void setTab(int index) {
     emit(state.copyWith(currentTabIndex: index));
   }
 
-  void loadInitialData() {
-    final mockMerchants = [
-      const AdminMerchantItem(
-        id: 'usr_merch_nokhba',
-        name: 'أسواق النخبة المركزية',
-        storeType: 'هايبر ماركت وتموينات',
-        city: 'الرياض',
-        commercialReg: '1010293847',
-        totalTransactions: 142,
-        totalDisbursed: 48500.0,
-        isActive: true,
-      ),
-      const AdminMerchantItem(
-        id: 'usr_merch_shefa',
-        name: 'صيدليات الشفاء التخصصية',
-        storeType: 'صيدلية ومستلزمات علاجية',
-        city: 'جدة',
-        commercialReg: '1010887722',
-        totalTransactions: 98,
-        totalDisbursed: 24200.0,
-        isActive: true,
-      ),
-      const AdminMerchantItem(
-        id: 'usr_merch_baraka',
-        name: 'تموينات ومخابز البركة',
-        storeType: 'تموينات إغاثية ومخبز',
-        city: 'الدمام',
-        commercialReg: '1010993344',
-        totalTransactions: 115,
-        totalDisbursed: 31000.0,
-        isActive: true,
-      ),
-    ];
+  void initDataStreams() {
+    // 1. Live Stats from Firestore (stats/global)
+    _statsSubscription?.cancel();
+    _statsSubscription = _repository.getGlobalStatsStream().listen((stats) {
+      emit(state.copyWith(
+        totalFundsDisbursed: stats['totalFundsDisbursed'] as double? ?? 0.0,
+        totalBeneficiariesCount: stats['totalBeneficiariesCount'] as int? ?? 0,
+        activeMerchantsCount: stats['activeMerchantsCount'] as int? ?? 0,
+        totalRedemptionsCount: stats['totalRedemptionsCount'] as int? ?? 0,
+      ));
+    });
 
-    final mockRedemptions = [
-      AdminRedemptionItem(
-        id: 'TXN-RED-481920',
-        beneficiaryName: 'أحمد سعيد الغامدي',
-        cardId: 'QOUT-CARD-784920',
-        merchantName: 'أسواق النخبة المركزية',
-        amount: 250.0,
-        foodBaskets: 1,
-        city: 'الرياض',
-        timestamp: DateTime.now().subtract(const Duration(minutes: 18)),
-      ),
-      AdminRedemptionItem(
-        id: 'TXN-RED-481912',
-        beneficiaryName: 'فاطمة مسفر العتيبي',
-        cardId: 'QOUT-CARD-554210',
-        merchantName: 'صيدليات الشفاء التخصصية',
-        amount: 180.0,
-        foodBaskets: 0,
-        city: 'جدة',
-        timestamp: DateTime.now().subtract(const Duration(hours: 1, minutes: 40)),
-      ),
-      AdminRedemptionItem(
-        id: 'TXN-RED-481890',
-        beneficiaryName: 'إبراهيم سالم الدوسري',
-        cardId: 'QOUT-CARD-992140',
-        merchantName: 'تموينات ومخابز البركة',
-        amount: 400.0,
-        foodBaskets: 1,
-        city: 'الدمام',
-        timestamp: DateTime.now().subtract(const Duration(hours: 3)),
-      ),
-    ];
+    // 2. Live Redemptions Stream from Firestore
+    _redemptionsSubscription?.cancel();
+    _redemptionsSubscription = _repository
+        .getLiveRedemptionsStream()
+        .listen((redemptions) {
+      emit(state.copyWith(recentRedemptions: redemptions));
+    });
 
-    emit(state.copyWith(
-      merchants: mockMerchants,
-      recentRedemptions: mockRedemptions,
-    ));
+    // 3. Live Merchants Stream from Firestore
+    _merchantsSubscription?.cancel();
+    _merchantsSubscription = _repository
+        .getMerchantsStream()
+        .listen((merchants) {
+      emit(state.copyWith(
+        merchants: merchants,
+        activeMerchantsCount: merchants.where((m) => m.isActive).length,
+      ));
+    });
   }
 
-  void toggleMerchantStatus(String merchantId) {
-    final updatedList = state.merchants.map((m) {
-      if (m.id == merchantId) {
-        return AdminMerchantItem(
-          id: m.id,
-          name: m.name,
-          storeType: m.storeType,
-          city: m.city,
-          commercialReg: m.commercialReg,
-          totalTransactions: m.totalTransactions,
-          totalDisbursed: m.totalDisbursed,
-          isActive: !m.isActive,
-        );
-      }
-      return m;
-    }).toList();
+  Future<void> toggleMerchantStatus(String merchantId) async {
+    final currentMerchant = state.merchants.firstWhere(
+      (m) => m.id == merchantId,
+      orElse: () => const AdminMerchantItem(
+        id: '',
+        name: '',
+        storeType: '',
+        city: '',
+        commercialReg: '',
+        totalTransactions: 0,
+        totalDisbursed: 0,
+        isActive: true,
+      ),
+    );
 
-    emit(state.copyWith(merchants: updatedList));
+    if (currentMerchant.id.isNotEmpty) {
+      final newStatus = !currentMerchant.isActive;
+      await _repository.updateMerchantStatus(merchantId, newStatus);
+    }
   }
 
   void clearNotification() {
     emit(state.copyWith(notificationMessage: null));
+  }
+
+  @override
+  Future<void> close() {
+    _statsSubscription?.cancel();
+    _redemptionsSubscription?.cancel();
+    _merchantsSubscription?.cancel();
+    return super.close();
   }
 }

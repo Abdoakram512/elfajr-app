@@ -10,11 +10,13 @@ import '../../features/auth/views/login_view.dart';
 import '../../features/auth/views/register_view.dart';
 import '../../features/auth/views/role_selection_view.dart';
 import '../../features/beneficiary/views/beneficiary_main_view.dart';
-import '../../features/donor/views/donor_main_view.dart';
+import '../../features/info_content/views/about_us_view.dart';
+import '../../features/info_content/views/contact_support_view.dart';
+import '../../features/info_content/views/faq_view.dart';
+import '../../features/info_content/views/terms_privacy_view.dart';
 import '../../features/merchant/views/merchant_main_view.dart';
 import '../../features/onboarding/presentation/views/onboarding_view.dart';
 import '../../features/splash/presentation/views/splash_view.dart';
-import '../../features/volunteer/views/volunteer_main_view.dart';
 import 'route_names.dart';
 
 class AppRouter {
@@ -45,7 +47,7 @@ class AppRouter {
         builder: (context, state) {
           final role = state.extra is UserRole
               ? state.extra as UserRole
-              : UserRole.donor;
+              : UserRole.beneficiary;
           return BlocProvider(
             create: (_) => sl<AuthCubit>(),
             child: RegisterView(initialRole: role),
@@ -60,18 +62,10 @@ class AppRouter {
         ),
       ),
 
-      // Role-Based Dashboards
-      GoRoute(
-        path: RouteNames.donorDashboard,
-        builder: (context, state) => const DonorMainView(),
-      ),
+      // 3 Core Role-Based Dashboards
       GoRoute(
         path: RouteNames.beneficiaryDashboard,
         builder: (context, state) => const BeneficiaryMainView(),
-      ),
-      GoRoute(
-        path: RouteNames.volunteerDashboard,
-        builder: (context, state) => const VolunteerMainView(),
       ),
       GoRoute(
         path: RouteNames.merchantDashboard,
@@ -80,6 +74,24 @@ class AppRouter {
       GoRoute(
         path: RouteNames.adminDashboard,
         builder: (context, state) => const AdminMainView(),
+      ),
+
+      // Dynamic Informational & Support Pages
+      GoRoute(
+        path: RouteNames.aboutUs,
+        builder: (context, state) => const AboutUsView(),
+      ),
+      GoRoute(
+        path: RouteNames.faq,
+        builder: (context, state) => const FaqView(),
+      ),
+      GoRoute(
+        path: RouteNames.termsPrivacy,
+        builder: (context, state) => const TermsPrivacyView(),
+      ),
+      GoRoute(
+        path: RouteNames.contactSupport,
+        builder: (context, state) => const ContactSupportView(),
       ),
     ],
   );

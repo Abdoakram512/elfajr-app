@@ -81,10 +81,10 @@ class AdminState extends Equatable {
 
   const AdminState({
     this.currentTabIndex = 0,
-    this.totalFundsDisbursed = 485200.0,
-    this.totalBeneficiariesCount = 340,
-    this.activeMerchantsCount = 18,
-    this.totalRedemptionsCount = 1420,
+    this.totalFundsDisbursed = 0.0,
+    this.totalBeneficiariesCount = 0,
+    this.activeMerchantsCount = 0,
+    this.totalRedemptionsCount = 0,
     this.recentRedemptions = const [],
     this.merchants = const [],
     this.isLoading = false,

@@ -18,7 +18,7 @@ class RegisterView extends StatefulWidget {
 
   const RegisterView({
     super.key,
-    this.initialRole = UserRole.donor,
+    this.initialRole = UserRole.beneficiary,
   });
 
   @override
@@ -57,6 +57,7 @@ class _RegisterViewState extends State<RegisterView> {
 
   void _submitRegister() {
     if (_formKey.currentState?.validate() ?? false) {
+      final isMerchant = _selectedRole == UserRole.merchant;
       context.read<AuthCubit>().register(
             name: _nameController.text.trim(),
             email: _emailController.text.trim(),
@@ -64,7 +65,8 @@ class _RegisterViewState extends State<RegisterView> {
             role: _selectedRole,
             phone: _phoneController.text.trim(),
             city: _cityController.text.trim(),
-            extraDetails: _extraDetailsController.text.trim(),
+            storeName: isMerchant ? _nameController.text.trim() : null,
+            commercialReg: isMerchant ? _extraDetailsController.text.trim() : null,
           );
     }
   }
@@ -84,17 +86,15 @@ class _RegisterViewState extends State<RegisterView> {
             case UserRole.admin:
               context.go(RouteNames.adminDashboard);
               break;
-            case UserRole.volunteer:
-              context.go(RouteNames.volunteerDashboard);
-              break;
-            case UserRole.donor:
-              context.go(RouteNames.donorDashboard);
-              break;
             case UserRole.beneficiary:
               context.go(RouteNames.beneficiaryDashboard);
               break;
             case UserRole.merchant:
               context.go(RouteNames.merchantDashboard);
+              break;
+            case UserRole.volunteer:
+            case UserRole.donor:
+              context.go(RouteNames.beneficiaryDashboard);
               break;
           }
         } else if (state is AuthError) {

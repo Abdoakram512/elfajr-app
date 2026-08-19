@@ -9,10 +9,7 @@ import '../models/aid_card_model.dart';
 class DigitalAidCardWidget extends StatelessWidget {
   final AidCardModel card;
 
-  const DigitalAidCardWidget({
-    super.key,
-    required this.card,
-  });
+  const DigitalAidCardWidget({super.key, required this.card});
 
   void _showEnlargedQrDialog(BuildContext context) {
     showDialog(
@@ -47,20 +44,29 @@ class DigitalAidCardWidget extends StatelessWidget {
                 ),
                 const Gap(12),
                 Container(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(24),
                     border: Border.all(color: AppColors.borderLight, width: 2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                        blurRadius: 16,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
                   ),
                   child: QrImageView(
                     data: card.cardId,
                     version: QrVersions.auto,
-                    size: 200,
+                    size: 260,
                     gapless: false,
-                    embeddedImage: const AssetImage('assets/images/app_logo.png'),
+                    embeddedImage: const AssetImage(
+                      'assets/images/app_logo.png',
+                    ),
                     embeddedImageStyle: const QrEmbeddedImageStyle(
-                      size: Size(36, 36),
+                      size: Size(44, 44),
                     ),
                     eyeStyle: const QrEyeStyle(
                       eyeShape: QrEyeShape.square,
@@ -72,22 +78,41 @@ class DigitalAidCardWidget extends StatelessWidget {
                     ),
                   ),
                 ),
-                const Gap(14),
+                const Gap(16),
                 Text(
                   card.cardId,
                   style: const TextStyle(
-                    fontSize: 16,
+                    fontSize: 18,
                     fontWeight: FontWeight.w900,
-                    letterSpacing: 1.5,
+                    letterSpacing: 2,
                     color: AppColors.textPrimaryLight,
                   ),
                 ),
-                const Gap(6),
+                const Gap(4),
                 Text(
                   card.beneficiaryName,
                   style: const TextStyle(
                     fontSize: 14,
                     color: AppColors.textSecondaryLight,
+                  ),
+                ),
+                const Gap(8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primarySubtle,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: const Text(
+                    'وجّه الشاشة نحو ماسح الكاشير لإتمام الصرف',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary,
+                    ),
                   ),
                 ),
               ],
@@ -150,7 +175,10 @@ class DigitalAidCardWidget extends StatelessWidget {
                 ],
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.accent.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
@@ -177,34 +205,58 @@ class DigitalAidCardWidget extends StatelessWidget {
           // Center: QR Code + Entitlement Balances
           Row(
             children: [
-              // Interactive QR Code Thumbnail
+              // Interactive QR Code Thumbnail (Enlarged & Prominent)
               GestureDetector(
                 onTap: () => _showEnlargedQrDialog(context),
                 child: Container(
-                  padding: const EdgeInsets.all(6),
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
+                        color: Colors.black.withValues(alpha: 0.15),
+                        blurRadius: 10,
+                        offset: const Offset(0, 3),
                       ),
                     ],
                   ),
-                  child: QrImageView(
-                    data: card.cardId,
-                    version: QrVersions.auto,
-                    size: 80,
-                    eyeStyle: const QrEyeStyle(
-                      eyeShape: QrEyeShape.square,
-                      color: AppColors.primary,
-                    ),
-                    dataModuleStyle: const QrDataModuleStyle(
-                      dataModuleShape: QrDataModuleShape.square,
-                      color: AppColors.primaryDark,
-                    ),
+                  child: Column(
+                    children: [
+                      QrImageView(
+                        data: card.cardId,
+                        version: QrVersions.auto,
+                        size: 100,
+                        eyeStyle: const QrEyeStyle(
+                          eyeShape: QrEyeShape.square,
+                          color: AppColors.primary,
+                        ),
+                        dataModuleStyle: const QrDataModuleStyle(
+                          dataModuleShape: QrDataModuleShape.square,
+                          color: AppColors.primaryDark,
+                        ),
+                      ),
+                      const Gap(4),
+                      const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.fullscreen_rounded,
+                            size: 12,
+                            color: AppColors.primary,
+                          ),
+                          Gap(2),
+                          Text(
+                            'انقر للتكبير',
+                            style: TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),

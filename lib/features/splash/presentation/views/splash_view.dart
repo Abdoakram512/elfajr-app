@@ -35,7 +35,7 @@ class _SplashViewBody extends StatelessWidget {
         } else if (state is SplashNavigateToLogin) {
           context.go(RouteNames.login);
         } else if (state is SplashNavigateToDashboard) {
-          context.go(RouteNames.donorDashboard);
+          context.go(RouteNames.login);
         }
       },
       child: Scaffold(

@@ -1,19 +1,19 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../models/user_role.dart';
-import '../services/auth_service.dart';
+import '../repositories/auth_repository.dart';
 import 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
-  final AuthService _authService;
+  final AuthRepository _authRepository;
 
-  AuthCubit({required AuthService authService})
-      : _authService = authService,
+  AuthCubit({required AuthRepository authRepository})
+      : _authRepository = authRepository,
         super(AuthInitial());
 
   Future<void> checkAuthStatus() async {
     emit(AuthLoading());
     try {
-      final user = await _authService.getCurrentUserData();
+      final user = await _authRepository.getCurrentUser();
       if (user != null) {
         emit(Authenticated(user));
       } else {
@@ -27,12 +27,14 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> login({
     required String email,
     required String password,
+    bool rememberMe = true,
   }) async {
     emit(AuthLoading());
     try {
-      final user = await _authService.signInWithEmailAndPassword(
+      final user = await _authRepository.signIn(
         email: email,
         password: password,
+        rememberMe: rememberMe,
       );
       emit(Authenticated(user));
     } catch (e) {
@@ -47,18 +49,20 @@ class AuthCubit extends Cubit<AuthState> {
     required UserRole role,
     String? phone,
     String? city,
-    String? extraDetails,
+    String? storeName,
+    String? commercialReg,
   }) async {
     emit(AuthLoading());
     try {
-      final user = await _authService.registerWithEmailAndPassword(
+      final user = await _authRepository.register(
         email: email,
         password: password,
         name: name,
         role: role,
         phone: phone,
         city: city,
-        extraDetails: extraDetails,
+        storeName: storeName,
+        commercialReg: commercialReg,
       );
       emit(Authenticated(user));
     } catch (e) {
@@ -69,7 +73,7 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> resetPassword({required String email}) async {
     emit(AuthLoading());
     try {
-      await _authService.sendPasswordResetEmail(email: email);
+      await _authRepository.sendPasswordReset(email);
       emit(PasswordResetSent(email));
     } catch (e) {
       emit(AuthError(e.toString().replaceAll('Exception: ', '')));
@@ -79,10 +83,13 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> signOut() async {
     emit(AuthLoading());
     try {
-      await _authService.signOut();
+      await _authRepository.signOut();
       emit(Unauthenticated());
     } catch (e) {
       emit(AuthError(e.toString().replaceAll('Exception: ', '')));
     }
   }
+
+  String? getSavedEmail() => _authRepository.getSavedEmail();
+  bool getRememberMe() => _authRepository.getRememberMe();
 }
