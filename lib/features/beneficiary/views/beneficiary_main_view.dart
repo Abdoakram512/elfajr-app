@@ -9,14 +9,27 @@ import 'tabs/beneficiary_home_tab.dart';
 import 'tabs/beneficiary_profile_tab.dart';
 import 'tabs/beneficiary_redemptions_tab.dart';
 
-class BeneficiaryMainView extends StatefulWidget {
+class BeneficiaryMainView extends StatelessWidget {
   const BeneficiaryMainView({super.key});
 
   @override
-  State<BeneficiaryMainView> createState() => _BeneficiaryMainViewState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => getIt<BeneficiaryCubit>(),
+      child: const _BeneficiaryMainViewBody(),
+    );
+  }
 }
 
-class _BeneficiaryMainViewState extends State<BeneficiaryMainView> {
+class _BeneficiaryMainViewBody extends StatefulWidget {
+  const _BeneficiaryMainViewBody();
+
+  @override
+  State<_BeneficiaryMainViewBody> createState() =>
+      _BeneficiaryMainViewBodyState();
+}
+
+class _BeneficiaryMainViewBodyState extends State<_BeneficiaryMainViewBody> {
   int _currentTabIndex = 0;
 
   @override
@@ -29,31 +42,28 @@ class _BeneficiaryMainViewState extends State<BeneficiaryMainView> {
       const BeneficiaryProfileTab(),
     ];
 
-    return BlocProvider(
-      create: (context) => getIt<BeneficiaryCubit>(),
-      child: Scaffold(
-        body: IndexedStack(index: _currentTabIndex, children: tabs),
-        bottomNavigationBar: CustomBottomNavBar(
-          currentIndex: _currentTabIndex,
-          onTap: (index) => setState(() => _currentTabIndex = index),
-          items: [
-            CustomBottomNavBarItem(
-              icon: Icons.qr_code_2_outlined,
-              activeIcon: Icons.qr_code_2_rounded,
-              label: 'dashboard.tabs.home'.tr(),
-            ),
-            CustomBottomNavBarItem(
-              icon: Icons.receipt_long_outlined,
-              activeIcon: Icons.receipt_long_rounded,
-              label: 'dashboard.tabs.history'.tr(),
-            ),
-            CustomBottomNavBarItem(
-              icon: Icons.person_outline_rounded,
-              activeIcon: Icons.person_rounded,
-              label: 'dashboard.tabs.profile'.tr(),
-            ),
-          ],
-        ),
+    return Scaffold(
+      body: IndexedStack(index: _currentTabIndex, children: tabs),
+      bottomNavigationBar: CustomBottomNavBar(
+        currentIndex: _currentTabIndex,
+        onTap: (index) => setState(() => _currentTabIndex = index),
+        items: [
+          CustomBottomNavBarItem(
+            icon: Icons.qr_code_2_outlined,
+            activeIcon: Icons.qr_code_2_rounded,
+            label: 'dashboard.tabs.home'.tr(),
+          ),
+          CustomBottomNavBarItem(
+            icon: Icons.receipt_long_outlined,
+            activeIcon: Icons.receipt_long_rounded,
+            label: 'dashboard.tabs.history'.tr(),
+          ),
+          CustomBottomNavBarItem(
+            icon: Icons.person_outline_rounded,
+            activeIcon: Icons.person_rounded,
+            label: 'dashboard.tabs.profile'.tr(),
+          ),
+        ],
       ),
     );
   }

@@ -13,6 +13,8 @@ class DigitalAidCardWidget extends StatelessWidget {
   const DigitalAidCardWidget({super.key, required this.card});
 
   void _showEnlargedQrDialog(BuildContext context) {
+    final cleanedNationalId = card.nationalId.replaceAll(RegExp(r'\s+'), '');
+
     showDialog(
       context: context,
       builder: (dialogContext) {
@@ -32,7 +34,7 @@ class DigitalAidCardWidget extends StatelessWidget {
                     Text(
                       'digital_card.title'.tr(),
                       style: const TextStyle(
-                        fontSize: 16,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: AppColors.primary,
                       ),
@@ -63,12 +65,6 @@ class DigitalAidCardWidget extends StatelessWidget {
                     version: QrVersions.auto,
                     size: 260,
                     gapless: false,
-                    embeddedImage: const AssetImage(
-                      'assets/images/app_logo.png',
-                    ),
-                    embeddedImageStyle: const QrEmbeddedImageStyle(
-                      size: Size(44, 44),
-                    ),
                     eyeStyle: const QrEyeStyle(
                       eyeShape: QrEyeShape.square,
                       color: AppColors.primary,
@@ -83,7 +79,7 @@ class DigitalAidCardWidget extends StatelessWidget {
                 Text(
                   card.cardId,
                   style: const TextStyle(
-                    fontSize: 18,
+                    fontSize: 26,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 2,
                     color: AppColors.textPrimaryLight,
@@ -93,34 +89,47 @@ class DigitalAidCardWidget extends StatelessWidget {
                 Text(
                   card.beneficiaryName,
                   style: const TextStyle(
-                    fontSize: 14,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                     color: AppColors.textSecondaryLight,
                   ),
                 ),
-                const Gap(12),
-
-                // Action Print Button inside Dialog
+                if (cleanedNationalId.isNotEmpty) ...[
+                  const Gap(4),
+                  Text(
+                    'رقم البطاقة: $cleanedNationalId',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.primary,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ],
+                const Gap(16),
                 ElevatedButton.icon(
                   onPressed: () {
                     Navigator.pop(dialogContext);
                     CardPrinterService.printAidCard(card: card);
                   },
-                  icon: const Icon(Icons.print_rounded, size: 18),
+                  icon: const Icon(Icons.print_rounded, size: 20),
                   label: Text(
                     'digital_card.print_card_button'.tr(),
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
-                    minimumSize: const Size(double.infinity, 44),
+                    minimumSize: const Size(double.infinity, 48),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
                 ),
                 const Gap(8),
-
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12,
@@ -133,7 +142,7 @@ class DigitalAidCardWidget extends StatelessWidget {
                   child: Text(
                     'digital_card.print_guidance'.tr(),
                     style: const TextStyle(
-                      fontSize: 11,
+                      fontSize: 12,
                       fontWeight: FontWeight.bold,
                       color: AppColors.primary,
                     ),
@@ -151,6 +160,7 @@ class DigitalAidCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final currencyFormatter = NumberFormat('#,###');
     final dateFormatter = DateFormat('yyyy/MM/dd');
+    final cleanedNationalId = card.nationalId.replaceAll(RegExp(r'\s+'), '');
 
     return Container(
       width: double.infinity,
@@ -168,101 +178,82 @@ class DigitalAidCardWidget extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          // Header: Brand + Quick Print + Status Pill
+          // ── Header: Brand Title + Status Pill ────────────────────────────
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.15),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.credit_card_rounded,
-                      color: AppColors.accentLight,
-                      size: 18,
-                    ),
-                  ),
-                  const Gap(8),
-                  Text(
-                    'digital_card.title'.tr(),
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  // Quick Print Button
-                  InkWell(
-                    onTap: () => CardPrinterService.printAidCard(card: card),
-                    borderRadius: BorderRadius.circular(12),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              Expanded(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(7),
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.18),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.white24),
+                        shape: BoxShape.circle,
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.print_rounded, size: 14, color: Colors.white),
-                          const Gap(4),
-                          Text(
-                            'common.print'.tr(),
-                            style: const TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const Gap(8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.accent.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: AppColors.accentLight.withValues(alpha: 0.4),
-                      ),
-                    ),
-                    child: Text(
-                      card.isActive
-                          ? 'digital_card.status_active'.tr()
-                          : 'digital_card.status_pending'.tr(),
-                      style: const TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
+                      child: const Icon(
+                        Icons.credit_card_rounded,
                         color: AppColors.accentLight,
+                        size: 22,
                       ),
                     ),
+                    const Gap(10),
+                    Expanded(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: AlignmentDirectional.centerStart,
+                        child: Text(
+                          'digital_card.title'.tr(),
+                          maxLines: 1,
+                          style: const TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Gap(10),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.accent.withValues(alpha: 0.22),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: AppColors.accentLight.withValues(alpha: 0.45),
+                    width: 1.2,
                   ),
-                ],
+                ),
+                child: Text(
+                  card.isActive
+                      ? 'digital_card.status_active'.tr()
+                      : 'digital_card.status_pending'.tr(),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.accentLight,
+                  ),
+                ),
               ),
             ],
           ),
 
           const Gap(16),
 
-          // Center: QR Code + Entitlement Balances
+          // ── Center: QR Code + Balances ───────────────────────────────────
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Interactive QR Code Thumbnail (Enlarged & Prominent)
+              // QR Code Container
               GestureDetector(
                 onTap: () => _showEnlargedQrDialog(context),
                 child: Container(
@@ -272,18 +263,19 @@ class DigitalAidCardWidget extends StatelessWidget {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.15),
+                        color: Colors.black.withValues(alpha: 0.18),
                         blurRadius: 10,
                         offset: const Offset(0, 3),
                       ),
                     ],
                   ),
                   child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       QrImageView(
                         data: card.cardId,
                         version: QrVersions.auto,
-                        size: 100,
+                        size: 102,
                         eyeStyle: const QrEyeStyle(
                           eyeShape: QrEyeShape.square,
                           color: AppColors.primary,
@@ -299,14 +291,14 @@ class DigitalAidCardWidget extends StatelessWidget {
                         children: [
                           const Icon(
                             Icons.fullscreen_rounded,
-                            size: 12,
+                            size: 13,
                             color: AppColors.primary,
                           ),
                           const Gap(2),
                           Text(
                             'digital_card.tap_to_enlarge'.tr(),
                             style: const TextStyle(
-                              fontSize: 9,
+                              fontSize: 10.5,
                               fontWeight: FontWeight.bold,
                               color: AppColors.primary,
                             ),
@@ -324,59 +316,80 @@ class DigitalAidCardWidget extends StatelessWidget {
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      'digital_card.available_balance'.tr(),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.white.withValues(alpha: 0.8),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: AlignmentDirectional.centerStart,
+                      child: Text(
+                        'digital_card.available_balance'.tr(),
+                        maxLines: 1,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white.withValues(alpha: 0.9),
+                        ),
                       ),
                     ),
+                    const Gap(2),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.baseline,
                       textBaseline: TextBaseline.alphabetic,
                       children: [
-                        Text(
-                          currencyFormatter.format(card.totalBalance),
-                          style: const TextStyle(
-                            fontSize: 26,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.white,
+                        Flexible(
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: AlignmentDirectional.centerStart,
+                            child: Text(
+                              currencyFormatter.format(card.totalBalance),
+                              style: const TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
                         ),
-                        const Gap(4),
+                        const Gap(5),
                         Text(
                           'common.currency'.tr(),
                           style: const TextStyle(
-                            fontSize: 14,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: AppColors.accentLight,
                           ),
                         ),
                       ],
                     ),
-                    const Gap(6),
+                    const Gap(10),
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(4),
+                          padding: const EdgeInsets.all(5),
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.15),
+                            color: Colors.white.withValues(alpha: 0.18),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
                             Icons.shopping_basket_rounded,
-                            size: 12,
+                            size: 15,
                             color: AppColors.accentLight,
                           ),
                         ),
-                        const Gap(6),
-                        Text(
-                          '${card.foodBasketsQuota} ${'digital_card.baskets_unit'.tr()} ${'digital_card.food_baskets'.tr()}',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                        const Gap(8),
+                        Expanded(
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: AlignmentDirectional.centerStart,
+                            child: Text(
+                              '${card.foodBasketsQuota} ${'digital_card.baskets_unit'.tr()} ${'digital_card.food_baskets'.tr()}',
+                              maxLines: 1,
+                              style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
                         ),
                       ],
@@ -387,43 +400,212 @@ class DigitalAidCardWidget extends StatelessWidget {
             ],
           ),
 
-          const Gap(16),
+          const Gap(14),
           const Divider(color: Colors.white24, height: 1),
-          const Gap(12),
+          const Gap(10),
 
-          // Footer: Card ID + Beneficiary Name + Expiry
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          // ── Footer: Name + Expiry + Badges + Card/National ID ────────────
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              // 1. Beneficiary Name + Expiry Date
+              Row(
                 children: [
-                  Text(
-                    card.beneficiaryName,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                  Expanded(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: AlignmentDirectional.centerStart,
+                      child: Text(
+                        card.beneficiaryName,
+                        maxLines: 1,
+                        style: const TextStyle(
+                          fontSize: 17.5,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   ),
+                  const Gap(8),
                   Text(
-                    '${'digital_card.card_number'.tr()}: ${card.cardId}',
+                    '${'digital_card.expires_at'.tr()} ${dateFormatter.format(card.expiresAt)}',
                     style: TextStyle(
-                      fontSize: 11,
-                      color: Colors.white.withValues(alpha: 0.75),
-                      letterSpacing: 0.8,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white.withValues(alpha: 0.85),
                     ),
                   ),
                 ],
               ),
-              Text(
-                '${'digital_card.expires_at'.tr()} ${dateFormatter.format(card.expiresAt)}',
-                style: TextStyle(
-                  fontSize: 11,
-                  color: Colors.white.withValues(alpha: 0.75),
+
+              // 2. Badges (Social Status + Nationality + Field Research)
+              if (card.socialStatus != null || card.nationality != null) ...[
+                const Gap(6),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 9,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(7),
+                        ),
+                        child: Text(
+                          '${card.socialStatus ?? ''}${card.socialStatus != null && card.nationality != null ? ' • ' : ''}${card.nationality ?? ''}',
+                          maxLines: 1,
+                          style: const TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.accentLight,
+                          ),
+                        ),
+                      ),
+                      if (card.fieldResearchStatus?.isNotEmpty == true) ...[
+                        const Gap(6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 9,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.success.withValues(alpha: 0.28),
+                            borderRadius: BorderRadius.circular(7),
+                            border: Border.all(
+                              color: AppColors.accentLight.withValues(
+                                alpha: 0.5,
+                              ),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.check_circle_rounded,
+                                size: 13,
+                                color: AppColors.accentLight,
+                              ),
+                              const Gap(4),
+                              Text(
+                                card.fieldResearchStatus!,
+                                maxLines: 1,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+
+              const Gap(10),
+
+              // 3. Card Number + National ID (Extra Large & Highly Prominent)
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: AlignmentDirectional.centerStart,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '${'digital_card.card_number'.tr()}: ',
+                      style: const TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Text(
+                      card.cardId,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.accentLight,
+                        letterSpacing: 0.8,
+                      ),
+                    ),
+                    if (cleanedNationalId.isNotEmpty) ...[
+                      const Text(
+                        '   •   رقم البطاقة: ',
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Text(
+                        cleanedNationalId,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.white,
+                          letterSpacing: 0.8,
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ),
             ],
+          ),
+
+          const Gap(14),
+
+          // ── Bottom: Dedicated Sleek Print Action Bar ─────────────────────
+          InkWell(
+            onTap: () => CardPrinterService.printAidCard(card: card),
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.16),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.28),
+                  width: 1.2,
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.print_rounded,
+                      color: Colors.white,
+                      size: 17,
+                    ),
+                  ),
+                  const Gap(8),
+                  Text(
+                    'digital_card.print_card_button'.tr(),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),

@@ -26,8 +26,8 @@ class QoutRefreshIndicator extends StatefulWidget {
 
 class _QoutRefreshIndicatorState extends State<QoutRefreshIndicator>
     with TickerProviderStateMixin {
-  static const double _kTriggerThreshold = 95.0;
-  static const double _kMaxDragOffset = 145.0;
+  static const double _kTriggerThreshold = 105.0;
+  static const double _kMaxDragOffset = 155.0;
 
   double _dragOffset = 0.0;
   bool _isRefreshing = false;
@@ -45,14 +45,15 @@ class _QoutRefreshIndicatorState extends State<QoutRefreshIndicator>
   void initState() {
     super.initState();
 
-    _resetController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 320),
-    )..addListener(() {
-        setState(() {
-          _dragOffset = _resetAnimation.value;
+    _resetController =
+        AnimationController(
+          vsync: this,
+          duration: const Duration(milliseconds: 320),
+        )..addListener(() {
+          setState(() {
+            _dragOffset = _resetAnimation.value;
+          });
         });
-      });
 
     _pulseController = AnimationController(
       vsync: this,
@@ -155,14 +156,8 @@ class _QoutRefreshIndicatorState extends State<QoutRefreshIndicator>
   }
 
   void _animateToOffset(double target) {
-    _resetAnimation = Tween<double>(
-      begin: _dragOffset,
-      end: target,
-    ).animate(
-      CurvedAnimation(
-        parent: _resetController,
-        curve: Curves.easeOutBack,
-      ),
+    _resetAnimation = Tween<double>(begin: _dragOffset, end: target).animate(
+      CurvedAnimation(parent: _resetController, curve: Curves.easeOutBack),
     );
     _resetController.forward(from: 0.0);
   }
@@ -181,7 +176,7 @@ class _QoutRefreshIndicatorState extends State<QoutRefreshIndicator>
             child: widget.child,
           ),
 
-          // 2. Custom Qout Pull-to-Refresh Header
+          // 2. Custom Qout Pull-to-Refresh Header (immune to overflow)
           if (_dragOffset > 0)
             Positioned(
               top: 0,
@@ -189,13 +184,13 @@ class _QoutRefreshIndicatorState extends State<QoutRefreshIndicator>
               right: 0,
               height: _dragOffset,
               child: ClipRect(
-                child: Container(
-                  color: Colors.transparent,
-                  child: Center(
-                    child: Opacity(
-                      opacity: math.min(1.0, progress * 1.2),
-                      child: _buildHeaderContent(progress),
-                    ),
+                child: OverflowBox(
+                  minHeight: 0.0,
+                  maxHeight: 180.0,
+                  alignment: Alignment.center,
+                  child: Opacity(
+                    opacity: math.min(1.0, math.max(0.0, progress * 1.1)),
+                    child: _buildHeaderContent(progress),
                   ),
                 ),
               ),
@@ -207,14 +202,16 @@ class _QoutRefreshIndicatorState extends State<QoutRefreshIndicator>
 
   Widget _buildHeaderContent(double progress) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         // Prominent Glowing Animated Qout Seal (Wheat & Emerald Emblem)
         AnimatedBuilder(
           animation: Listenable.merge([_pulseController, _spinController]),
           builder: (context, child) {
-            final scale =
-                _isRefreshing ? _pulseScale.value : 0.85 + (progress * 0.25);
+            final scale = _isRefreshing
+                ? _pulseScale.value
+                : 0.85 + (progress * 0.25);
             final glow = _isRefreshing ? _pulseGlow.value : (progress * 14);
             final rotationAngle = _isRefreshing
                 ? _spinController.value * 2 * math.pi
@@ -223,8 +220,8 @@ class _QoutRefreshIndicatorState extends State<QoutRefreshIndicator>
             return Transform.scale(
               scale: scale,
               child: Container(
-                width: 60,
-                height: 60,
+                width: 58,
+                height: 58,
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     colors: [
@@ -238,7 +235,7 @@ class _QoutRefreshIndicatorState extends State<QoutRefreshIndicator>
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: _canRefresh ? AppColors.accent : Colors.white,
-                    width: 2.8,
+                    width: 2.6,
                   ),
                   boxShadow: [
                     BoxShadow(
@@ -246,13 +243,13 @@ class _QoutRefreshIndicatorState extends State<QoutRefreshIndicator>
                         alpha: _isRefreshing ? 0.50 : 0.30,
                       ),
                       blurRadius: glow,
-                      spreadRadius: _isRefreshing ? 3.5 : 1.0,
+                      spreadRadius: _isRefreshing ? 3.0 : 1.0,
                     ),
                     if (_isRefreshing)
                       BoxShadow(
                         color: AppColors.accent.withValues(alpha: 0.40),
-                        blurRadius: glow * 1.5,
-                        spreadRadius: 2.0,
+                        blurRadius: glow * 1.4,
+                        spreadRadius: 1.8,
                       ),
                   ],
                 ),
@@ -263,13 +260,13 @@ class _QoutRefreshIndicatorState extends State<QoutRefreshIndicator>
                     Transform.rotate(
                       angle: rotationAngle,
                       child: Container(
-                        width: 48,
-                        height: 48,
+                        width: 46,
+                        height: 46,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
                             color: Colors.white.withValues(alpha: 0.40),
-                            width: 2.0,
+                            width: 1.8,
                             strokeAlign: BorderSide.strokeAlignInside,
                           ),
                         ),
@@ -282,10 +279,10 @@ class _QoutRefreshIndicatorState extends State<QoutRefreshIndicator>
                         _isRefreshing
                             ? Icons.eco_rounded
                             : (_canRefresh
-                                ? Icons.spa_rounded
-                                : Icons.volunteer_activism_rounded),
+                                  ? Icons.spa_rounded
+                                  : Icons.volunteer_activism_rounded),
                         color: Colors.white,
-                        size: 30,
+                        size: 28,
                       ),
                     ),
                   ],
@@ -301,7 +298,7 @@ class _QoutRefreshIndicatorState extends State<QoutRefreshIndicator>
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.85),
+            color: Colors.white.withValues(alpha: 0.90),
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
@@ -328,10 +325,10 @@ class _QoutRefreshIndicatorState extends State<QoutRefreshIndicator>
                 _isRefreshing
                     ? (widget.refreshingText ?? 'common.refreshing'.tr())
                     : (_canRefresh
-                        ? 'common.release_to_refresh'.tr()
-                        : 'common.pull_to_refresh'.tr()),
+                          ? 'common.release_to_refresh'.tr()
+                          : 'common.pull_to_refresh'.tr()),
                 style: TextStyle(
-                  fontSize: 12.5,
+                  fontSize: 12.0,
                   fontWeight: FontWeight.bold,
                   color: _canRefresh
                       ? AppColors.primaryDark

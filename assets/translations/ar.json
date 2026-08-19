@@ -16,8 +16,9 @@
     "error": "حدث خطأ ما",
     "retry": "إعادة المحاولة",
     "logout": "تسجيل الخروج",
-    "currency": "ر.س",
-    "sar": "ريال",
+    "currency": "ج.م",
+    "sar": "جنيه",
+    "egp": "جنيه",
     "search": "بحث",
     "print": "طباعة",
     "share": "مشاركة",
@@ -109,7 +110,8 @@
     "show_qr_dialog": "تكبير الرمز للمسح",
     "print_card_button": "طباعة البطاقة الورقية / مشاركة PDF",
     "print_guidance": "وجّه الشاشة نحو ماسح الكاشير أو اطبع البطاقة الورقية",
-    "tap_to_enlarge": "انقر للتكبير"
+    "tap_to_enlarge": "انقر للتكبير",
+    "passport_or_id": "رقم الجواز / البطاقة"
   },
   "merchant": {
     "greeting": "أهلاً بك، منفذ الصرف المعتمد 🏪",
@@ -124,10 +126,10 @@
     "beneficiary_details": "بيانات المستفيد المستحق",
     "beneficiary_label": "المستفيد",
     "national_id": "رقم الهوية",
-    "enter_deduction_amount": "مبلغ المشتريات المراد خصمه (ر.س)",
+    "enter_deduction_amount": "مبلغ المشتريات المراد خصمه (ج.م)",
     "deduct_food_basket": "صرف سلة تموينية (خصم 1 سلة)",
     "confirm_redemption": "تأكيد عملية الصرف والخصم",
-    "redemption_success": "تمت عملية الصرف بنجاح! تم خصم {} ر.س من كارت المستفيد.",
+    "redemption_success": "تمت عملية الصرف بنجاح! تم خصم {} ج.م من كارت المستفيد.",
     "invalid_card": "رمز الـ QR غير صالح أو أن الكارت غير مفعل.",
     "card_not_registered": "كارت الإغاثة غير مسجل أو غير صالح",
     "search_query_empty": "يرجى إدخال رقم الهوية الوطنية أو رقم الكارت",
@@ -178,7 +180,7 @@
       "remaining": "المتبقي",
       "donate_now": "تبرع الآن",
       "quick_donate_title": "مبلغ التبرع السريع",
-      "donation_success": "جزاك الله خيراً! تم تسجيل تبرعك بمبلغ {} ر.س بنجاح."
+      "donation_success": "جزاك الله خيراً! تم تسجيل تبرعك بمبلغ {} ج.م بنجاح."
     },
     "beneficiary": {
       "greeting": "مرحباً بك في قوت، كارتك الإغاثي جاهز 🤝",
@@ -260,7 +262,13 @@
     "txns_unit": "عملية",
     "families_unit": "أسرة",
     "stores_unit": "منفذ",
-    "store_info": "بيانات المنفذ والمتجر",
+    "beneficiary_case_details": "بيانات الحالة والتوثيق الميداني",
+    "medical_and_needs_title": "الدعم الطبي والمساعدات المسجلة",
+    "social_status_label": "الحالة الاجتماعية والوضع الأسري",
+    "nationality_label": "الجنسية والتصنيف",
+    "field_research_label": "حالة البحث الميداني",
+    "medical_aid_label": "الرعاية الطبية والعمليات",
+    "inkind_needs_label": "المساعدات والأجهزة العينية",
     "personal_info": "البيانات الشخصية والمعلومات",
     "language_settings": "إعدادات اللغة والمظهر",
     "system_info": "معلومات المنظومة والسياسات",

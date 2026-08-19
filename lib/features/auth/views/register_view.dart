@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../app/service_locator.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/routes/route_names.dart';
 import '../../../../core/widgets/custom_text_field.dart';
@@ -13,7 +14,7 @@ import '../models/user_role.dart';
 import '../view_models/auth_cubit.dart';
 import '../view_models/auth_state.dart';
 
-class RegisterView extends StatefulWidget {
+class RegisterView extends StatelessWidget {
   final UserRole initialRole;
 
   const RegisterView({
@@ -22,10 +23,26 @@ class RegisterView extends StatefulWidget {
   });
 
   @override
-  State<RegisterView> createState() => _RegisterViewState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => getIt<AuthCubit>(),
+      child: _RegisterViewBody(initialRole: initialRole),
+    );
+  }
 }
 
-class _RegisterViewState extends State<RegisterView> {
+class _RegisterViewBody extends StatefulWidget {
+  final UserRole initialRole;
+
+  const _RegisterViewBody({
+    required this.initialRole,
+  });
+
+  @override
+  State<_RegisterViewBody> createState() => _RegisterViewBodyState();
+}
+
+class _RegisterViewBodyState extends State<_RegisterViewBody> {
   final _formKey = GlobalKey<FormState>();
   late UserRole _selectedRole;
 

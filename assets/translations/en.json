@@ -16,8 +16,9 @@
     "error": "Something went wrong",
     "retry": "Try Again",
     "logout": "Sign Out",
-    "currency": "SAR",
-    "sar": "SAR",
+    "currency": "EGP",
+    "sar": "EGP",
+    "egp": "EGP",
     "search": "Search",
     "print": "Print",
     "share": "Share",
@@ -109,7 +110,8 @@
     "show_qr_dialog": "Enlarge QR Code",
     "print_card_button": "Print Physical Card / Share PDF",
     "print_guidance": "Present this code to the cashier or print physical card",
-    "tap_to_enlarge": "Tap to enlarge"
+    "tap_to_enlarge": "Tap to enlarge",
+    "passport_or_id": "Passport / National ID"
   },
   "merchant": {
     "greeting": "Welcome, Authorized Aid Dispenser 🏪",
@@ -124,10 +126,10 @@
     "beneficiary_details": "Eligible Beneficiary Details",
     "beneficiary_label": "Beneficiary",
     "national_id": "National ID",
-    "enter_deduction_amount": "Purchase amount to deduct (SAR)",
+    "enter_deduction_amount": "Purchase amount to deduct (EGP)",
     "deduct_food_basket": "Disburse Food Basket (1 basket)",
     "confirm_redemption": "Confirm & Deduct Balance",
-    "redemption_success": "Redemption confirmed! {} SAR deducted successfully.",
+    "redemption_success": "Redemption confirmed! {} EGP deducted successfully.",
     "invalid_card": "Invalid QR code or card is not active.",
     "card_not_registered": "Aid card is not registered or invalid",
     "search_query_empty": "Please enter National ID or Card number",
@@ -178,7 +180,7 @@
       "remaining": "Remaining",
       "donate_now": "Donate Now",
       "quick_donate_title": "Quick Donation Amount",
-      "donation_success": "Thank you! Your donation of {} SAR was recorded successfully."
+      "donation_success": "Thank you! Your donation of {} EGP was recorded successfully."
     },
     "beneficiary": {
       "greeting": "Welcome to Qout, your digital aid card is ready 🤝",
@@ -260,7 +262,13 @@
     "txns_unit": "Transactions",
     "families_unit": "Families",
     "stores_unit": "Stores",
-    "store_info": "Store & Merchant Info",
+    "beneficiary_case_details": "Case Details & Verification",
+    "medical_and_needs_title": "Medical Care & Registered Needs",
+    "social_status_label": "Social & Family Status",
+    "nationality_label": "Nationality & Origin",
+    "field_research_label": "Field Research Status",
+    "medical_aid_label": "Free Medical Care",
+    "inkind_needs_label": "In-Kind Household Needs",
     "personal_info": "Personal Information",
     "language_settings": "Language & Appearance",
     "system_info": "System & Policies Info",

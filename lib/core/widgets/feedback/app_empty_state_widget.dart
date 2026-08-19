@@ -31,11 +31,7 @@ class AppEmptyStateWidget extends StatelessWidget {
                 color: AppColors.primarySubtle,
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                icon,
-                size: 40,
-                color: AppColors.primary,
-              ),
+              child: Icon(icon, size: 40, color: AppColors.primary),
             ),
             const Gap(16),
             Text(
@@ -59,10 +55,7 @@ class AppEmptyStateWidget extends StatelessWidget {
                 ),
               ),
             ],
-            if (actionButton != null) ...[
-              const Gap(20),
-              actionButton!,
-            ],
+            if (actionButton != null) ...[const Gap(20), actionButton!],
           ],
         ),
       ),

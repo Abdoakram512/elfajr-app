@@ -1,10 +1,7 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../app/service_locator.dart';
 import '../../features/admin/views/admin_main_view.dart';
 import '../../features/auth/models/user_role.dart';
-import '../../features/auth/view_models/auth_cubit.dart';
 import '../../features/auth/views/forgot_password_view.dart';
 import '../../features/auth/views/login_view.dart';
 import '../../features/auth/views/register_view.dart';
@@ -37,10 +34,7 @@ class AppRouter {
       ),
       GoRoute(
         path: RouteNames.login,
-        builder: (context, state) => BlocProvider(
-          create: (_) => getIt<AuthCubit>(),
-          child: const LoginView(),
-        ),
+        builder: (context, state) => const LoginView(),
       ),
       GoRoute(
         path: RouteNames.register,
@@ -48,18 +42,12 @@ class AppRouter {
           final role = state.extra is UserRole
               ? state.extra as UserRole
               : UserRole.beneficiary;
-          return BlocProvider(
-            create: (_) => getIt<AuthCubit>(),
-            child: RegisterView(initialRole: role),
-          );
+          return RegisterView(initialRole: role);
         },
       ),
       GoRoute(
         path: RouteNames.forgotPassword,
-        builder: (context, state) => BlocProvider(
-          create: (_) => getIt<AuthCubit>(),
-          child: const ForgotPasswordView(),
-        ),
+        builder: (context, state) => const ForgotPasswordView(),
       ),
 
       // 3 Core Role-Based Dashboards

@@ -141,22 +141,30 @@ class BeneficiaryProfileTab extends StatelessWidget {
 
                 // 2. Beneficiary Official Card Details
                 ProfileSectionCard(
-                  title: 'profile.beneficiary_card_title'.tr(),
-                  icon: Icons.credit_card_rounded,
+                  title: 'profile.beneficiary_case_details'.tr(),
+                  icon: Icons.badge_outlined,
                   children: [
                     ProfileInfoRow(
                       label: 'digital_card.card_number'.tr(),
                       value: card?.cardId ?? '-',
                     ),
                     ProfileInfoRow(
-                      label: 'profile.national_id_label'.tr(),
-                      value: card?.nationalId ?? '-',
+                      label: 'digital_card.passport_or_id'.tr(),
+                      value: user?.nationalId ?? card?.nationalId ?? '-',
                     ),
                     ProfileInfoRow(
-                      label: 'digital_card.family_count'.tr(),
-                      value: card != null
-                          ? '${card.familyCount} ${'digital_card.persons'.tr()}'
-                          : '-',
+                      label: 'profile.social_status_label'.tr(),
+                      value: user?.socialStatus ?? card?.socialStatus ?? '-',
+                      valueColor: AppColors.primary,
+                    ),
+                    ProfileInfoRow(
+                      label: 'profile.nationality_label'.tr(),
+                      value: user?.nationality ?? card?.nationality ?? '-',
+                    ),
+                    ProfileInfoRow(
+                      label: 'profile.field_research_label'.tr(),
+                      value: user?.fieldResearchStatus ?? card?.fieldResearchStatus ?? 'digital_card.status_active'.tr(),
+                      valueColor: AppColors.success,
                     ),
                     ProfileInfoRow(
                       label: 'profile.eligibility_status_label'.tr(),
@@ -176,6 +184,29 @@ class BeneficiaryProfileTab extends StatelessWidget {
                     ),
                   ],
                 ),
+
+                if ((user?.medicalNotes?.isNotEmpty == true) ||
+                    (user?.inKindNeeds?.isNotEmpty == true)) ...[
+                  const Gap(16),
+                  ProfileSectionCard(
+                    title: 'profile.medical_and_needs_title'.tr(),
+                    icon: Icons.health_and_safety_outlined,
+                    children: [
+                      if (user?.medicalNotes?.isNotEmpty == true)
+                        ProfileInfoRow(
+                          label: 'profile.medical_aid_label'.tr(),
+                          value: user!.medicalNotes!,
+                          valueColor: AppColors.primaryDark,
+                        ),
+                      if (user?.inKindNeeds?.isNotEmpty == true)
+                        ProfileInfoRow(
+                          label: 'profile.inkind_needs_label'.tr(),
+                          value: user!.inKindNeeds!,
+                          showDivider: false,
+                        ),
+                    ],
+                  ),
+                ],
 
                 const Gap(16),
 

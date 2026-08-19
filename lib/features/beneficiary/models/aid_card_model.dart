@@ -48,6 +48,9 @@ class AidCardModel extends Equatable {
   final double totalBalance;
   final int foodBasketsQuota;
   final AidCardStatus status;
+  final String? socialStatus;
+  final String? nationality;
+  final String? fieldResearchStatus;
   final String? issuedByVolunteerId;
   final DateTime? activatedAt;
   final DateTime expiresAt;
@@ -62,6 +65,9 @@ class AidCardModel extends Equatable {
     required this.totalBalance,
     required this.foodBasketsQuota,
     this.status = AidCardStatus.active,
+    this.socialStatus,
+    this.nationality,
+    this.fieldResearchStatus,
     this.issuedByVolunteerId,
     this.activatedAt,
     required this.expiresAt,
@@ -80,6 +86,9 @@ class AidCardModel extends Equatable {
     double? totalBalance,
     int? foodBasketsQuota,
     AidCardStatus? status,
+    String? socialStatus,
+    String? nationality,
+    String? fieldResearchStatus,
     String? issuedByVolunteerId,
     DateTime? activatedAt,
     DateTime? expiresAt,
@@ -94,6 +103,9 @@ class AidCardModel extends Equatable {
       totalBalance: totalBalance ?? this.totalBalance,
       foodBasketsQuota: foodBasketsQuota ?? this.foodBasketsQuota,
       status: status ?? this.status,
+      socialStatus: socialStatus ?? this.socialStatus,
+      nationality: nationality ?? this.nationality,
+      fieldResearchStatus: fieldResearchStatus ?? this.fieldResearchStatus,
       issuedByVolunteerId: issuedByVolunteerId ?? this.issuedByVolunteerId,
       activatedAt: activatedAt ?? this.activatedAt,
       expiresAt: expiresAt ?? this.expiresAt,
@@ -111,6 +123,9 @@ class AidCardModel extends Equatable {
       'totalBalance': totalBalance,
       'foodBasketsQuota': foodBasketsQuota,
       'status': status.nameString,
+      'socialStatus': socialStatus,
+      'nationality': nationality,
+      'fieldResearchStatus': fieldResearchStatus,
       'issuedByVolunteerId': issuedByVolunteerId,
       'activatedAt': activatedAt?.toIso8601String(),
       'expiresAt': expiresAt.toIso8601String(),
@@ -131,14 +146,17 @@ class AidCardModel extends Equatable {
 
   factory AidCardModel.fromMap(Map<String, dynamic> map, {String? documentId}) {
     return AidCardModel(
-      cardId: documentId ?? (map['cardId'] as String? ?? 'QOUT-CARD-784920'),
+      cardId: documentId ?? (map['cardId'] as String? ?? 'QOUT-CARD-002'),
       beneficiaryId: map['beneficiaryId'] as String? ?? '',
-      beneficiaryName: map['beneficiaryName'] as String? ?? 'أحمد سعيد الغامدي',
-      nationalId: map['nationalId'] as String? ?? '1089283746',
-      familyCount: map['familyCount'] as int? ?? 5,
+      beneficiaryName: map['beneficiaryName'] as String? ?? 'مستفيد',
+      nationalId: map['nationalId'] as String? ?? '',
+      familyCount: map['familyCount'] as int? ?? 4,
       totalBalance: (map['totalBalance'] as num?)?.toDouble() ?? 600.0,
       foodBasketsQuota: map['foodBasketsQuota'] as int? ?? 2,
       status: AidCardStatus.fromString(map['status'] as String?),
+      socialStatus: map['socialStatus'] as String?,
+      nationality: map['nationality'] as String?,
+      fieldResearchStatus: map['fieldResearchStatus'] as String?,
       issuedByVolunteerId: map['issuedByVolunteerId'] as String?,
       activatedAt: map['activatedAt'] != null ? _parseDate(map['activatedAt']) : null,
       expiresAt: _parseDate(map['expiresAt']),
@@ -156,6 +174,9 @@ class AidCardModel extends Equatable {
         totalBalance,
         foodBasketsQuota,
         status,
+        socialStatus,
+        nationality,
+        fieldResearchStatus,
         issuedByVolunteerId,
         activatedAt,
         expiresAt,

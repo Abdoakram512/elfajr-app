@@ -145,8 +145,8 @@ class CardPrinterService {
                       _buildPdfInfoItem(
                         font: font,
                         fontRegular: fontRegular,
-                        label: 'الهوية الوطنية',
-                        value: card.nationalId,
+                        label: 'رقم البطاقة / الجواز',
+                        value: card.nationalId.replaceAll(RegExp(r'\s+'), ''),
                       ),
                       _buildPdfInfoItem(
                         font: font,

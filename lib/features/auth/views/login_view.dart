@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../app/service_locator.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/routes/route_names.dart';
 import '../../../../core/widgets/custom_text_field.dart';
@@ -13,14 +14,26 @@ import '../models/user_role.dart';
 import '../view_models/auth_cubit.dart';
 import '../view_models/auth_state.dart';
 
-class LoginView extends StatefulWidget {
+class LoginView extends StatelessWidget {
   const LoginView({super.key});
 
   @override
-  State<LoginView> createState() => _LoginViewState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => getIt<AuthCubit>(),
+      child: const _LoginViewBody(),
+    );
+  }
 }
 
-class _LoginViewState extends State<LoginView> {
+class _LoginViewBody extends StatefulWidget {
+  const _LoginViewBody();
+
+  @override
+  State<_LoginViewBody> createState() => _LoginViewBodyState();
+}
+
+class _LoginViewBodyState extends State<_LoginViewBody> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -93,10 +106,7 @@ class _LoginViewState extends State<LoginView> {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [
-                  AppColors.primarySubtle,
-                  AppColors.backgroundLight,
-                ],
+                colors: [AppColors.primarySubtle, AppColors.backgroundLight],
                 stops: [0.0, 0.4],
               ),
             ),
@@ -165,7 +175,9 @@ class _LoginViewState extends State<LoginView> {
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.primary.withValues(alpha: 0.2),
+                                  color: AppColors.primary.withValues(
+                                    alpha: 0.2,
+                                  ),
                                   blurRadius: 20,
                                   offset: const Offset(0, 8),
                                 ),
@@ -178,10 +190,10 @@ class _LoginViewState extends State<LoginView> {
                                 fit: BoxFit.contain,
                                 errorBuilder: (context, error, stackTrace) =>
                                     const Icon(
-                                  Icons.volunteer_activism_rounded,
-                                  size: 40,
-                                  color: AppColors.primary,
-                                ),
+                                      Icons.volunteer_activism_rounded,
+                                      size: 40,
+                                      color: AppColors.primary,
+                                    ),
                               ),
                             ),
                           ),
@@ -192,14 +204,14 @@ class _LoginViewState extends State<LoginView> {
 
                       // Welcome Back Title
                       Text(
-                        'auth.welcome_back'.tr(),
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.headlineMedium
-                            ?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimaryLight,
-                            ),
-                      )
+                            'auth.welcome_back'.tr(),
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.headlineMedium
+                                ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.textPrimaryLight,
+                                ),
+                          )
                           .animate()
                           .fadeIn(duration: 300.ms)
                           .slideY(begin: 0.2, end: 0),
@@ -219,21 +231,22 @@ class _LoginViewState extends State<LoginView> {
 
                       // Email Field
                       CustomTextField(
-                        controller: _emailController,
-                        label: 'auth.email'.tr(),
-                        hint: 'example@domain.com',
-                        prefixIcon: Icons.email_outlined,
-                        keyboardType: TextInputType.emailAddress,
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'auth.validation_email_required'.tr();
-                          }
-                          if (!value.contains('@') || !value.contains('.')) {
-                            return 'auth.validation_email_invalid'.tr();
-                          }
-                          return null;
-                        },
-                      )
+                            controller: _emailController,
+                            label: 'auth.email'.tr(),
+                            hint: 'example@domain.com',
+                            prefixIcon: Icons.email_outlined,
+                            keyboardType: TextInputType.emailAddress,
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'auth.validation_email_required'.tr();
+                              }
+                              if (!value.contains('@') ||
+                                  !value.contains('.')) {
+                                return 'auth.validation_email_invalid'.tr();
+                              }
+                              return null;
+                            },
+                          )
                           .animate()
                           .fadeIn(delay: 200.ms, duration: 400.ms)
                           .slideX(begin: 0.1, end: 0),
@@ -242,21 +255,21 @@ class _LoginViewState extends State<LoginView> {
 
                       // Password Field
                       CustomTextField(
-                        controller: _passwordController,
-                        label: 'auth.password'.tr(),
-                        hint: '••••••••',
-                        prefixIcon: Icons.lock_outline_rounded,
-                        isPassword: true,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'auth.validation_password_required'.tr();
-                          }
-                          if (value.length < 6) {
-                            return 'auth.validation_password_min'.tr();
-                          }
-                          return null;
-                        },
-                      )
+                            controller: _passwordController,
+                            label: 'auth.password'.tr(),
+                            hint: '••••••••',
+                            prefixIcon: Icons.lock_outline_rounded,
+                            isPassword: true,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'auth.validation_password_required'.tr();
+                              }
+                              if (value.length < 6) {
+                                return 'auth.validation_password_min'.tr();
+                              }
+                              return null;
+                            },
+                          )
                           .animate()
                           .fadeIn(delay: 300.ms, duration: 400.ms)
                           .slideX(begin: 0.1, end: 0),
@@ -347,10 +360,10 @@ class _LoginViewState extends State<LoginView> {
 
                       // Login Button
                       PrimaryButton(
-                        text: 'auth.login'.tr(),
-                        isLoading: isLoading,
-                        onPressed: _submitLogin,
-                      )
+                            text: 'auth.login'.tr(),
+                            isLoading: isLoading,
+                            onPressed: _submitLogin,
+                          )
                           .animate()
                           .fadeIn(delay: 400.ms, duration: 400.ms)
                           .slideY(begin: 0.1, end: 0),

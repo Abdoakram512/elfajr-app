@@ -5,20 +5,33 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../app/service_locator.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../view_models/auth_cubit.dart';
 import '../view_models/auth_state.dart';
 
-class ForgotPasswordView extends StatefulWidget {
+class ForgotPasswordView extends StatelessWidget {
   const ForgotPasswordView({super.key});
 
   @override
-  State<ForgotPasswordView> createState() => _ForgotPasswordViewState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => getIt<AuthCubit>(),
+      child: const _ForgotPasswordViewBody(),
+    );
+  }
 }
 
-class _ForgotPasswordViewState extends State<ForgotPasswordView> {
+class _ForgotPasswordViewBody extends StatefulWidget {
+  const _ForgotPasswordViewBody();
+
+  @override
+  State<_ForgotPasswordViewBody> createState() => _ForgotPasswordViewBodyState();
+}
+
+class _ForgotPasswordViewBodyState extends State<_ForgotPasswordViewBody> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
 

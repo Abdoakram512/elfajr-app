@@ -9,14 +9,26 @@ import 'tabs/merchant_history_tab.dart';
 import 'tabs/merchant_home_tab.dart';
 import 'tabs/merchant_profile_tab.dart';
 
-class MerchantMainView extends StatefulWidget {
+class MerchantMainView extends StatelessWidget {
   const MerchantMainView({super.key});
 
   @override
-  State<MerchantMainView> createState() => _MerchantMainViewState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => getIt<MerchantDashboardCubit>(),
+      child: const _MerchantMainViewBody(),
+    );
+  }
 }
 
-class _MerchantMainViewState extends State<MerchantMainView> {
+class _MerchantMainViewBody extends StatefulWidget {
+  const _MerchantMainViewBody();
+
+  @override
+  State<_MerchantMainViewBody> createState() => _MerchantMainViewBodyState();
+}
+
+class _MerchantMainViewBodyState extends State<_MerchantMainViewBody> {
   int _currentTabIndex = 0;
 
   void _onSwitchTab(int index) {
@@ -31,34 +43,28 @@ class _MerchantMainViewState extends State<MerchantMainView> {
       const MerchantProfileTab(),
     ];
 
-    return BlocProvider(
-      create: (context) => getIt<MerchantDashboardCubit>(),
-      child: Scaffold(
-        body: IndexedStack(
-          index: _currentTabIndex,
-          children: tabs,
-        ),
-        bottomNavigationBar: CustomBottomNavBar(
-          currentIndex: _currentTabIndex,
-          onTap: _onSwitchTab,
-          items: [
-            CustomBottomNavBarItem(
-              icon: Icons.storefront_outlined,
-              activeIcon: Icons.storefront_rounded,
-              label: 'dashboard.tabs.home'.tr(),
-            ),
-            CustomBottomNavBarItem(
-              icon: Icons.receipt_long_outlined,
-              activeIcon: Icons.receipt_long_rounded,
-              label: 'dashboard.tabs.history'.tr(),
-            ),
-            CustomBottomNavBarItem(
-              icon: Icons.person_outline_rounded,
-              activeIcon: Icons.person_rounded,
-              label: 'dashboard.tabs.profile'.tr(),
-            ),
-          ],
-        ),
+    return Scaffold(
+      body: IndexedStack(index: _currentTabIndex, children: tabs),
+      bottomNavigationBar: CustomBottomNavBar(
+        currentIndex: _currentTabIndex,
+        onTap: _onSwitchTab,
+        items: [
+          CustomBottomNavBarItem(
+            icon: Icons.storefront_outlined,
+            activeIcon: Icons.storefront_rounded,
+            label: 'dashboard.tabs.home'.tr(),
+          ),
+          CustomBottomNavBarItem(
+            icon: Icons.receipt_long_outlined,
+            activeIcon: Icons.receipt_long_rounded,
+            label: 'dashboard.tabs.history'.tr(),
+          ),
+          CustomBottomNavBarItem(
+            icon: Icons.person_outline_rounded,
+            activeIcon: Icons.person_rounded,
+            label: 'dashboard.tabs.profile'.tr(),
+          ),
+        ],
       ),
     );
   }

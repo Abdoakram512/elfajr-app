@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../app/service_locator.dart';
 import '../../auth/view_models/auth_cubit.dart';
@@ -13,8 +14,8 @@ class BeneficiaryCubit extends Cubit<BeneficiaryState> {
   StreamSubscription<List<BeneficiaryRedemptionItem>>? _redemptionsSubscription;
 
   BeneficiaryCubit({BeneficiaryRepository? repository})
-      : _repository = repository ?? getIt<BeneficiaryRepository>(),
-        super(const BeneficiaryState()) {
+    : _repository = repository ?? getIt<BeneficiaryRepository>(),
+      super(const BeneficiaryState()) {
     initDataStreams();
   }
 
@@ -22,26 +23,39 @@ class BeneficiaryCubit extends Cubit<BeneficiaryState> {
     final authState = getIt<AuthCubit>().state;
     final user = authState is Authenticated ? authState.user : null;
 
-    final beneficiaryId = user?.uid ?? 'usr_ben_ahmed';
-    final cardId = user?.activeCardId ?? 'QOUT-CARD-784920';
+    if (user == null) {
+      debugPrint('[BeneficiaryCubit] ⚠️ No authenticated user - skipping streams');
+      return;
+    }
+
+    final beneficiaryId = user.uid;
+    final cardId = user.activeCardId?.isNotEmpty == true
+        ? user.activeCardId!
+        : beneficiaryId.replaceFirst('usr_ben_case_', 'QOUT-CARD-');
+
+    debugPrint('[BeneficiaryCubit] 🔍 user.uid       = $beneficiaryId');
+    debugPrint('[BeneficiaryCubit] 🔍 user.activeCardId = ${user.activeCardId}');
+    debugPrint('[BeneficiaryCubit] 🔍 derived cardId = $cardId');
 
     // 1. Subscribe to Live Aid Card from Firestore
     _cardSubscription?.cancel();
     _cardSubscription = _repository
         .getActiveAidCard(beneficiaryId: beneficiaryId, cardId: cardId)
         .listen((card) {
-      if (card != null) {
-        emit(state.copyWith(activeCard: card));
-      }
-    });
+          debugPrint('[BeneficiaryCubit] 📥 card received = ${card?.cardId} (null=${card == null})');
+          if (card != null) {
+            emit(state.copyWith(activeCard: card));
+          }
+        });
 
     // 2. Subscribe to Live Redemptions from Firestore
     _redemptionsSubscription?.cancel();
     _redemptionsSubscription = _repository
         .getRedemptionsHistory(beneficiaryId: beneficiaryId, cardId: cardId)
         .listen((redemptions) {
-      emit(state.copyWith(redemptions: redemptions));
-    });
+          debugPrint('[BeneficiaryCubit] 📥 redemptions count = ${redemptions.length}');
+          emit(state.copyWith(redemptions: redemptions));
+        });
   }
 
   Future<void> refreshData() async {

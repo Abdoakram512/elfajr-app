@@ -32,7 +32,7 @@ class _AdminProfileTabBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authState = context.watch<AuthCubit>().state;
+    final authState = getIt<AuthCubit>().state;
     final user = authState is Authenticated ? authState.user : null;
     final currencyFormatter = NumberFormat('#,###');
 
@@ -192,15 +192,18 @@ class _AdminProfileTabBody extends StatelessWidget {
                     ),
                     ProfileInfoRow(
                       label: 'admin.stats.total_beneficiaries'.tr(),
-                      value: '${state.totalBeneficiariesCount} ${'profile.families_unit'.tr()}',
+                      value:
+                          '${state.totalBeneficiariesCount} ${'profile.families_unit'.tr()}',
                     ),
                     ProfileInfoRow(
                       label: 'admin.stats.active_merchants'.tr(),
-                      value: '${state.activeMerchantsCount} ${'profile.stores_unit'.tr()}',
+                      value:
+                          '${state.activeMerchantsCount} ${'profile.stores_unit'.tr()}',
                     ),
                     ProfileInfoRow(
                       label: 'admin.stats.total_redemptions'.tr(),
-                      value: '${state.totalRedemptionsCount} ${'profile.txns_unit'.tr()}',
+                      value:
+                          '${state.totalRedemptionsCount} ${'profile.txns_unit'.tr()}',
                       showDivider: false,
                     ),
                   ],
