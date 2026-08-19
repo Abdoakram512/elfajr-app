@@ -2,12 +2,13 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:go_router/go_router.dart';
 
-import '../../../../app/service_locator.dart';
 import '../../../../core/constants/app_colors.dart';
-import '../../../../core/constants/app_constants.dart';
-import '../../../../core/routes/route_names.dart';
+import '../../../../core/widgets/dialogs/logout_confirm_dialog.dart';
+import '../../../../core/widgets/profile/profile_info_content_links.dart';
+import '../../../../core/widgets/profile/profile_info_row.dart';
+import '../../../../core/widgets/profile/profile_language_tile.dart';
+import '../../../../core/widgets/profile/profile_section_card.dart';
 import '../../../auth/view_models/auth_cubit.dart';
 import '../../../auth/view_models/auth_state.dart';
 import '../../view_models/merchant_cubit.dart';
@@ -18,16 +19,17 @@ class MerchantProfileTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authState = sl<AuthCubit>().state;
+    final authState = context.watch<AuthCubit>().state;
     final user = authState is Authenticated ? authState.user : null;
-    final isArabic = context.locale.languageCode == 'ar';
+    final currencyFormatter = NumberFormat('#,###');
 
     final storeName = user?.storeName?.isNotEmpty == true
         ? user!.storeName!
         : (user?.name.isNotEmpty == true ? user!.name : 'منفذ معتمد');
     final displayEmail = user?.email.isNotEmpty == true ? user!.email : '-';
     final displayPhone = user?.phone?.isNotEmpty == true ? user!.phone! : '-';
-    final displayCity = user?.city?.isNotEmpty == true ? user!.city! : 'المدينة';
+    final displayCity =
+        user?.city?.isNotEmpty == true ? user!.city! : 'المدينة';
     final commercialReg = user?.commercialReg?.isNotEmpty == true
         ? user!.commercialReg!
         : '-';
@@ -39,8 +41,6 @@ class MerchantProfileTab extends StatelessWidget {
           (sum, item) => sum + item.foodBasketsDeducted,
         );
 
-        final currencyFormatter = NumberFormat('#,###');
-
         return Scaffold(
           backgroundColor: AppColors.backgroundLight,
           appBar: AppBar(
@@ -49,7 +49,7 @@ class MerchantProfileTab extends StatelessWidget {
             actions: [
               IconButton(
                 icon: const Icon(Icons.logout_rounded, color: AppColors.error),
-                onPressed: () => _confirmLogout(context),
+                onPressed: () => LogoutConfirmDialog.show(context),
               ),
             ],
           ),
@@ -81,7 +81,7 @@ class MerchantProfileTab extends StatelessWidget {
                           color: Colors.white,
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: AppColors.accent,
+                            color: AppColors.accentLight,
                             width: 3,
                           ),
                           boxShadow: [
@@ -100,7 +100,6 @@ class MerchantProfileTab extends StatelessWidget {
                       const Gap(14),
                       Text(
                         storeName,
-                        textAlign: TextAlign.center,
                         style: const TextStyle(
                           fontSize: 19,
                           fontWeight: FontWeight.bold,
@@ -109,37 +108,35 @@ class MerchantProfileTab extends StatelessWidget {
                       ),
                       const Gap(4),
                       Text(
-                        '$displayEmail • س.ت: $commercialReg',
+                        displayEmail,
                         style: TextStyle(
                           fontSize: 13,
-                          color: Colors.white.withValues(alpha: 0.85),
+                          color: Colors.white.withValues(alpha: 0.8),
                         ),
                       ),
-                      const Gap(14),
+                      const Gap(12),
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 14,
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.18),
+                          color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.3),
-                          ),
+                          border: Border.all(color: Colors.white30),
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.verified_rounded,
-                              size: 16,
+                              size: 15,
                               color: AppColors.accentLight,
                             ),
-                            Gap(6),
+                            const Gap(6),
                             Text(
-                              'منفذ صرف معتمد في منظومة قوت',
-                              style: TextStyle(
+                              'منفذ صرف وتموينات معتمد',
+                              style: const TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
@@ -154,296 +151,101 @@ class MerchantProfileTab extends StatelessWidget {
 
                 const Gap(20),
 
-                // 2. Store & Entity Details
-                _buildSectionCard(
-                  title: 'بيانات المنشأة والمتجر المعتمد',
-                  icon: Icons.store_rounded,
+                // 2. Commercial & Registry Information
+                ProfileSectionCard(
+                  title: 'بيانات الاعتماد والترخيص التجاري',
+                  icon: Icons.domain_rounded,
                   children: [
-                    _buildInfoRow(
-                      icon: Icons.business_rounded,
-                      label: 'اسم المتجر / الفرع',
+                    ProfileInfoRow(
+                      label: 'auth.store_name_label'.tr(),
                       value: storeName,
                     ),
-                    _buildDivider(),
-                    _buildInfoRow(
-                      icon: Icons.assignment_outlined,
-                      label: 'رقم السجل التجاري',
+                    ProfileInfoRow(
+                      label: 'رقم السجل التجاري / المنشأة',
                       value: commercialReg,
                     ),
-                    _buildDivider(),
-                    _buildInfoRow(
-                      icon: Icons.phone_outlined,
-                      label: 'رقم التواصل والشكاوى',
-                      value: displayPhone,
-                    ),
-                    _buildDivider(),
-                    _buildInfoRow(
-                      icon: Icons.location_on_outlined,
-                      label: 'المدينة والمنطقة',
-                      value: displayCity,
-                    ),
-                    _buildDivider(),
-                    _buildInfoRow(
-                      icon: Icons.check_circle_outline_rounded,
-                      label: 'حالة الصرف والتعاقد',
-                      value: 'نشط ومفوض بالصرف اللحظي',
+                    ProfileInfoRow(
+                      label: 'حالة الترخيص والاعتماد',
+                      value: 'معتمد ونشط بالشبكة',
                       valueColor: AppColors.success,
                     ),
+                    ProfileInfoRow(
+                      label: 'المدينة والمنطقة',
+                      value: displayCity,
+                      showDivider: false,
+                    ),
                   ],
                 ),
 
                 const Gap(16),
 
-                // 3. Redemptions Activity Summary
-                _buildSectionCard(
-                  title: 'إحصائيات عمليات الصرف بالمنفذ',
-                  icon: Icons.query_stats_rounded,
+                // 3. Overall Operational Metrics
+                ProfileSectionCard(
+                  title: 'إحصائيات الصرف التراكمية للمنفذ',
+                  icon: Icons.insights_rounded,
                   children: [
-                    _buildInfoRow(
-                      icon: Icons.receipt_long_rounded,
-                      label: 'إجمالي العمليات الموثقة',
-                      value: '${state.todayTransactionsCount} عملية',
-                      valueColor: AppColors.primary,
-                    ),
-                    _buildDivider(),
-                    _buildInfoRow(
-                      icon: Icons.payments_outlined,
+                    ProfileInfoRow(
                       label: 'إجمالي المبالغ المنصرفة',
-                      value: '${currencyFormatter.format(state.todayDispensedAmount)} ${'common.currency'.tr()}',
-                      valueColor: AppColors.primary,
+                      value:
+                          '${currencyFormatter.format(state.todayDispensedAmount)} ${'common.currency'.tr()}',
+                      valueColor: AppColors.primaryDark,
                     ),
-                    _buildDivider(),
-                    _buildInfoRow(
-                      icon: Icons.shopping_basket_outlined,
-                      label: 'السلال الغذائية المصروفة',
-                      value: '$totalBasketsDispensed سلة تموينية',
+                    ProfileInfoRow(
+                      label: 'إجمالي السلال الغذائية المسلّمة',
+                      value: '$totalBasketsDispensed سلة غذائية',
                       valueColor: AppColors.accentDark,
                     ),
+                    ProfileInfoRow(
+                      label: 'عدد المعاملات المسجلة',
+                      value: '${state.recentTransactions.length} عملية',
+                      showDivider: false,
+                    ),
                   ],
                 ),
 
                 const Gap(16),
 
-                // 4. App & Support Settings
-                _buildSectionCard(
+                // 4. Contact & Support
+                ProfileSectionCard(
+                  title: 'معلومات الاتصال والمسؤول',
+                  icon: Icons.contact_phone_outlined,
+                  children: [
+                    ProfileInfoRow(
+                      label: 'auth.phone'.tr(),
+                      value: displayPhone,
+                    ),
+                    ProfileInfoRow(
+                      label: 'auth.email'.tr(),
+                      value: displayEmail,
+                      showDivider: false,
+                    ),
+                  ],
+                ),
+
+                const Gap(16),
+
+                // 5. System Settings & Info Content Links
+                ProfileSectionCard(
                   title: 'إعدادات الحساب والدعم',
                   icon: Icons.settings_outlined,
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        final newLocale = isArabic
-                            ? AppConstants.englishLocale
-                            : AppConstants.arabicLocale;
-                        context.setLocale(newLocale);
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: AppColors.primarySubtle,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Icon(
-                                Icons.language_rounded,
-                                size: 18,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                            const Gap(12),
-                            const Text(
-                              'لغة التطبيق (Language)',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textPrimaryLight,
-                              ),
-                            ),
-                            const Spacer(),
-                            Text(
-                              isArabic ? 'العربية (AR)' : 'English (EN)',
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                            const Gap(6),
-                            const Icon(
-                              Icons.arrow_forward_ios_rounded,
-                              size: 14,
-                              color: AppColors.textMutedLight,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    _buildDivider(),
-                    InkWell(
-                      onTap: () => context.push(RouteNames.aboutUs),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: AppColors.primarySubtle,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Icon(
-                                Icons.info_outline_rounded,
-                                size: 18,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                            const Gap(12),
-                            const Text(
-                              'عن منصة قُوت',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textPrimaryLight,
-                              ),
-                            ),
-                            const Spacer(),
-                            const Icon(
-                              Icons.arrow_forward_ios_rounded,
-                              size: 14,
-                              color: AppColors.textMutedLight,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    _buildDivider(),
-                    InkWell(
-                      onTap: () => context.push(RouteNames.faq),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: AppColors.primarySubtle,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Icon(
-                                Icons.quiz_outlined,
-                                size: 18,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                            const Gap(12),
-                            const Text(
-                              'الأسئلة الشائعة',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textPrimaryLight,
-                              ),
-                            ),
-                            const Spacer(),
-                            const Icon(
-                              Icons.arrow_forward_ios_rounded,
-                              size: 14,
-                              color: AppColors.textMutedLight,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    _buildDivider(),
-                    InkWell(
-                      onTap: () => context.push(RouteNames.termsPrivacy),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: AppColors.primarySubtle,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Icon(
-                                Icons.verified_user_outlined,
-                                size: 18,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                            const Gap(12),
-                            const Text(
-                              'الشروط وسياسة الخصوصية',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textPrimaryLight,
-                              ),
-                            ),
-                            const Spacer(),
-                            const Icon(
-                              Icons.arrow_forward_ios_rounded,
-                              size: 14,
-                              color: AppColors.textMutedLight,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    _buildDivider(),
-                    InkWell(
-                      onTap: () => context.push(RouteNames.contactSupport),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: AppColors.primarySubtle,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Icon(
-                                Icons.support_agent_rounded,
-                                size: 18,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                            const Gap(12),
-                            const Text(
-                              'الدعم الفني والمالي للتجار',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textPrimaryLight,
-                              ),
-                            ),
-                            const Spacer(),
-                            const Icon(
-                              Icons.arrow_forward_ios_rounded,
-                              size: 14,
-                              color: AppColors.textMutedLight,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                  children: const [
+                    ProfileLanguageTile(),
+                    ProfileInfoContentLinks(wrapInSectionCard: false),
                   ],
                 ),
 
                 const Gap(24),
 
-                // Logout Button
+                // 6. Logout Button
                 SizedBox(
                   width: double.infinity,
                   height: 52,
                   child: OutlinedButton.icon(
-                    onPressed: () => _confirmLogout(context),
-                    icon: const Icon(Icons.logout_rounded, color: AppColors.error),
+                    onPressed: () => LogoutConfirmDialog.show(context),
+                    icon: const Icon(
+                      Icons.logout_rounded,
+                      color: AppColors.error,
+                    ),
                     label: Text(
                       'common.logout'.tr(),
                       style: const TextStyle(
@@ -453,7 +255,10 @@ class MerchantProfileTab extends StatelessWidget {
                       ),
                     ),
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: AppColors.error, width: 1.2),
+                      side: const BorderSide(
+                        color: AppColors.error,
+                        width: 1.2,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
@@ -466,139 +271,6 @@ class MerchantProfileTab extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-
-  Widget _buildSectionCard({
-    required String title,
-    required IconData icon,
-    required List<Widget> children,
-  }) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.borderLight),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppColors.primarySubtle,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(icon, size: 18, color: AppColors.primary),
-              ),
-              const Gap(10),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimaryLight,
-                ),
-              ),
-            ],
-          ),
-          const Gap(12),
-          ...children,
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInfoRow({
-    required IconData icon,
-    required String label,
-    required String value,
-    Color? valueColor,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 2),
-            child: Icon(icon, size: 18, color: AppColors.textMutedLight),
-          ),
-          const Gap(10),
-          Expanded(
-            flex: 5,
-            child: Text(
-              label,
-              style: const TextStyle(
-                fontSize: 13,
-                color: AppColors.textSecondaryLight,
-                height: 1.3,
-              ),
-            ),
-          ),
-          const Gap(10),
-          Flexible(
-            flex: 6,
-            child: Text(
-              value,
-              textAlign: TextAlign.end,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-                color: valueColor ?? AppColors.textPrimaryLight,
-                height: 1.3,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDivider() {
-    return const Divider(height: 1, color: AppColors.borderLight);
-  }
-
-  void _confirmLogout(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('تأكيد تسجيل الخروج'),
-        content: const Text('هل أنت متأكد من رغبتك في تسجيل الخروج من حساب منفذ الصرف؟'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('إلغاء'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              sl<AuthCubit>().signOut();
-              context.go(RouteNames.login);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.error,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: const Text('تسجيل الخروج'),
-          ),
-        ],
-      ),
     );
   }
 }

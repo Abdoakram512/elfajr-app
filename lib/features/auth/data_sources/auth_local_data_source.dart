@@ -1,12 +1,14 @@
+import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/constants/app_constants.dart';
+import '../models/user_model.dart';
 
 abstract class AuthLocalDataSource {
   Future<void> setRememberMe(bool enabled);
   bool getRememberMe();
-  Future<void> saveEmail(String email);
-  String? getSavedEmail();
-  Future<void> clearSavedEmail();
+  Future<void> saveUserSession(UserModel user);
+  UserModel? getCachedUserSession();
+  Future<void> clearUserSession();
 }
 
 class AuthLocalDataSourceImpl implements AuthLocalDataSource {
@@ -21,21 +23,31 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
 
   @override
   bool getRememberMe() {
-    return _prefs.getBool(AppConstants.prefsKeyRememberMe) ?? true;
+    return _prefs.getBool(AppConstants.prefsKeyRememberMe) ?? false;
   }
 
   @override
-  Future<void> saveEmail(String email) async {
-    await _prefs.setString(AppConstants.prefsKeySavedEmail, email);
+  Future<void> saveUserSession(UserModel user) async {
+    final rawJson = jsonEncode(user.toMap());
+    await _prefs.setString(AppConstants.prefsKeyUserSession, rawJson);
   }
 
   @override
-  String? getSavedEmail() {
-    return _prefs.getString(AppConstants.prefsKeySavedEmail);
+  UserModel? getCachedUserSession() {
+    final rawJson = _prefs.getString(AppConstants.prefsKeyUserSession);
+    if (rawJson != null && rawJson.isNotEmpty) {
+      try {
+        final map = jsonDecode(rawJson) as Map<String, dynamic>;
+        return UserModel.fromMap(map);
+      } catch (_) {
+        return null;
+      }
+    }
+    return null;
   }
 
   @override
-  Future<void> clearSavedEmail() async {
-    await _prefs.remove(AppConstants.prefsKeySavedEmail);
+  Future<void> clearUserSession() async {
+    await _prefs.remove(AppConstants.prefsKeyUserSession);
   }
 }

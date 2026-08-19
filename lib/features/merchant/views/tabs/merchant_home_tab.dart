@@ -5,6 +5,8 @@ import 'package:gap/gap.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/widgets/feedback/app_empty_state_widget.dart';
+import '../../../../core/widgets/transactions/transaction_list_item.dart';
 import '../../view_models/merchant_cubit.dart';
 import '../../view_models/merchant_state.dart';
 import '../merchant_scanner_view.dart';
@@ -15,7 +17,6 @@ class MerchantHomeTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currencyFormatter = NumberFormat('#,###');
-    final dateFormatter = DateFormat('HH:mm - yyyy/MM/dd');
     final isArabic = context.locale.languageCode == 'ar';
 
     return BlocBuilder<MerchantCubit, MerchantState>(
@@ -178,8 +179,9 @@ class MerchantHomeTab extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(14),
                               ),
                               elevation: 3,
-                              shadowColor:
-                                  AppColors.accent.withValues(alpha: 0.4),
+                              shadowColor: AppColors.accent.withValues(
+                                alpha: 0.4,
+                              ),
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -318,87 +320,31 @@ class MerchantHomeTab extends StatelessWidget {
                   const Gap(12),
 
                   // Redemptions List
-                  ListView.separated(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: state.recentTransactions.length,
-                    separatorBuilder: (context, index) => const Gap(12),
-                    itemBuilder: (context, index) {
-                      final item = state.recentTransactions[index];
-
-                      return Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(18),
-                          border: Border.all(
-                            color: AppColors.borderLight,
-                            width: 0.8,
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: AppColors.primarySubtle,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.receipt_long_rounded,
-                                color: AppColors.primary,
-                                size: 20,
-                              ),
-                            ),
-                            const Gap(14),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    item.beneficiaryName,
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.textPrimaryLight,
-                                    ),
-                                  ),
-                                  const Gap(4),
-                                  Text(
-                                    dateFormatter.format(item.timestamp),
-                                    style: const TextStyle(
-                                      fontSize: 11,
-                                      color: AppColors.textMutedLight,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Text(
-                                  '-${currencyFormatter.format(item.amountDeducted)}',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.error,
-                                  ),
-                                ),
-                                Text(
-                                  'common.currency'.tr(),
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    color: AppColors.textSecondaryLight,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
+                  if (state.recentTransactions.isEmpty)
+                    const AppEmptyStateWidget(
+                      title: 'لا توجد عمليات صرف مسجلة اليوم',
+                      description:
+                          'ستظهر هنا كافة عمليات الخصم وسحب الإعانات فور تنفيذها',
+                      icon: Icons.receipt_long_outlined,
+                    )
+                  else
+                    ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: state.recentTransactions.length,
+                      separatorBuilder: (context, index) => const Gap(10),
+                      itemBuilder: (context, index) {
+                        final item = state.recentTransactions[index];
+                        return TransactionListItem(
+                          cardId: item.cardId,
+                          beneficiaryName: item.beneficiaryName,
+                          amount: item.amountDeducted,
+                          foodBaskets: item.foodBasketsDeducted,
+                          timestamp: item.timestamp,
+                          showPrintButton: true,
+                        );
+                      },
+                    ),
                 ],
               ),
             ),

@@ -5,9 +5,11 @@ import 'package:gap/gap.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/widgets/cards/stat_kpi_card.dart';
+import '../../../../core/widgets/feedback/app_empty_state_widget.dart';
+import '../../../../core/widgets/transactions/transaction_list_item.dart';
 import '../../view_models/admin_cubit.dart';
 import '../../view_models/admin_state.dart';
-import '../../widgets/admin_kpi_card.dart';
 
 class AdminOverviewTab extends StatelessWidget {
   const AdminOverviewTab({super.key});
@@ -15,13 +17,10 @@ class AdminOverviewTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currencyFormatter = NumberFormat('#,###');
-    final dateFormatter = DateFormat('yyyy/MM/dd - HH:mm');
     final isArabic = context.locale.languageCode == 'ar';
 
     return BlocBuilder<AdminCubit, AdminState>(
       builder: (context, state) {
-        final cubit = context.read<AdminCubit>();
-
         return Scaffold(
           backgroundColor: AppColors.backgroundLight,
           body: SafeArea(
@@ -38,7 +37,7 @@ class AdminOverviewTab extends StatelessWidget {
                         children: [
                           Container(
                             padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
+                            decoration: const BoxDecoration(
                               color: AppColors.primarySubtle,
                               shape: BoxShape.circle,
                             ),
@@ -105,11 +104,11 @@ class AdminOverviewTab extends StatelessWidget {
 
                   const Gap(20),
 
-                  // 2x2 KPI Grid
+                  // 2x2 KPI Grid using StatKpiCard
                   Row(
                     children: [
                       Expanded(
-                        child: AdminKpiCard(
+                        child: StatKpiCard(
                           title: 'إجمالي المبالغ المصروفة',
                           value:
                               '${currencyFormatter.format(state.totalFundsDisbursed)} ${'common.currency'.tr()}',
@@ -119,7 +118,7 @@ class AdminOverviewTab extends StatelessWidget {
                       ),
                       const Gap(12),
                       Expanded(
-                        child: AdminKpiCard(
+                        child: StatKpiCard(
                           title: 'الأسر المستفيدة',
                           value: '${state.totalBeneficiariesCount}',
                           icon: Icons.family_restroom_rounded,
@@ -134,7 +133,7 @@ class AdminOverviewTab extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: AdminKpiCard(
+                        child: StatKpiCard(
                           title: 'منافذ الصرف المعتمدة',
                           value: '${state.activeMerchantsCount}',
                           icon: Icons.storefront_rounded,
@@ -143,7 +142,7 @@ class AdminOverviewTab extends StatelessWidget {
                       ),
                       const Gap(12),
                       Expanded(
-                        child: AdminKpiCard(
+                        child: StatKpiCard(
                           title: 'إجمالي عمليات الصرف',
                           value: currencyFormatter.format(state.totalRedemptionsCount),
                           icon: Icons.receipt_long_rounded,
@@ -162,153 +161,72 @@ class AdminOverviewTab extends StatelessWidget {
                       const Text(
                         'عمليات الصرف اللحظية في المنافذ',
                         style: TextStyle(
-                          fontSize: 17,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: AppColors.textPrimaryLight,
                         ),
                       ),
-                      TextButton(
-                        onPressed: () => cubit.setTab(1),
-                        child: const Text(
-                          'إدارة المنافذ',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primary,
-                          ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.success.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 6,
+                              height: 6,
+                              decoration: const BoxDecoration(
+                                color: AppColors.success,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const Gap(4),
+                            const Text(
+                              'بث مباشر',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.success,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
 
-                  const Gap(12),
+                  const Gap(14),
 
+                  // List of Live Redemptions
                   if (state.recentRedemptions.isEmpty)
-                    Center(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 24),
-                        child: Text(
-                          'لا توجد عمليات صرف مسجلة حتى الآن.',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: AppColors.textMutedLight,
-                          ),
-                        ),
-                      ),
+                    const AppEmptyStateWidget(
+                      title: 'لا توجد عمليات صرف مسجلة حتى الآن',
+                      description: 'ستظهر هنا كافة عمليات الخصم وسحب الإعانات فور تنفيذها في منافذ الصرف',
+                      icon: Icons.receipt_long_outlined,
                     )
                   else
                     ListView.separated(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: state.recentRedemptions.length,
-                      separatorBuilder: (context, index) => const Gap(12),
+                      separatorBuilder: (_, _) => const Gap(10),
                       itemBuilder: (context, index) {
                         final item = state.recentRedemptions[index];
-                        return Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(18),
-                            border: Border.all(color: AppColors.borderLight),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.02),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.all(8),
-                                        decoration: BoxDecoration(
-                                          color: AppColors.primarySubtle,
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                        child: const Icon(
-                                          Icons.store_rounded,
-                                          color: AppColors.primary,
-                                          size: 18,
-                                        ),
-                                      ),
-                                      const Gap(10),
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            item.merchantName,
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                              color: AppColors.textPrimaryLight,
-                                            ),
-                                          ),
-                                          Text(
-                                            'المستفيد: ${item.beneficiaryName}',
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                              color: AppColors.textSecondaryLight,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      Text(
-                                        '-${currencyFormatter.format(item.amount)} ${'common.currency'.tr()}',
-                                        style: const TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold,
-                                          color: AppColors.error,
-                                        ),
-                                      ),
-                                      if (item.foodBaskets > 0)
-                                        Text(
-                                          '+${item.foodBaskets} سلة غذائية',
-                                          style: const TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.bold,
-                                            color: AppColors.accentDark,
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              const Gap(12),
-                              const Divider(height: 1, color: AppColors.borderLight),
-                              const Gap(8),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'الكارت: ${item.cardId} • ${item.city}',
-                                    style: const TextStyle(
-                                      fontSize: 11,
-                                      color: AppColors.textMutedLight,
-                                    ),
-                                  ),
-                                  Text(
-                                    dateFormatter.format(item.timestamp),
-                                    style: const TextStyle(
-                                      fontSize: 11,
-                                      color: AppColors.textMutedLight,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
+                        return TransactionListItem(
+                          cardId: item.cardId,
+                          beneficiaryName: item.beneficiaryName,
+                          merchantStoreName: item.merchantName,
+                          amount: item.amount,
+                          foodBaskets: item.foodBaskets,
+                          city: item.city,
+                          timestamp: item.timestamp,
+                          showPrintButton: true,
                         );
                       },
                     ),

@@ -3,9 +3,11 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
+import 'package:qout/core/constants/app_colors.dart';
 
 import '../../../../app/service_locator.dart';
-import '../../../../core/constants/app_colors.dart';
+import '../../../../core/widgets/feedback/app_error_state_widget.dart';
+import '../../../../core/widgets/feedback/app_loading_indicator.dart';
 import '../view_models/info_cubit.dart';
 import '../view_models/info_state.dart';
 
@@ -38,14 +40,15 @@ class _ContactSupportViewBody extends StatelessWidget {
       body: BlocBuilder<InfoCubit, InfoState>(
         builder: (context, state) {
           if (state.isLoading && state.contactSupport == null) {
-            return const Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
-            );
+            return const AppLoadingIndicator();
           }
 
           final contact = state.contactSupport;
           if (contact == null) {
-            return const Center(child: Text('تعذر تحميل البيانات'));
+            return AppErrorStateWidget(
+              errorMessage: state.errorMessage ?? 'تعذر تحميل بيانات الدعم والمساعدة',
+              onRetry: () => context.read<InfoCubit>().loadAllInfo(),
+            );
           }
 
           return SingleChildScrollView(

@@ -16,7 +16,19 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<UserModel?> getCurrentUser() async {
-    return await _remoteDataSource.getCurrentUserData();
+    final rememberMe = _localDataSource.getRememberMe();
+    if (rememberMe) {
+      final cachedUser = _localDataSource.getCachedUserSession();
+      if (cachedUser != null) {
+        return cachedUser;
+      }
+    }
+
+    final remoteUser = await _remoteDataSource.getCurrentUserData();
+    if (remoteUser != null && rememberMe) {
+      await _localDataSource.saveUserSession(remoteUser);
+    }
+    return remoteUser;
   }
 
   @override
@@ -32,9 +44,9 @@ class AuthRepositoryImpl implements AuthRepository {
 
     await _localDataSource.setRememberMe(rememberMe);
     if (rememberMe) {
-      await _localDataSource.saveEmail(email.trim());
+      await _localDataSource.saveUserSession(user);
     } else {
-      await _localDataSource.clearSavedEmail();
+      await _localDataSource.clearUserSession();
     }
 
     return user;
@@ -62,12 +74,16 @@ class AuthRepositoryImpl implements AuthRepository {
       commercialReg: commercialReg,
     );
 
+    await _localDataSource.setRememberMe(true);
+    await _localDataSource.saveUserSession(user);
+
     return user;
   }
 
   @override
   Future<void> signOut() async {
     await _remoteDataSource.signOut();
+    await _localDataSource.clearUserSession();
   }
 
   @override
@@ -76,12 +92,8 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  String? getSavedEmail() {
-    return _localDataSource.getSavedEmail();
-  }
+  String? getSavedEmail() => null;
 
   @override
-  bool getRememberMe() {
-    return _localDataSource.getRememberMe();
-  }
+  bool getRememberMe() => _localDataSource.getRememberMe();
 }

@@ -8,6 +8,7 @@
     "cancel": "إلغاء",
     "confirm": "تأكيد",
     "save": "حفظ",
+    "close": "إغلاق",
     "language": "اللغة",
     "arabic": "العربية",
     "english": "English",
@@ -16,7 +17,10 @@
     "retry": "إعادة المحاولة",
     "logout": "تسجيل الخروج",
     "currency": "ر.س",
-    "sar": "ريال"
+    "sar": "ريال",
+    "search": "بحث",
+    "print": "طباعة",
+    "share": "مشاركة"
   },
   "onboarding": {
     "title_1": "كارت إغاثي ذكي ومستدام",
@@ -98,7 +102,10 @@
     "status_depleted": "تم استنفاد الرصيد",
     "status_pending": "بانتظار التفعيل الميداني",
     "expires_at": "صالح حتى:",
-    "show_qr_dialog": "تكبير الرمز للمسح"
+    "show_qr_dialog": "تكبير الرمز للمسح",
+    "print_card_button": "طباعة البطاقة الورقية / مشاركة PDF",
+    "print_guidance": "وجّه الشاشة نحو ماسح الكاشير أو اطبع البطاقة الورقية",
+    "tap_to_enlarge": "انقر للتكبير"
   },
   "merchant": {
     "greeting": "أهلاً بك، منفذ الصرف المعتمد 🏪",
@@ -115,7 +122,20 @@
     "confirm_redemption": "تأكيد عملية الصرف والخصم",
     "redemption_success": "تمت عملية الصرف بنجاح! تم خصم {} ر.س من كارت المستفيد.",
     "invalid_card": "رمز الـ QR غير صالح أو أن الكارت غير مفعل.",
-    "insufficient_balance": "رصيد المستفيد لا يكفي لإتمام هذه العملية."
+    "insufficient_balance": "رصيد المستفيد لا يكفي لإتمام هذه العملية.",
+    "search_manual_title": "البحث اليدوي عن المستفيد",
+    "search_manual_button": "بحث برقم الهوية / الكارت (بدون هاتف)",
+    "search_manual_hint": "مثال: 1089283746 أو QOUT-CARD-784920",
+    "search_manual_label": "رقم الهوية الوطنية أو رقم الكارت",
+    "security_verification_title": "التحقق الأمني من المستفيد الحاضر (إلزامي):",
+    "security_verification_desc": "لمنع التلاعب بالصور المحفوظة، اطلب من المستفيد تأكيد آخر 4 أرقام من هويته الوطنية:",
+    "security_pin_label": "آخر 4 أرقام من الهوية الوطنية",
+    "security_pin_hint": "مثال: 3746",
+    "security_pin_error_empty": "يرجى إدخال آخر 4 أرقام من هوية المستفيد للتحقق الأمني",
+    "security_pin_error_mismatch": "فشل التحقق الأمني: الأرقام غير متطابقة مع هوية المستفيد الحاضر!",
+    "print_paper_card_button": "طباعة كارت الدعم الورقي للمستفيد",
+    "notes_label": "ملاحظات الصرف (اختياري)",
+    "notes_hint": "مثال: مشتريات تموينية شهرية"
   },
   "dashboard": {
     "tabs": {
@@ -163,6 +183,20 @@
       "live_redemptions_title": "عمليات الصرف اللحظية في المنافذ",
       "merchants_tab_title": "منافذ الصرف المعتمدة"
     }
+  },
+  "info_content": {
+    "about_us": "عن منصة قُوت",
+    "faq": "الأسئلة الشائعة",
+    "terms_privacy": "الشروط وسياسة الخصوصية",
+    "contact_support": "مركز الرعاية والدعم الإغاثي",
+    "terms_tab": "شروط الاستخدام والضوابط",
+    "privacy_tab": "سياسة الخصوصية وأمان البيانات",
+    "hotline": "الرقم الموحد المجاني",
+    "emergency_phone": "خط الطوارئ الإغاثي",
+    "support_email": "بريد الدعم والمستفيدين",
+    "merchant_email": "بريد الشركاء ومنافذ الصرف",
+    "working_hours": "أوقات وساعات العمل",
+    "headquarters": "المقر الرئيسي"
   },
   "auth_errors": {
     "user_not_found": "لا يوجد حساب مسجل بهذا البريد الإلكتروني.",

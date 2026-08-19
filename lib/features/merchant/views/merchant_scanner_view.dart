@@ -1,11 +1,13 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gap/gap.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../view_models/merchant_cubit.dart';
 import '../view_models/merchant_state.dart';
+import '../widgets/manual_search_sheet.dart';
 import '../widgets/redemption_confirmation_sheet.dart';
 
 class MerchantScannerView extends StatefulWidget {
@@ -17,9 +19,10 @@ class MerchantScannerView extends StatefulWidget {
 
 class _MerchantScannerViewState extends State<MerchantScannerView> {
   final MobileScannerController _scannerController = MobileScannerController(
-    detectionSpeed: DetectionSpeed.noDuplicates,
+    detectionSpeed: DetectionSpeed.normal,
     facing: CameraFacing.back,
     torchEnabled: false,
+    returnImage: false,
   );
 
   bool _isProcessing = false;
@@ -56,16 +59,14 @@ class _MerchantScannerViewState extends State<MerchantScannerView> {
           card: state.scannedCard!,
           onConfirm: (amount, baskets, notes) {
             Navigator.pop(sheetContext);
-            cubit.redeemAid(
-              amount: amount,
-              foodBaskets: baskets,
-              notes: notes,
-            );
+            cubit.redeemAid(amount: amount, foodBaskets: baskets, notes: notes);
           },
         );
       },
     ).whenComplete(() {
-      setState(() => _isProcessing = false);
+      if (mounted) {
+        setState(() => _isProcessing = false);
+      }
       cubit.clearScannedCard();
     });
   }
@@ -75,7 +76,11 @@ class _MerchantScannerViewState extends State<MerchantScannerView> {
     return BlocConsumer<MerchantCubit, MerchantState>(
       listener: (context, state) {
         if (state.scannedCard != null) {
-          _showRedemptionSheet(context, state);
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (context.mounted && state.scannedCard != null) {
+              _showRedemptionSheet(context, state);
+            }
+          });
         }
         if (state.successMessage != null) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -95,18 +100,57 @@ class _MerchantScannerViewState extends State<MerchantScannerView> {
               backgroundColor: AppColors.error,
             ),
           );
-          setState(() => _isProcessing = false);
+          if (mounted) {
+            setState(() => _isProcessing = false);
+          }
           context.read<MerchantCubit>().clearMessages();
         }
       },
       builder: (context, state) {
+        final cubit = context.read<MerchantCubit>();
+
         return Scaffold(
           backgroundColor: Colors.black,
           appBar: AppBar(
             backgroundColor: Colors.black,
             foregroundColor: Colors.white,
-            title: Text('merchant.scan_title'.tr()),
+            elevation: 0,
+            leading: IconButton(
+              icon: const Icon(
+                Icons.arrow_back_ios_new_rounded,
+                color: Colors.white,
+                size: 20,
+              ),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            title: Row(
+              children: [
+                const Icon(
+                  Icons.qr_code_scanner_rounded,
+                  color: AppColors.primary,
+                  size: 22,
+                ),
+                const Gap(8),
+                Text(
+                  'merchant.scan_title'.tr(),
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
             actions: [
+              IconButton(
+                tooltip: 'merchant.search_manual_title'.tr(),
+                icon: const Icon(
+                  Icons.person_search_rounded,
+                  color: AppColors.primary,
+                  size: 24,
+                ),
+                onPressed: () => ManualSearchSheet.show(context, cubit),
+              ),
               IconButton(
                 icon: ValueListenableBuilder(
                   valueListenable: _scannerController,
@@ -116,7 +160,9 @@ class _MerchantScannerViewState extends State<MerchantScannerView> {
                       torchState == TorchState.on
                           ? Icons.flash_on_rounded
                           : Icons.flash_off_rounded,
-                      color: Colors.white,
+                      color: torchState == TorchState.on
+                          ? AppColors.accentLight
+                          : Colors.white,
                     );
                   },
                 ),
@@ -131,37 +177,100 @@ class _MerchantScannerViewState extends State<MerchantScannerView> {
                 onDetect: _onDetect,
               ),
 
-              // Overlay viewfinder
+              // Emerald Green Viewfinder box
               Center(
                 child: Container(
                   width: 260,
                   height: 260,
                   decoration: BoxDecoration(
-                    border: Border.all(color: AppColors.primary, width: 3),
+                    border: Border.all(color: AppColors.primary, width: 3.5),
                     borderRadius: BorderRadius.circular(24),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.35),
+                        blurRadius: 20,
+                        spreadRadius: 2,
+                      ),
+                    ],
                   ),
                 ),
               ),
 
-              // Bottom instruction text
+              // Bottom Actions & Instruction Card
               Positioned(
-                bottom: 40,
+                bottom: 30,
                 left: 20,
                 right: 20,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.7),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Text(
-                    'merchant.scan_instruction'.tr(),
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: Colors.white,
+                child: Column(
+                  children: [
+                    // Manual Search Button for beneficiaries without phones
+                    ElevatedButton.icon(
+                      onPressed: () => ManualSearchSheet.show(context, cubit),
+                      icon: const Icon(
+                        Icons.dialpad_rounded,
+                        size: 20,
+                        color: Colors.white,
+                      ),
+                      label: Text(
+                        'merchant.search_manual_button'.tr(),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        minimumSize: const Size(double.infinity, 50),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        elevation: 6,
+                      ),
                     ),
-                  ),
+
+                    const Gap(12),
+
+                    // Instruction Card with Emerald Focus Icon and crisp text
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 12,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.85),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: AppColors.primary.withValues(alpha: 0.4),
+                          width: 1.2,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.center_focus_strong_rounded,
+                            size: 18,
+                            color: AppColors.primary,
+                          ),
+                          const Gap(8),
+                          Flexible(
+                            child: Text(
+                              'merchant.scan_instruction'.tr(),
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                                height: 1.3,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],

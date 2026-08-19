@@ -8,6 +8,7 @@
     "cancel": "Cancel",
     "confirm": "Confirm",
     "save": "Save",
+    "close": "Close",
     "language": "Language",
     "arabic": "العربية",
     "english": "English",
@@ -16,7 +17,10 @@
     "retry": "Try Again",
     "logout": "Sign Out",
     "currency": "SAR",
-    "sar": "SAR"
+    "sar": "SAR",
+    "search": "Search",
+    "print": "Print",
+    "share": "Share"
   },
   "onboarding": {
     "title_1": "Smart & Sustainable Aid Card",
@@ -98,7 +102,10 @@
     "status_depleted": "Balance Depleted",
     "status_pending": "Pending Field Activation",
     "expires_at": "Valid Until:",
-    "show_qr_dialog": "Enlarge QR Code"
+    "show_qr_dialog": "Enlarge QR Code",
+    "print_card_button": "Print Physical Card / Share PDF",
+    "print_guidance": "Present this code to the cashier or print physical card",
+    "tap_to_enlarge": "Tap to enlarge"
   },
   "merchant": {
     "greeting": "Welcome, Authorized Aid Dispenser 🏪",
@@ -115,7 +122,20 @@
     "confirm_redemption": "Confirm & Deduct Balance",
     "redemption_success": "Redemption confirmed! {} SAR deducted successfully.",
     "invalid_card": "Invalid QR code or card is not active.",
-    "insufficient_balance": "Beneficiary has insufficient balance for this transaction."
+    "insufficient_balance": "Beneficiary has insufficient balance for this transaction.",
+    "search_manual_title": "Manual Beneficiary Lookup",
+    "search_manual_button": "Search by ID / Card (No Phone)",
+    "search_manual_hint": "e.g. 1089283746 or QOUT-CARD-784920",
+    "search_manual_label": "National ID or Card Number",
+    "security_verification_title": "In-Person Security Verification (Required):",
+    "security_verification_desc": "To prevent fraud from stored photos, ask the present beneficiary to confirm their last 4 digits of National ID:",
+    "security_pin_label": "Last 4 digits of National ID",
+    "security_pin_hint": "e.g. 3746",
+    "security_pin_error_empty": "Please enter the last 4 digits of beneficiary National ID",
+    "security_pin_error_mismatch": "Security verification failed: Digits do not match the present beneficiary ID!",
+    "print_paper_card_button": "Print Physical Aid Card for Beneficiary",
+    "notes_label": "Redemption Notes (Optional)",
+    "notes_hint": "e.g. Monthly grocery supplies"
   },
   "dashboard": {
     "tabs": {
@@ -163,6 +183,20 @@
       "live_redemptions_title": "Live Redemptions Stream",
       "merchants_tab_title": "Authorized Merchants"
     }
+  },
+  "info_content": {
+    "about_us": "About Qout Platform",
+    "faq": "Frequently Asked Questions",
+    "terms_privacy": "Terms & Privacy Policy",
+    "contact_support": "Relief Support & Care Center",
+    "terms_tab": "Terms of Service & Rules",
+    "privacy_tab": "Privacy Policy & Data Security",
+    "hotline": "Toll-Free Hotline",
+    "emergency_phone": "Emergency Relief Phone",
+    "support_email": "Beneficiary Support Email",
+    "merchant_email": "Merchants & Partners Email",
+    "working_hours": "Working Hours",
+    "headquarters": "Headquarters"
   },
   "auth_errors": {
     "user_not_found": "No user found with this email.",

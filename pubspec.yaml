@@ -49,6 +49,8 @@ dependencies:
   # QR Code Ecosystem
   qr_flutter: ^4.1.0
   mobile_scanner: ^6.0.4
+  pdf: ^3.12.0
+  printing: ^5.14.3
 
 dev_dependencies:
   flutter_test:

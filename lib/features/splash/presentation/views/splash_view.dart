@@ -35,7 +35,18 @@ class _SplashViewBody extends StatelessWidget {
         } else if (state is SplashNavigateToLogin) {
           context.go(RouteNames.login);
         } else if (state is SplashNavigateToDashboard) {
-          context.go(RouteNames.login);
+          switch (state.role) {
+            case 'admin':
+              context.go(RouteNames.adminDashboard);
+              break;
+            case 'merchant':
+              context.go(RouteNames.merchantDashboard);
+              break;
+            case 'beneficiary':
+            default:
+              context.go(RouteNames.beneficiaryDashboard);
+              break;
+          }
         }
       },
       child: Scaffold(

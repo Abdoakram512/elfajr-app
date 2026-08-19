@@ -2,12 +2,13 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:go_router/go_router.dart';
 
-import '../../../../app/service_locator.dart';
 import '../../../../core/constants/app_colors.dart';
-import '../../../../core/constants/app_constants.dart';
-import '../../../../core/routes/route_names.dart';
+import '../../../../core/widgets/dialogs/logout_confirm_dialog.dart';
+import '../../../../core/widgets/profile/profile_info_content_links.dart';
+import '../../../../core/widgets/profile/profile_info_row.dart';
+import '../../../../core/widgets/profile/profile_language_tile.dart';
+import '../../../../core/widgets/profile/profile_section_card.dart';
 import '../../../auth/view_models/auth_cubit.dart';
 import '../../../auth/view_models/auth_state.dart';
 import '../../view_models/beneficiary_cubit.dart';
@@ -18,14 +19,16 @@ class BeneficiaryProfileTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authState = sl<AuthCubit>().state;
+    final authState = context.watch<AuthCubit>().state;
     final user = authState is Authenticated ? authState.user : null;
-    final isArabic = context.locale.languageCode == 'ar';
+    final dateFormatter = DateFormat('yyyy/MM/dd');
 
-    final displayName = user?.name.isNotEmpty == true ? user!.name : 'مستفيد معتمد';
+    final displayName =
+        user?.name.isNotEmpty == true ? user!.name : 'مستفيد معتمد';
     final displayEmail = user?.email.isNotEmpty == true ? user!.email : '-';
     final displayPhone = user?.phone?.isNotEmpty == true ? user!.phone! : '-';
-    final displayCity = user?.city?.isNotEmpty == true ? user!.city! : 'المدينة';
+    final displayCity =
+        user?.city?.isNotEmpty == true ? user!.city! : 'المدينة';
 
     return BlocBuilder<BeneficiaryCubit, BeneficiaryState>(
       builder: (context, state) {
@@ -39,7 +42,7 @@ class BeneficiaryProfileTab extends StatelessWidget {
             actions: [
               IconButton(
                 icon: const Icon(Icons.logout_rounded, color: AppColors.error),
-                onPressed: () => _confirmLogout(context),
+                onPressed: () => LogoutConfirmDialog.show(context),
               ),
             ],
           ),
@@ -101,34 +104,32 @@ class BeneficiaryProfileTab extends StatelessWidget {
                         displayEmail,
                         style: TextStyle(
                           fontSize: 13,
-                          color: Colors.white.withValues(alpha: 0.85),
+                          color: Colors.white.withValues(alpha: 0.8),
                         ),
                       ),
-                      const Gap(14),
+                      const Gap(12),
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 14,
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.18),
+                          color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.3),
-                          ),
+                          border: Border.all(color: Colors.white30),
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.verified_user_rounded,
-                              size: 16,
+                              size: 15,
                               color: AppColors.accentLight,
                             ),
-                            Gap(6),
+                            const Gap(6),
                             Text(
-                              'مستفيد معتمد في منظومة قوت',
-                              style: TextStyle(
+                              'auth.role_beneficiary'.tr(),
+                              style: const TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
@@ -143,302 +144,87 @@ class BeneficiaryProfileTab extends StatelessWidget {
 
                 const Gap(20),
 
-                // 2. Personal Information Card
-                _buildSectionCard(
-                  title: 'البيانات الشخصية والأسرة',
-                  icon: Icons.badge_outlined,
+                // 2. Beneficiary Official Card Details
+                ProfileSectionCard(
+                  title: 'بيانات كارت الإغاثة المعتمد',
+                  icon: Icons.credit_card_rounded,
                   children: [
-                    _buildInfoRow(
-                      icon: Icons.person_outline_rounded,
-                      label: 'الاسم الكامل',
-                      value: displayName,
+                    ProfileInfoRow(
+                      label: 'digital_card.card_number'.tr(),
+                      value: card?.cardId ?? '-',
                     ),
-                    _buildDivider(),
-                    _buildInfoRow(
-                      icon: Icons.credit_card_outlined,
-                      label: 'رقم الهوية الوطنية',
+                    ProfileInfoRow(
+                      label: 'الرقم الوطني / الإقامة',
                       value: card?.nationalId ?? '-',
                     ),
-                    _buildDivider(),
-                    _buildInfoRow(
-                      icon: Icons.phone_outlined,
-                      label: 'رقم الجوال',
-                      value: displayPhone,
+                    ProfileInfoRow(
+                      label: 'digital_card.family_count'.tr(),
+                      value: card != null
+                          ? '${card.familyCount} ${'digital_card.persons'.tr()}'
+                          : '-',
                     ),
-                    _buildDivider(),
-                    _buildInfoRow(
-                      icon: Icons.location_on_outlined,
-                      label: 'المدينة / المنطقة',
-                      value: displayCity,
+                    ProfileInfoRow(
+                      label: 'حالة الاستحقاق',
+                      value: card != null && card.isActive
+                          ? 'digital_card.status_active'.tr()
+                          : 'digital_card.status_pending'.tr(),
+                      valueColor: card != null && card.isActive
+                          ? AppColors.success
+                          : AppColors.warning,
                     ),
-                    _buildDivider(),
-                    _buildInfoRow(
-                      icon: Icons.family_restroom_outlined,
-                      label: 'أفراد الأسرة المسجلين',
-                      value: card != null ? '${card.familyCount} أفراد' : '-',
+                    ProfileInfoRow(
+                      label: 'تاريخ انتهاء الصلاحية',
+                      value: card != null
+                          ? dateFormatter.format(card.expiresAt)
+                          : '-',
+                      showDivider: false,
                     ),
                   ],
                 ),
 
                 const Gap(16),
 
-                // 3. Digital Aid Card Info Card
-                if (card != null) ...[
-                  _buildSectionCard(
-                    title: 'بيانات كارت الإغاثة المربوط',
-                    icon: Icons.qr_code_rounded,
-                    children: [
-                      _buildInfoRow(
-                        icon: Icons.numbers_rounded,
-                        label: 'رقم الكارت الذكي',
-                        value: card.cardId,
-                      ),
-                      _buildDivider(),
-                      _buildInfoRow(
-                        icon: Icons.account_balance_wallet_outlined,
-                        label: 'الرصيد الإجمالي المتاح',
-                        value:
-                            '${card.totalBalance.toInt()} ${'common.currency'.tr()}',
-                        valueColor: AppColors.primary,
-                      ),
-                      _buildDivider(),
-                      _buildInfoRow(
-                        icon: Icons.shopping_basket_outlined,
-                        label: 'حصة السلال التموينية',
-                        value: '${card.foodBasketsQuota} سلال غذائية',
-                        valueColor: AppColors.accentDark,
-                      ),
-                      _buildDivider(),
-                      _buildInfoRow(
-                        icon: Icons.event_available_outlined,
-                        label: 'حالة الصلاحية',
-                        value: 'صالح ومفعل للاستخدام',
-                        valueColor: AppColors.success,
-                      ),
-                    ],
-                  ),
-                  const Gap(16),
-                ],
+                // 3. Contact Details
+                ProfileSectionCard(
+                  title: 'معلومات الاتصال والإقامة',
+                  icon: Icons.contact_phone_outlined,
+                  children: [
+                    ProfileInfoRow(
+                      label: 'auth.phone'.tr(),
+                      value: displayPhone,
+                    ),
+                    ProfileInfoRow(
+                      label: 'auth.email'.tr(),
+                      value: displayEmail,
+                    ),
+                    ProfileInfoRow(
+                      label: 'المدينة والمنطقة',
+                      value: displayCity,
+                      showDivider: false,
+                    ),
+                  ],
+                ),
 
-                // 4. App & Support Settings
-                _buildSectionCard(
+                const Gap(16),
+
+                // 4. System Settings & Info Content Links
+                ProfileSectionCard(
                   title: 'إعدادات الحساب والدعم',
                   icon: Icons.settings_outlined,
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        final newLocale = isArabic
-                            ? AppConstants.englishLocale
-                            : AppConstants.arabicLocale;
-                        context.setLocale(newLocale);
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: AppColors.primarySubtle,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Icon(
-                                Icons.language_rounded,
-                                size: 18,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                            const Gap(12),
-                            const Text(
-                              'لغة التطبيق (Language)',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textPrimaryLight,
-                              ),
-                            ),
-                            const Spacer(),
-                            Text(
-                              isArabic ? 'العربية (AR)' : 'English (EN)',
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                            const Gap(6),
-                            const Icon(
-                              Icons.arrow_forward_ios_rounded,
-                              size: 14,
-                              color: AppColors.textMutedLight,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    _buildDivider(),
-                    InkWell(
-                      onTap: () => context.push(RouteNames.aboutUs),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: AppColors.primarySubtle,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Icon(
-                                Icons.info_outline_rounded,
-                                size: 18,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                            const Gap(12),
-                            const Text(
-                              'عن منصة قُوت',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textPrimaryLight,
-                              ),
-                            ),
-                            const Spacer(),
-                            const Icon(
-                              Icons.arrow_forward_ios_rounded,
-                              size: 14,
-                              color: AppColors.textMutedLight,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    _buildDivider(),
-                    InkWell(
-                      onTap: () => context.push(RouteNames.faq),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: AppColors.primarySubtle,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Icon(
-                                Icons.quiz_outlined,
-                                size: 18,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                            const Gap(12),
-                            const Text(
-                              'الأسئلة الشائعة',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textPrimaryLight,
-                              ),
-                            ),
-                            const Spacer(),
-                            const Icon(
-                              Icons.arrow_forward_ios_rounded,
-                              size: 14,
-                              color: AppColors.textMutedLight,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    _buildDivider(),
-                    InkWell(
-                      onTap: () => context.push(RouteNames.termsPrivacy),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: AppColors.primarySubtle,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Icon(
-                                Icons.verified_user_outlined,
-                                size: 18,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                            const Gap(12),
-                            const Text(
-                              'الشروط وسياسة الخصوصية',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textPrimaryLight,
-                              ),
-                            ),
-                            const Spacer(),
-                            const Icon(
-                              Icons.arrow_forward_ios_rounded,
-                              size: 14,
-                              color: AppColors.textMutedLight,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    _buildDivider(),
-                    InkWell(
-                      onTap: () => context.push(RouteNames.contactSupport),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: AppColors.primarySubtle,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Icon(
-                                Icons.headset_mic_outlined,
-                                size: 18,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                            const Gap(12),
-                            const Text(
-                              'مركز الرعاية والدعم الإغاثي',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textPrimaryLight,
-                              ),
-                            ),
-                            const Spacer(),
-                            const Icon(
-                              Icons.arrow_forward_ios_rounded,
-                              size: 14,
-                              color: AppColors.textMutedLight,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                  children: const [
+                    ProfileLanguageTile(),
+                    ProfileInfoContentLinks(wrapInSectionCard: false),
                   ],
                 ),
 
                 const Gap(24),
 
-                // Logout Button
+                // 5. Logout Button
                 SizedBox(
                   width: double.infinity,
                   height: 52,
                   child: OutlinedButton.icon(
-                    onPressed: () => _confirmLogout(context),
+                    onPressed: () => LogoutConfirmDialog.show(context),
                     icon: const Icon(
                       Icons.logout_rounded,
                       color: AppColors.error,
@@ -468,139 +254,6 @@ class BeneficiaryProfileTab extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-
-  Widget _buildSectionCard({
-    required String title,
-    required IconData icon,
-    required List<Widget> children,
-  }) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.borderLight),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppColors.primarySubtle,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(icon, size: 18, color: AppColors.primary),
-              ),
-              const Gap(10),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimaryLight,
-                ),
-              ),
-            ],
-          ),
-          const Gap(12),
-          ...children,
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInfoRow({
-    required IconData icon,
-    required String label,
-    required String value,
-    Color? valueColor,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 2),
-            child: Icon(icon, size: 18, color: AppColors.textMutedLight),
-          ),
-          const Gap(10),
-          Expanded(
-            flex: 5,
-            child: Text(
-              label,
-              style: const TextStyle(
-                fontSize: 13,
-                color: AppColors.textSecondaryLight,
-                height: 1.3,
-              ),
-            ),
-          ),
-          const Gap(10),
-          Flexible(
-            flex: 6,
-            child: Text(
-              value,
-              textAlign: TextAlign.end,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-                color: valueColor ?? AppColors.textPrimaryLight,
-                height: 1.3,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDivider() {
-    return const Divider(height: 1, color: AppColors.borderLight);
-  }
-
-  void _confirmLogout(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('تأكيد تسجيل الخروج'),
-        content: const Text('هل أنت متأكد من رغبتك في تسجيل الخروج من حسابك؟'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('إلغاء'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              sl<AuthCubit>().signOut();
-              context.go(RouteNames.login);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.error,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: const Text('تسجيل الخروج'),
-          ),
-        ],
-      ),
     );
   }
 }

@@ -4,6 +4,7 @@ import 'package:gap/gap.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/services/card_printer_service.dart';
 import '../models/aid_card_model.dart';
 
 class DigitalAidCardWidget extends StatelessWidget {
@@ -96,7 +97,30 @@ class DigitalAidCardWidget extends StatelessWidget {
                     color: AppColors.textSecondaryLight,
                   ),
                 ),
+                const Gap(12),
+
+                // Action Print Button inside Dialog
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.pop(dialogContext);
+                    CardPrinterService.printAidCard(card: card);
+                  },
+                  icon: const Icon(Icons.print_rounded, size: 18),
+                  label: Text(
+                    'digital_card.print_card_button'.tr(),
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size(double.infinity, 44),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                ),
                 const Gap(8),
+
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12,
@@ -106,10 +130,10 @@ class DigitalAidCardWidget extends StatelessWidget {
                     color: AppColors.primarySubtle,
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: const Text(
-                    'وجّه الشاشة نحو ماسح الكاشير لإتمام الصرف',
-                    style: TextStyle(
-                      fontSize: 12,
+                  child: Text(
+                    'digital_card.print_guidance'.tr(),
+                    style: const TextStyle(
+                      fontSize: 11,
                       fontWeight: FontWeight.bold,
                       color: AppColors.primary,
                     ),
@@ -145,7 +169,7 @@ class DigitalAidCardWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header: Brand + Status Pill
+          // Header: Brand + Quick Print + Status Pill
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -174,28 +198,61 @@ class DigitalAidCardWidget extends StatelessWidget {
                   ),
                 ],
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.accent.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: AppColors.accentLight.withValues(alpha: 0.4),
+              Row(
+                children: [
+                  // Quick Print Button
+                  InkWell(
+                    onTap: () => CardPrinterService.printAidCard(card: card),
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.18),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.white24),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.print_rounded, size: 14, color: Colors.white),
+                          const Gap(4),
+                          Text(
+                            'common.print'.tr(),
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-                child: Text(
-                  card.isActive
-                      ? 'digital_card.status_active'.tr()
-                      : 'digital_card.status_pending'.tr(),
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.accentLight,
+                  const Gap(8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.accent.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: AppColors.accentLight.withValues(alpha: 0.4),
+                      ),
+                    ),
+                    child: Text(
+                      card.isActive
+                          ? 'digital_card.status_active'.tr()
+                          : 'digital_card.status_pending'.tr(),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.accentLight,
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
             ],
           ),
@@ -237,18 +294,18 @@ class DigitalAidCardWidget extends StatelessWidget {
                         ),
                       ),
                       const Gap(4),
-                      const Row(
+                      Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.fullscreen_rounded,
                             size: 12,
                             color: AppColors.primary,
                           ),
-                          Gap(2),
+                          const Gap(2),
                           Text(
-                            'انقر للتكبير',
-                            style: TextStyle(
+                            'digital_card.tap_to_enlarge'.tr(),
+                            style: const TextStyle(
                               fontSize: 9,
                               fontWeight: FontWeight.bold,
                               color: AppColors.primary,

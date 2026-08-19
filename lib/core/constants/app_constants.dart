@@ -6,7 +6,7 @@ abstract class AppConstants {
   static const String prefsKeyLocale = 'app_locale';
   static const String prefsKeyThemeMode = 'app_theme_mode';
   static const String prefsKeyRememberMe = 'remember_me';
-  static const String prefsKeySavedEmail = 'saved_email';
+  static const String prefsKeyUserSession = 'user_session_cache';
 
   // Locales
   static const Locale arabicLocale = Locale('ar');

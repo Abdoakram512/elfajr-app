@@ -16,6 +16,11 @@ class MerchantRepositoryImpl implements MerchantRepository {
   }
 
   @override
+  Future<AidCardModel?> searchCardByIdOrNationalId(String query) async {
+    return await _remoteDataSource.searchCardByIdOrNationalId(query);
+  }
+
+  @override
   Future<RedemptionTransactionModel> processRedemption({
     required String cardId,
     required double amount,

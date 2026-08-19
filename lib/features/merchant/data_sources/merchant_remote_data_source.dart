@@ -5,6 +5,7 @@ import '../models/redemption_transaction_model.dart';
 
 abstract class MerchantRemoteDataSource {
   Future<AidCardModel?> fetchCardById(String cardId);
+  Future<AidCardModel?> searchCardByIdOrNationalId(String query);
   Future<RedemptionTransactionModel> commitRedemption({
     required String cardId,
     required double amount,
@@ -59,6 +60,47 @@ class MerchantRemoteDataSourceImpl implements MerchantRemoteDataSource {
       return null;
     } catch (e) {
       throw AppException('فشل في جلب بيانات كارت الإغاثة: $e');
+    }
+  }
+
+  @override
+  Future<AidCardModel?> searchCardByIdOrNationalId(String query) async {
+    final clean = query.trim();
+    if (clean.isEmpty) return null;
+
+    try {
+      // 1. Direct fetch by cardId / documentId
+      final directCard = await fetchCardById(clean);
+      if (directCard != null) return directCard;
+
+      // 2. Query by nationalId on aid_cards
+      final byNat = await _firestore
+          .collection('aid_cards')
+          .where('nationalId', isEqualTo: clean)
+          .limit(1)
+          .get();
+      if (byNat.docs.isNotEmpty) {
+        final d = byNat.docs.first;
+        return AidCardModel.fromMap(d.data(), documentId: d.id);
+      }
+
+      // 3. Query by phone on users
+      final byPhone = await _firestore
+          .collection('users')
+          .where('phone', isEqualTo: clean)
+          .limit(1)
+          .get();
+      if (byPhone.docs.isNotEmpty) {
+        final u = byPhone.docs.first.data();
+        final cardId = u['activeCardId'] as String?;
+        if (cardId != null && cardId.isNotEmpty) {
+          return fetchCardById(cardId);
+        }
+      }
+
+      return null;
+    } catch (e) {
+      throw AppException('فشل في البحث عن كارت المستفيد: $e');
     }
   }
 

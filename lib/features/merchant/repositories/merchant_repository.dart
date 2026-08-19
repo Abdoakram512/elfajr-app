@@ -3,6 +3,7 @@ import '../models/redemption_transaction_model.dart';
 
 abstract class MerchantRepository {
   Future<AidCardModel?> verifyScannedCard(String cardId);
+  Future<AidCardModel?> searchCardByIdOrNationalId(String query);
   Future<RedemptionTransactionModel> processRedemption({
     required String cardId,
     required double amount,

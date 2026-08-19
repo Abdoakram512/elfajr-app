@@ -46,9 +46,7 @@ class QoutApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: [
-        BlocProvider.value(value: sl<AuthCubit>()),
-      ],
+      providers: [BlocProvider.value(value: sl<AuthCubit>())],
       child: ScreenUtilInit(
         designSize: const Size(390, 844),
         minTextAdapt: true,
@@ -64,6 +62,9 @@ class QoutApp extends StatelessWidget {
             supportedLocales: context.supportedLocales,
             locale: context.locale,
             routerConfig: AppRouter.router,
+            builder: (context, routerChild) {
+              return SafeArea(child: routerChild ?? const SizedBox.shrink());
+            },
           );
         },
       ),

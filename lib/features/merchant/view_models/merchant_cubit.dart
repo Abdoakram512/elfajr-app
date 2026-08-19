@@ -62,7 +62,26 @@ class MerchantCubit extends Cubit<MerchantState> {
       if (card != null) {
         emit(state.copyWith(scannedCard: card));
       } else {
-        emit(state.copyWith(errorMessage: 'كارت الإغاثة غير موجود أو غير صالح'));
+        emit(state.copyWith(errorMessage: 'كارت الإغاثة غير مسجل أو غير صالح'));
+      }
+    } catch (e) {
+      emit(state.copyWith(errorMessage: e.toString().replaceAll('AppException: ', '')));
+    }
+  }
+
+  Future<void> searchCardManual(String query) async {
+    final clean = query.trim();
+    if (clean.isEmpty) {
+      emit(state.copyWith(errorMessage: 'يرجى إدخال رقم الهوية الوطنية أو رقم الكارت'));
+      return;
+    }
+
+    try {
+      final card = await _repository.searchCardByIdOrNationalId(clean);
+      if (card != null) {
+        emit(state.copyWith(scannedCard: card));
+      } else {
+        emit(state.copyWith(errorMessage: 'لم يتم العثور على أي كارت برقم الهوية أو الكارت المدخل'));
       }
     } catch (e) {
       emit(state.copyWith(errorMessage: e.toString().replaceAll('AppException: ', '')));
