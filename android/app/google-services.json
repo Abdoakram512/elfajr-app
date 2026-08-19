@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "974658039816",
+    "project_id": "qout-f853f",
+    "storage_bucket": "qout-f853f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:974658039816:android:6701b993fa6a2f488b61bd",
+        "android_client_info": {
+          "package_name": "com.example.qout"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQssp6ASuH_YoOaq3AZXFy7CFhGrz2rHk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

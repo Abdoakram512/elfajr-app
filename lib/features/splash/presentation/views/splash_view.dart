@@ -49,114 +49,145 @@ class _SplashViewBody extends StatelessWidget {
               end: Alignment.bottomCenter,
             ),
           ),
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              // Ambient Soft Glow in the Center (Static, Non-distracting)
-              Container(
-                width: 240,
-                height: 240,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppColors.primaryLight.withValues(alpha: 0.08),
-                ),
-              ),
-
-              // Central Clean Brand Identity
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
                 children: [
-                  // Clean, Premium Emblem
+                  // Optical Center Top Spacer (Places brand at the ideal 40-42% vertical eye-line)
+                  const Spacer(flex: 5),
+
+                  // 1. Central Brand Emblem
                   Container(
-                    width: 108,
-                    height: 108,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF10875C), Color(0xFF0A5C3E)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      border: Border.all(
-                        color: AppColors.accent.withValues(alpha: 0.6),
-                        width: 2,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.25),
-                          blurRadius: 24,
-                          offset: const Offset(0, 8),
+                        width: 96,
+                        height: 96,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF10875C), Color(0xFF074830)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          border: Border.all(
+                            color: AppColors.accentLight.withValues(alpha: 0.7),
+                            width: 1.8,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.25),
+                              blurRadius: 24,
+                              offset: const Offset(0, 8),
+                            ),
+                            BoxShadow(
+                              color: AppColors.primaryLight.withValues(
+                                alpha: 0.2,
+                              ),
+                              blurRadius: 36,
+                              spreadRadius: 2,
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    child: const Center(
-                      child: Icon(
-                        Icons.volunteer_activism_rounded,
-                        size: 48,
-                        color: Colors.white,
-                      ),
-                    ),
-                  )
-                      .animate()
-                      .scale(
-                        duration: 600.ms,
-                        curve: Curves.easeOutBack,
+                        child: Center(
+                          child: Container(
+                            width: 58,
+                            height: 58,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.white.withValues(alpha: 0.12),
+                            ),
+                            child: const Icon(
+                              Icons.volunteer_activism_rounded,
+                              size: 34,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
                       )
-                      .fadeIn(duration: 500.ms),
-
-                  const Gap(24),
-
-                  // Brand Name (قوت)
-                  Text(
-                    'app_name'.tr(),
-                    style: const TextStyle(
-                      fontSize: 40,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      letterSpacing: 2,
-                    ),
-                  )
                       .animate()
-                      .fadeIn(delay: 200.ms, duration: 500.ms)
-                      .slideY(begin: 0.2, end: 0, duration: 500.ms),
+                      .scale(duration: 500.ms, curve: Curves.easeOutBack)
+                      .fadeIn(duration: 400.ms),
+
+                  const Gap(20),
+
+                  // 2. Brand Name Typography
+                  Text(
+                        'app_name'.tr(),
+                        style: const TextStyle(
+                          fontSize: 38,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                          letterSpacing: 2.0,
+                        ),
+                      )
+                      .animate()
+                      .fadeIn(delay: 150.ms, duration: 450.ms)
+                      .slideY(begin: 0.2, end: 0, duration: 450.ms),
 
                   const Gap(8),
 
-                  // Slogan / Tagline (Clean & Elegant)
+                  // 3. Slogan / Tagline
                   Text(
-                    'app_tagline'.tr(),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.white.withValues(alpha: 0.8),
-                      letterSpacing: 0.3,
-                    ),
-                  )
+                        'app_tagline'.tr(),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.white.withValues(alpha: 0.8),
+                          letterSpacing: 0.3,
+                        ),
+                      )
                       .animate()
-                      .fadeIn(delay: 350.ms, duration: 500.ms)
-                      .slideY(begin: 0.2, end: 0, duration: 500.ms),
+                      .fadeIn(delay: 250.ms, duration: 450.ms)
+                      .slideY(begin: 0.2, end: 0, duration: 450.ms),
+
+                  // Bottom Balance Spacer
+                  const Spacer(flex: 4),
+
+                  // 4. Elegant Staggered 3-Dot Loading Pulse
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildLoadingDot(delayMs: 0),
+                      const Gap(8),
+                      _buildLoadingDot(delayMs: 180),
+                      const Gap(8),
+                      _buildLoadingDot(delayMs: 360),
+                    ],
+                  ).animate().fadeIn(delay: 400.ms, duration: 350.ms),
+
+                  const Gap(32),
                 ],
               ),
-
-              // Bottom Minimal Indicator
-              Positioned(
-                bottom: 48,
-                child: SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      AppColors.accent.withValues(alpha: 0.8),
-                    ),
-                  ),
-                ).animate().fadeIn(delay: 500.ms, duration: 400.ms),
-              ),
-            ],
+            ),
           ),
         ),
       ),
     );
+  }
+
+  Widget _buildLoadingDot({required int delayMs}) {
+    return Container(
+          width: 7,
+          height: 7,
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            color: AppColors.accentLight,
+          ),
+        )
+        .animate(onPlay: (controller) => controller.repeat(reverse: true))
+        .scale(
+          begin: const Offset(0.7, 0.7),
+          end: const Offset(1.3, 1.3),
+          duration: 600.ms,
+          delay: delayMs.ms,
+          curve: Curves.easeInOut,
+        )
+        .fade(
+          begin: 0.3,
+          end: 1.0,
+          duration: 600.ms,
+          delay: delayMs.ms,
+          curve: Curves.easeInOut,
+        );
   }
 }

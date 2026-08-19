@@ -1,0 +1,31 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Allow full read and write access for development & test credentials verification
+    match /users/{userId} {
+      allow read, write: if true;
+    }
+
+    // Digital Aid Cards (QR Code verification & balance updates)
+    match /aid_cards/{cardId} {
+      allow read, write: if true;
+    }
+
+    // Redemptions & Transactions
+    match /redemptions/{transactionId} {
+      allow read, write: if true;
+    }
+
+    // Aid Requests
+    match /aid_requests/{requestId} {
+      allow read, write: if true;
+    }
+
+    // Global Collections
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}

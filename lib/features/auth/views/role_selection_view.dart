@@ -19,7 +19,7 @@ class RoleSelectionView extends StatefulWidget {
 }
 
 class _RoleSelectionViewState extends State<RoleSelectionView> {
-  UserRole _selectedRole = UserRole.donor;
+  UserRole _selectedRole = UserRole.beneficiary;
 
   @override
   Widget build(BuildContext context) {
@@ -139,19 +139,20 @@ class _RoleSelectionViewState extends State<RoleSelectionView> {
 
               const Gap(28),
 
-              // Role Cards List
+              // The 3 Core Role Cards
               Expanded(
                 child: ListView(
                   children: [
-                    // Donor Card
+                    // 1. Beneficiary Card
                     RoleCard(
-                      role: UserRole.donor,
-                      title: 'auth.role_donor'.tr(),
-                      description: 'auth.role_donor_desc'.tr(),
-                      icon: Icons.favorite_rounded,
+                      role: UserRole.beneficiary,
+                      title: 'auth.role_beneficiary'.tr(),
+                      description: 'auth.role_beneficiary_desc'.tr(),
+                      icon: Icons.qr_code_rounded,
                       themeColor: AppColors.primary,
-                      isSelected: _selectedRole == UserRole.donor,
-                      onSelect: () => setState(() => _selectedRole = UserRole.donor),
+                      isSelected: _selectedRole == UserRole.beneficiary,
+                      onSelect: () =>
+                          setState(() => _selectedRole = UserRole.beneficiary),
                     )
                         .animate()
                         .fadeIn(delay: 200.ms, duration: 400.ms)
@@ -159,24 +160,24 @@ class _RoleSelectionViewState extends State<RoleSelectionView> {
 
                     const Gap(16),
 
-                    // Beneficiary Card
+                    // 2. Merchant / Aid Dispenser Card
                     RoleCard(
-                      role: UserRole.beneficiary,
-                      title: 'auth.role_beneficiary'.tr(),
-                      description: 'auth.role_beneficiary_desc'.tr(),
-                      icon: Icons.shield_rounded,
-                      themeColor: AppColors.accentDark,
-                      isSelected: _selectedRole == UserRole.beneficiary,
+                      role: UserRole.merchant,
+                      title: 'auth.role_merchant'.tr(),
+                      description: 'auth.role_merchant_desc'.tr(),
+                      icon: Icons.storefront_rounded,
+                      themeColor: const Color(0xFFD97706),
+                      isSelected: _selectedRole == UserRole.merchant,
                       onSelect: () =>
-                          setState(() => _selectedRole = UserRole.beneficiary),
+                          setState(() => _selectedRole = UserRole.merchant),
                     )
                         .animate()
                         .fadeIn(delay: 300.ms, duration: 400.ms)
                         .slideX(begin: 0.1, end: 0),
 
+                    // [FROZEN TEMPORARILY] Volunteer / Delivery Agent Card
+                    /*
                     const Gap(16),
-
-                    // Volunteer Card
                     RoleCard(
                       role: UserRole.volunteer,
                       title: 'auth.role_volunteer'.tr(),
@@ -190,6 +191,7 @@ class _RoleSelectionViewState extends State<RoleSelectionView> {
                         .animate()
                         .fadeIn(delay: 400.ms, duration: 400.ms)
                         .slideX(begin: 0.1, end: 0),
+                    */
                   ],
                 ),
               ),

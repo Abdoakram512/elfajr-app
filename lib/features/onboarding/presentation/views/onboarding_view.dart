@@ -10,6 +10,7 @@ import '../../../../app/service_locator.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/routes/route_names.dart';
+import '../../../../core/widgets/primary_button.dart';
 import '../cubit/onboarding_cubit.dart';
 import '../cubit/onboarding_state.dart';
 import '../widgets/floating_chip_widget.dart';
@@ -64,7 +65,10 @@ class _OnboardingViewBodyState extends State<_OnboardingViewBody> {
               children: [
                 // 1. Top Navigation Bar (Language Switcher Pill & Skip Button)
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -91,7 +95,9 @@ class _OnboardingViewBodyState extends State<_OnboardingViewBody> {
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.primary.withValues(alpha: 0.08),
+                                color: AppColors.primary.withValues(
+                                  alpha: 0.08,
+                                ),
                                 blurRadius: 12,
                                 offset: const Offset(0, 3),
                               ),
@@ -163,7 +169,10 @@ class _OnboardingViewBodyState extends State<_OnboardingViewBody> {
                       _OnboardingSlide(
                         icon: Icons.favorite_rounded,
                         accentColor: AppColors.primary,
-                        gradientColors: const [Color(0xFFE6F5EF), Color(0xFFC7EBDD)],
+                        gradientColors: const [
+                          Color(0xFFE6F5EF),
+                          Color(0xFFC7EBDD),
+                        ],
                         titleKey: 'onboarding.title_1',
                         descKey: 'onboarding.desc_1',
                         chip1Text: 'onboarding.chip_transparency'.tr(),
@@ -176,7 +185,10 @@ class _OnboardingViewBodyState extends State<_OnboardingViewBody> {
                       _OnboardingSlide(
                         icon: Icons.shield_rounded,
                         accentColor: AppColors.accentDark,
-                        gradientColors: const [Color(0xFFFEF3C7), Color(0xFFFDE68A)],
+                        gradientColors: const [
+                          Color(0xFFFEF3C7),
+                          Color(0xFFFDE68A),
+                        ],
                         titleKey: 'onboarding.title_2',
                         descKey: 'onboarding.desc_2',
                         chip1Text: 'onboarding.chip_privacy'.tr(),
@@ -189,7 +201,10 @@ class _OnboardingViewBodyState extends State<_OnboardingViewBody> {
                       _OnboardingSlide(
                         icon: Icons.groups_rounded,
                         accentColor: const Color(0xFF0284C7),
-                        gradientColors: const [Color(0xFFE0F2FE), Color(0xFFBAE6FD)],
+                        gradientColors: const [
+                          Color(0xFFE0F2FE),
+                          Color(0xFFBAE6FD),
+                        ],
                         titleKey: 'onboarding.title_3',
                         descKey: 'onboarding.desc_3',
                         chip1Text: 'onboarding.chip_field'.tr(),
@@ -203,7 +218,10 @@ class _OnboardingViewBodyState extends State<_OnboardingViewBody> {
 
                 // 3. Bottom Indicator & Dynamic Call to Action
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 20,
+                  ),
                   child: Column(
                     children: [
                       // Expanding Dots Indicator
@@ -225,55 +243,22 @@ class _OnboardingViewBodyState extends State<_OnboardingViewBody> {
                       const Gap(28),
 
                       // Primary Call-to-Action Button with Pulse Animation on Last Step
-                      SizedBox(
-                        width: double.infinity,
-                        height: 56,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            if (isLastPage) {
-                              cubit.completeOnboarding();
-                            } else {
-                              _pageController.nextPage(
-                                duration: AppConstants.pageTransitionDuration,
-                                curve: Curves.easeInOut,
-                              );
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: isLastPage
-                                ? AppColors.primary
-                                : AppColors.primary,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18),
-                            ),
-                            elevation: isLastPage ? 4 : 2,
-                            shadowColor: AppColors.primary.withValues(alpha: 0.4),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                (isLastPage
-                                        ? 'common.get_started'
-                                        : 'common.next')
-                                    .tr(),
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const Gap(8),
-                              Icon(
-                                isArabic
-                                    ? Icons.arrow_back_rounded
-                                    : Icons.arrow_forward_rounded,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                            ],
-                          ),
-                        ),
+                      PrimaryButton(
+                        text: (isLastPage
+                                ? 'common.get_started'
+                                : 'common.next')
+                            .tr(),
+                        trailingIcon: Icons.arrow_forward_rounded,
+                        onPressed: () {
+                          if (isLastPage) {
+                            cubit.completeOnboarding();
+                          } else {
+                            _pageController.nextPage(
+                              duration: AppConstants.pageTransitionDuration,
+                              curve: Curves.easeInOut,
+                            );
+                          }
+                        },
                       ),
                     ],
                   ),
@@ -327,47 +312,43 @@ class _OnboardingSlide extends StatelessWidget {
               children: [
                 // Glowing Background Outer Aura
                 Container(
-                  width: 230,
-                  height: 230,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: gradientColors,
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: accentColor.withValues(alpha: 0.22),
-                        blurRadius: 36,
-                        spreadRadius: 4,
-                        offset: const Offset(0, 14),
-                      ),
-                    ],
-                  ),
-                  child: Center(
-                    child: Container(
-                      width: 124,
-                      height: 124,
+                      width: 230,
+                      height: 230,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        gradient: LinearGradient(
+                          colors: gradientColors,
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.08),
-                            blurRadius: 20,
-                            offset: const Offset(0, 6),
+                            color: accentColor.withValues(alpha: 0.22),
+                            blurRadius: 36,
+                            spreadRadius: 4,
+                            offset: const Offset(0, 14),
                           ),
                         ],
                       ),
-                      child: Icon(
-                        icon,
-                        size: 58,
-                        color: accentColor,
+                      child: Center(
+                        child: Container(
+                          width: 124,
+                          height: 124,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.08),
+                                blurRadius: 20,
+                                offset: const Offset(0, 6),
+                              ),
+                            ],
+                          ),
+                          child: Icon(icon, size: 58, color: accentColor),
+                        ),
                       ),
-                    ),
-                  ),
-                )
+                    )
                     .animate()
                     .scale(duration: 600.ms, curve: Curves.easeOutBack)
                     .fadeIn(duration: 500.ms),
@@ -405,15 +386,15 @@ class _OnboardingSlide extends StatelessWidget {
 
           // Slide Title
           Text(
-            titleKey.tr(),
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 26,
-              fontWeight: FontWeight.w800,
-              color: AppColors.textPrimaryLight,
-              letterSpacing: -0.3,
-            ),
-          )
+                titleKey.tr(),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textPrimaryLight,
+                  letterSpacing: -0.3,
+                ),
+              )
               .animate()
               .fadeIn(delay: 200.ms, duration: 400.ms)
               .slideY(begin: 0.15, end: 0, duration: 400.ms),
@@ -422,17 +403,17 @@ class _OnboardingSlide extends StatelessWidget {
 
           // Slide Description
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Text(
-              descKey.tr(),
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 15,
-                height: 1.6,
-                color: AppColors.textSecondaryLight,
-              ),
-            ),
-          )
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Text(
+                  descKey.tr(),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    height: 1.6,
+                    color: AppColors.textSecondaryLight,
+                  ),
+                ),
+              )
               .animate()
               .fadeIn(delay: 300.ms, duration: 400.ms)
               .slideY(begin: 0.15, end: 0, duration: 400.ms),

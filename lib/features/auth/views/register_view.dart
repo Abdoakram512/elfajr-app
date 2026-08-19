@@ -93,6 +93,9 @@ class _RegisterViewState extends State<RegisterView> {
             case UserRole.beneficiary:
               context.go(RouteNames.beneficiaryDashboard);
               break;
+            case UserRole.merchant:
+              context.go(RouteNames.merchantDashboard);
+              break;
           }
         } else if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -143,22 +146,33 @@ class _RegisterViewState extends State<RegisterView> {
                                 ? Icons.favorite_rounded
                                 : _selectedRole == UserRole.beneficiary
                                     ? Icons.shield_rounded
-                                    : Icons.groups_rounded,
+                                    : _selectedRole == UserRole.merchant
+                                        ? Icons.storefront_rounded
+                                        : Icons.groups_rounded,
                             color: AppColors.primary,
                             size: 20,
                           ),
                           const Gap(8),
-                          Text(
-                            '${'auth.registering_as'.tr()} ${'auth.role_${_selectedRole.name}'.tr()}',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primary,
+                          Expanded(
+                            child: Text(
+                              '${'auth.registering_as'.tr()} ${'auth.role_${_selectedRole.name}'.tr()}',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primary,
+                              ),
                             ),
                           ),
-                          const Spacer(),
+                          const Gap(8),
                           TextButton(
                             onPressed: () => context.pop(),
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                              minimumSize: Size.zero,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
                             child: Text(
                               'auth.change_role'.tr(),
                               style: const TextStyle(
@@ -227,9 +241,10 @@ class _RegisterViewState extends State<RegisterView> {
 
                     const Gap(18),
 
-                    // Role-Specific Fields (City)
+                    // Role-Specific Fields (City, Skills, Store Info)
                     if (_selectedRole == UserRole.volunteer ||
-                        _selectedRole == UserRole.beneficiary) ...[
+                        _selectedRole == UserRole.beneficiary ||
+                        _selectedRole == UserRole.merchant) ...[
                       CustomTextField(
                         controller: _cityController,
                         label: 'auth.city'.tr(),
@@ -245,16 +260,22 @@ class _RegisterViewState extends State<RegisterView> {
                       const Gap(18),
                       CustomTextField(
                         controller: _extraDetailsController,
-                        label: _selectedRole == UserRole.volunteer
-                            ? 'auth.skills_label'.tr()
-                            : 'auth.aid_type_label'.tr(),
-                        hint: _selectedRole == UserRole.volunteer
-                            ? 'auth.skills_hint'.tr()
-                            : 'auth.aid_type_hint'.tr(),
-                        prefixIcon: _selectedRole == UserRole.volunteer
-                            ? Icons.handyman_outlined
-                            : Icons.category_outlined,
-                        maxLines: 2,
+                        label: _selectedRole == UserRole.merchant
+                            ? 'auth.store_name_label'.tr()
+                            : (_selectedRole == UserRole.volunteer
+                                ? 'auth.skills_label'.tr()
+                                : 'auth.aid_type_label'.tr()),
+                        hint: _selectedRole == UserRole.merchant
+                            ? 'auth.store_name_hint'.tr()
+                            : (_selectedRole == UserRole.volunteer
+                                ? 'auth.skills_hint'.tr()
+                                : 'auth.aid_type_hint'.tr()),
+                        prefixIcon: _selectedRole == UserRole.merchant
+                            ? Icons.storefront_rounded
+                            : (_selectedRole == UserRole.volunteer
+                                ? Icons.handyman_outlined
+                                : Icons.category_outlined),
+                        maxLines: 1,
                       ),
                       const Gap(18),
                     ],

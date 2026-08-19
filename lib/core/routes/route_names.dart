@@ -10,5 +10,6 @@ abstract class RouteNames {
   static const String donorDashboard = '/donor-dashboard';
   static const String beneficiaryDashboard = '/beneficiary-dashboard';
   static const String volunteerDashboard = '/volunteer-dashboard';
+  static const String merchantDashboard = '/merchant-dashboard';
   static const String adminDashboard = '/admin-dashboard';
 }

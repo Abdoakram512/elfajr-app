@@ -2,6 +2,7 @@ enum UserRole {
   donor,
   beneficiary,
   volunteer,
+  merchant,
   admin;
 
   String get nameString => name;
@@ -17,4 +18,5 @@ enum UserRole {
   bool get isVolunteer => this == UserRole.volunteer;
   bool get isBeneficiary => this == UserRole.beneficiary;
   bool get isDonor => this == UserRole.donor;
+  bool get isMerchant => this == UserRole.merchant;
 }

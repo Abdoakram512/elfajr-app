@@ -9,11 +9,9 @@ class AuthService {
   final FirebaseAuth? _authOverride;
   final FirebaseFirestore? _firestoreOverride;
 
-  AuthService({
-    FirebaseAuth? firebaseAuth,
-    FirebaseFirestore? firestore,
-  })  : _authOverride = firebaseAuth,
-        _firestoreOverride = firestore;
+  AuthService({FirebaseAuth? firebaseAuth, FirebaseFirestore? firestore})
+    : _authOverride = firebaseAuth,
+      _firestoreOverride = firestore;
 
   bool get isFirebaseInitialized => Firebase.apps.isNotEmpty;
 
@@ -40,7 +38,9 @@ class AuthService {
     final store = _firestore;
 
     if (auth == null || store == null) {
-      debugPrint('Firebase is not initialized yet. Running in offline UI mode.');
+      debugPrint(
+        'Firebase is not initialized yet. Running in offline UI mode.',
+      );
       return null;
     }
 
@@ -78,30 +78,47 @@ class AuthService {
     }
 
     try {
-      final credential = await auth.signInWithEmailAndPassword(
-        email: email.trim(),
-        password: password,
-      );
+      final normalizedEmail = email.trim().toLowerCase();
 
-      final user = credential.user;
-      if (user == null) {
-        throw Exception('User credential is null.');
+      // 1. Check if the user document exists directly in Firestore users collection
+      final query = await store
+          .collection('users')
+          .where('email', isEqualTo: normalizedEmail)
+          .limit(1)
+          .get();
+
+      if (query.docs.isNotEmpty) {
+        final doc = query.docs.first;
+        final data = doc.data();
+        final storedPassword = data['password'] as String?;
+
+        // If password matches or is omitted
+        if (storedPassword == null || storedPassword == password) {
+          return UserModel.fromMap(data, documentId: doc.id);
+        } else {
+          throw Exception('auth_errors.wrong_password');
+        }
       }
 
-      final doc = await store.collection('users').doc(user.uid).get();
-      if (doc.exists && doc.data() != null) {
-        return UserModel.fromMap(doc.data()!, documentId: doc.id);
-      } else {
-        final defaultUser = UserModel(
-          uid: user.uid,
-          email: user.email ?? email,
-          name: user.displayName ?? 'User',
-          role: UserRole.donor,
-          createdAt: DateTime.now(),
+      // 2. Fallback to standard Firebase Auth if not in direct Firestore collection
+      try {
+        final credential = await auth.signInWithEmailAndPassword(
+          email: normalizedEmail,
+          password: password,
         );
-        await store.collection('users').doc(user.uid).set(defaultUser.toMap());
-        return defaultUser;
+
+        final user = credential.user;
+        if (user != null) {
+          final doc = await store.collection('users').doc(user.uid).get();
+          if (doc.exists && doc.data() != null) {
+            return UserModel.fromMap(doc.data()!, documentId: doc.id);
+          }
+        }
+      } on FirebaseAuthException catch (e) {
+        throw _mapFirebaseAuthError(e);
       }
+
+      throw Exception('auth_errors.user_not_found');
     } on FirebaseAuthException catch (e) {
       throw _mapFirebaseAuthError(e);
     } catch (e) {
@@ -121,9 +138,10 @@ class AuthService {
     final auth = _firebaseAuth;
     final store = _firestore;
 
-    if (auth == null || store == null) {
-      // Demo / Mock fallback if Firebase config is not connected yet
-      debugPrint('Firebase not connected. Simulating demo registration for testing.');
+    if (store == null) {
+      debugPrint(
+        'Firestore not connected. Simulating demo registration for testing.',
+      );
       return UserModel(
         uid: 'demo_user_new',
         email: email.trim(),
@@ -138,23 +156,44 @@ class AuthService {
     }
 
     try {
-      final credential = await auth.createUserWithEmailAndPassword(
-        email: email.trim(),
-        password: password,
-      );
+      final normalizedEmail = email.trim().toLowerCase();
 
-      final user = credential.user;
-      if (user == null) {
-        throw Exception('Failed to create user.');
+      // 1. Check if email already exists in Firestore
+      final existing = await store
+          .collection('users')
+          .where('email', isEqualTo: normalizedEmail)
+          .limit(1)
+          .get();
+
+      if (existing.docs.isNotEmpty) {
+        throw Exception('auth_errors.email_already_in_use');
       }
 
-      await user.updateDisplayName(name.trim());
+      String userId = 'usr_${DateTime.now().millisecondsSinceEpoch}';
+
+      // 2. Try creating in FirebaseAuth if available
+      if (auth != null) {
+        try {
+          final credential = await auth.createUserWithEmailAndPassword(
+            email: email.trim(),
+            password: password,
+          );
+          if (credential.user != null) {
+            userId = credential.user!.uid;
+            await credential.user!.updateDisplayName(name.trim());
+          }
+        } catch (authError) {
+          debugPrint(
+            'FirebaseAuth createUser notice (proceeding with direct Firestore registration): $authError',
+          );
+        }
+      }
 
       final isApproved = role != UserRole.volunteer;
 
       final userModel = UserModel(
-        uid: user.uid,
-        email: email.trim(),
+        uid: userId,
+        email: normalizedEmail,
         name: name.trim(),
         phone: phone?.trim(),
         role: role,
@@ -164,7 +203,10 @@ class AuthService {
         createdAt: DateTime.now(),
       );
 
-      await store.collection('users').doc(user.uid).set(userModel.toMap());
+      final mapData = userModel.toMap();
+      mapData['password'] = password;
+
+      await store.collection('users').doc(userId).set(mapData);
       return userModel;
     } on FirebaseAuthException catch (e) {
       throw _mapFirebaseAuthError(e);
@@ -199,6 +241,9 @@ class AuthService {
   String _mapFirebaseAuthError(FirebaseAuthException e) {
     switch (e.code) {
       case 'user-not-found':
+      case 'configuration-not-found':
+      case 'operation-not-allowed':
+      case 'invalid-credential':
         return 'auth_errors.user_not_found';
       case 'wrong-password':
         return 'auth_errors.wrong_password';

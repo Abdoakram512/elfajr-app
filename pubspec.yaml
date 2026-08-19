@@ -46,6 +46,10 @@ dependencies:
   cloud_firestore: ^5.6.5
   firebase_storage: ^12.4.4
 
+  # QR Code Ecosystem
+  qr_flutter: ^4.1.0
+  mobile_scanner: ^6.0.4
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

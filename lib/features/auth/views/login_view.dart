@@ -36,9 +36,9 @@ class _LoginViewState extends State<LoginView> {
   void _submitLogin() {
     if (_formKey.currentState?.validate() ?? false) {
       context.read<AuthCubit>().login(
-            email: _emailController.text.trim(),
-            password: _passwordController.text,
-          );
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
     }
   }
 
@@ -68,6 +68,9 @@ class _LoginViewState extends State<LoginView> {
               break;
             case UserRole.beneficiary:
               context.go(RouteNames.beneficiaryDashboard);
+              break;
+            case UserRole.merchant:
+              context.go(RouteNames.merchantDashboard);
               break;
           }
         } else if (state is AuthError) {
@@ -171,13 +174,13 @@ class _LoginViewState extends State<LoginView> {
 
                     // Greeting Header
                     Text(
-                      'auth.welcome_back'.tr(),
-                      style: const TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimaryLight,
-                      ),
-                    )
+                          'auth.welcome_back'.tr(),
+                          style: const TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimaryLight,
+                          ),
+                        )
                         .animate()
                         .fadeIn(duration: 400.ms)
                         .slideY(begin: 0.2, end: 0, duration: 400.ms),
@@ -185,12 +188,12 @@ class _LoginViewState extends State<LoginView> {
                     const Gap(8),
 
                     Text(
-                      'auth.login_subtitle'.tr(),
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: AppColors.textSecondaryLight,
-                      ),
-                    )
+                          'auth.login_subtitle'.tr(),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: AppColors.textSecondaryLight,
+                          ),
+                        )
                         .animate()
                         .fadeIn(delay: 100.ms, duration: 400.ms)
                         .slideY(begin: 0.2, end: 0, duration: 400.ms),
@@ -199,21 +202,21 @@ class _LoginViewState extends State<LoginView> {
 
                     // Email Field
                     CustomTextField(
-                      controller: _emailController,
-                      label: 'auth.email'.tr(),
-                      hint: 'example@domain.com',
-                      prefixIcon: Icons.email_outlined,
-                      keyboardType: TextInputType.emailAddress,
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'auth.validation_email_required'.tr();
-                        }
-                        if (!value.contains('@') || !value.contains('.')) {
-                          return 'auth.validation_email_invalid'.tr();
-                        }
-                        return null;
-                      },
-                    )
+                          controller: _emailController,
+                          label: 'auth.email'.tr(),
+                          hint: 'example@domain.com',
+                          prefixIcon: Icons.email_outlined,
+                          keyboardType: TextInputType.emailAddress,
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'auth.validation_email_required'.tr();
+                            }
+                            if (!value.contains('@') || !value.contains('.')) {
+                              return 'auth.validation_email_invalid'.tr();
+                            }
+                            return null;
+                          },
+                        )
                         .animate()
                         .fadeIn(delay: 200.ms, duration: 400.ms)
                         .slideX(begin: 0.1, end: 0),
@@ -222,21 +225,21 @@ class _LoginViewState extends State<LoginView> {
 
                     // Password Field
                     CustomTextField(
-                      controller: _passwordController,
-                      label: 'auth.password'.tr(),
-                      hint: '••••••••',
-                      prefixIcon: Icons.lock_outline_rounded,
-                      isPassword: true,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'auth.validation_password_required'.tr();
-                        }
-                        if (value.length < 6) {
-                          return 'auth.validation_password_min'.tr();
-                        }
-                        return null;
-                      },
-                    )
+                          controller: _passwordController,
+                          label: 'auth.password'.tr(),
+                          hint: '••••••••',
+                          prefixIcon: Icons.lock_outline_rounded,
+                          isPassword: true,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'auth.validation_password_required'.tr();
+                            }
+                            if (value.length < 6) {
+                              return 'auth.validation_password_min'.tr();
+                            }
+                            return null;
+                          },
+                        )
                         .animate()
                         .fadeIn(delay: 300.ms, duration: 400.ms)
                         .slideX(begin: 0.1, end: 0),
@@ -266,10 +269,10 @@ class _LoginViewState extends State<LoginView> {
 
                     // Login Button
                     PrimaryButton(
-                      text: 'auth.login'.tr(),
-                      isLoading: isLoading,
-                      onPressed: _submitLogin,
-                    )
+                          text: 'auth.login'.tr(),
+                          isLoading: isLoading,
+                          onPressed: _submitLogin,
+                        )
                         .animate()
                         .fadeIn(delay: 400.ms, duration: 400.ms)
                         .slideY(begin: 0.2, end: 0),
