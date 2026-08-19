@@ -7,8 +7,8 @@ class InfoCubit extends Cubit<InfoState> {
   final InfoRepository _repository;
 
   InfoCubit({InfoRepository? repository})
-      : _repository = repository ?? sl<InfoRepository>(),
-        super(const InfoState(isLoading: true)) {
+    : _repository = repository ?? getIt<InfoRepository>(),
+      super(const InfoState(isLoading: true)) {
     loadAllInfo();
   }
 
@@ -23,18 +23,22 @@ class InfoCubit extends Cubit<InfoState> {
         _repository.getContactSupport(),
       ]);
 
-      emit(state.copyWith(
-        aboutUs: results[0] as dynamic,
-        faqs: results[1] as dynamic,
-        termsPrivacy: results[2] as dynamic,
-        contactSupport: results[3] as dynamic,
-        isLoading: false,
-      ));
+      emit(
+        state.copyWith(
+          aboutUs: results[0] as dynamic,
+          faqs: results[1] as dynamic,
+          termsPrivacy: results[2] as dynamic,
+          contactSupport: results[3] as dynamic,
+          isLoading: false,
+        ),
+      );
     } catch (e) {
-      emit(state.copyWith(
-        isLoading: false,
-        errorMessage: 'فشل في تحميل البيانات من قاعدة البيانات: $e',
-      ));
+      emit(
+        state.copyWith(
+          isLoading: false,
+          errorMessage: 'فشل في تحميل البيانات من قاعدة البيانات: $e',
+        ),
+      );
     }
   }
 

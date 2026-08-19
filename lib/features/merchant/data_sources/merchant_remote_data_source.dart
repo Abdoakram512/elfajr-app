@@ -118,14 +118,24 @@ class MerchantRemoteDataSourceImpl implements MerchantRemoteDataSource {
         'TXN-RED-${DateTime.now().millisecondsSinceEpoch.toString().substring(5)}';
 
     try {
-      final cardRef = _firestore.collection('aid_cards').doc(cleanId);
-      final cardDoc = await cardRef.get();
+      DocumentReference cardRef = _firestore.collection('aid_cards').doc(cleanId);
+      DocumentSnapshot cardDoc = await cardRef.get();
 
       if (!cardDoc.exists || cardDoc.data() == null) {
-        throw const AppException('merchant.invalid_card');
+        final query = await _firestore
+            .collection('aid_cards')
+            .where('cardId', isEqualTo: cleanId)
+            .limit(1)
+            .get();
+        if (query.docs.isNotEmpty) {
+          cardDoc = query.docs.first;
+          cardRef = cardDoc.reference;
+        } else {
+          throw const AppException('merchant.invalid_card');
+        }
       }
 
-      final data = cardDoc.data()!;
+      final data = cardDoc.data() as Map<String, dynamic>;
       final currentBal = (data['totalBalance'] as num?)?.toDouble() ?? 0.0;
       final currentBaskets = (data['foodBasketsQuota'] as num?)?.toInt() ?? 0;
       final benId = data['beneficiaryId'] as String? ?? '';

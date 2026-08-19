@@ -17,7 +17,7 @@ class FaqView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => sl<InfoCubit>(),
+      create: (_) => getIt<InfoCubit>(),
       child: const _FaqViewBody(),
     );
   }
@@ -158,13 +158,10 @@ class _FaqViewBody extends StatelessWidget {
                     vertical: 8,
                   ),
                   sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        final item = faqs[index];
-                        return _buildFaqTile(item, index);
-                      },
-                      childCount: faqs.length,
-                    ),
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      final item = faqs[index];
+                      return _buildFaqTile(item, index);
+                    }, childCount: faqs.length),
                   ),
                 ),
 

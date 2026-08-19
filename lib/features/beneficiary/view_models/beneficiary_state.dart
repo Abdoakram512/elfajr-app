@@ -36,14 +36,12 @@ class BeneficiaryRedemptionItem extends Equatable {
 }
 
 class BeneficiaryState extends Equatable {
-  final int currentTabIndex;
   final AidCardModel? activeCard;
   final List<BeneficiaryRedemptionItem> redemptions;
   final bool isLoading;
   final String? successMessage;
 
   const BeneficiaryState({
-    this.currentTabIndex = 0,
     this.activeCard,
     this.redemptions = const [],
     this.isLoading = false,
@@ -51,14 +49,12 @@ class BeneficiaryState extends Equatable {
   });
 
   BeneficiaryState copyWith({
-    int? currentTabIndex,
     AidCardModel? activeCard,
     List<BeneficiaryRedemptionItem>? redemptions,
     bool? isLoading,
     String? successMessage,
   }) {
     return BeneficiaryState(
-      currentTabIndex: currentTabIndex ?? this.currentTabIndex,
       activeCard: activeCard ?? this.activeCard,
       redemptions: redemptions ?? this.redemptions,
       isLoading: isLoading ?? this.isLoading,
@@ -68,7 +64,6 @@ class BeneficiaryState extends Equatable {
 
   @override
   List<Object?> get props => [
-        currentTabIndex,
         activeCard,
         redemptions,
         isLoading,

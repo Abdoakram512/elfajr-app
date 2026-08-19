@@ -17,7 +17,7 @@ class SplashView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => SplashCubit(prefs: sl())..initApp(),
+      create: (context) => getIt<SplashCubit>()..initApp(),
       child: const _SplashViewBody(),
     );
   }

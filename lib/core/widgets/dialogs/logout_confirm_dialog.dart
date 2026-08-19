@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import '../../../app/service_locator.dart';
 import '../../constants/app_colors.dart';
 import '../../routes/route_names.dart';
 import '../../../features/auth/view_models/auth_cubit.dart';
@@ -46,7 +46,7 @@ class LogoutConfirmDialog extends StatelessWidget {
         ElevatedButton(
           onPressed: () {
             Navigator.pop(context);
-            context.read<AuthCubit>().signOut();
+            getIt<AuthCubit>().signOut();
             context.go(RouteNames.login);
           },
           style: ElevatedButton.styleFrom(

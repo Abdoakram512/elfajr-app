@@ -17,7 +17,7 @@ class TermsPrivacyView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => sl<InfoCubit>(),
+      create: (_) => getIt<InfoCubit>(),
       child: const _TermsPrivacyViewBody(),
     );
   }
@@ -58,7 +58,8 @@ class _TermsPrivacyViewBody extends StatelessWidget {
             final data = state.termsPrivacy;
             if (data == null) {
               return AppErrorStateWidget(
-                errorMessage: state.errorMessage ?? 'تعذر تحميل الشروط وسياسة الخصوصية',
+                errorMessage:
+                    state.errorMessage ?? 'تعذر تحميل الشروط وسياسة الخصوصية',
                 onRetry: () => context.read<InfoCubit>().loadAllInfo(),
               );
             }

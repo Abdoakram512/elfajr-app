@@ -17,7 +17,7 @@ class AboutUsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => sl<InfoCubit>(),
+      create: (_) => getIt<InfoCubit>(),
       child: const _AboutUsViewBody(),
     );
   }

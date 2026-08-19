@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:qout/app/service_locator.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/widgets/dialogs/logout_confirm_dialog.dart';
@@ -11,15 +12,15 @@ import '../../../../core/widgets/profile/profile_language_tile.dart';
 import '../../../../core/widgets/profile/profile_section_card.dart';
 import '../../../auth/view_models/auth_cubit.dart';
 import '../../../auth/view_models/auth_state.dart';
-import '../../view_models/merchant_cubit.dart';
-import '../../view_models/merchant_state.dart';
+import '../../view_models/merchant_dashboard_cubit.dart';
+import '../../view_models/merchant_dashboard_state.dart';
 
 class MerchantProfileTab extends StatelessWidget {
   const MerchantProfileTab({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final authState = context.watch<AuthCubit>().state;
+    final authState = getIt<AuthCubit>().state;
     final user = authState is Authenticated ? authState.user : null;
     final currencyFormatter = NumberFormat('#,###');
 
@@ -34,7 +35,7 @@ class MerchantProfileTab extends StatelessWidget {
         ? user!.commercialReg!
         : '-';
 
-    return BlocBuilder<MerchantCubit, MerchantState>(
+    return BlocBuilder<MerchantDashboardCubit, MerchantDashboardState>(
       builder: (context, state) {
         final totalBasketsDispensed = state.recentTransactions.fold<int>(
           0,
@@ -46,12 +47,6 @@ class MerchantProfileTab extends StatelessWidget {
           appBar: AppBar(
             title: const Text('الملف التعريفي للمنفذ'),
             automaticallyImplyLeading: false,
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.logout_rounded, color: AppColors.error),
-                onPressed: () => LogoutConfirmDialog.show(context),
-              ),
-            ],
           ),
           body: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),

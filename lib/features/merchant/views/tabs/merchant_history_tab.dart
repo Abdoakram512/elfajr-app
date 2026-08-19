@@ -5,15 +5,15 @@ import 'package:gap/gap.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/widgets/feedback/app_empty_state_widget.dart';
 import '../../../../core/widgets/transactions/transaction_list_item.dart';
-import '../../view_models/merchant_cubit.dart';
-import '../../view_models/merchant_state.dart';
+import '../../view_models/merchant_dashboard_cubit.dart';
+import '../../view_models/merchant_dashboard_state.dart';
 
 class MerchantHistoryTab extends StatelessWidget {
   const MerchantHistoryTab({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<MerchantCubit, MerchantState>(
+    return BlocBuilder<MerchantDashboardCubit, MerchantDashboardState>(
       builder: (context, state) {
         return Scaffold(
           backgroundColor: AppColors.backgroundLight,

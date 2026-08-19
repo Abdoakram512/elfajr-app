@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -18,13 +20,15 @@ import '../features/beneficiary/view_models/beneficiary_cubit.dart';
 import '../features/merchant/data_sources/merchant_remote_data_source.dart';
 import '../features/merchant/repositories/merchant_repository.dart';
 import '../features/merchant/repositories/merchant_repository_impl.dart';
-import '../features/merchant/view_models/merchant_cubit.dart';
+import '../features/merchant/view_models/merchant_dashboard_cubit.dart';
+import '../features/merchant/view_models/redemption_cubit.dart';
 
 // Admin Feature
 import '../features/admin/data_sources/admin_remote_data_source.dart';
 import '../features/admin/repositories/admin_repository.dart';
 import '../features/admin/repositories/admin_repository_impl.dart';
-import '../features/admin/view_models/admin_cubit.dart';
+import '../features/admin/view_models/admin_merchants_cubit.dart';
+import '../features/admin/view_models/admin_overview_cubit.dart';
 
 // Info & Content Feature
 import '../features/info_content/data_sources/info_remote_data_source.dart';
@@ -32,71 +36,105 @@ import '../features/info_content/repositories/info_repository.dart';
 import '../features/info_content/repositories/info_repository_impl.dart';
 import '../features/info_content/view_models/info_cubit.dart';
 
-final sl = GetIt.instance;
+// Splash & Onboarding Feature
+import '../features/onboarding/presentation/cubit/onboarding_cubit.dart';
+import '../features/splash/presentation/cubit/splash_cubit.dart';
+
+final getIt = GetIt.instance;
 
 Future<void> initServiceLocator() async {
-  // 1. External Services
+  // 1. Core External Infrastructure Singletons
   final sharedPreferences = await SharedPreferences.getInstance();
-  sl.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
+  getIt.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
+  getIt.registerLazySingleton<FirebaseFirestore>(
+    () => FirebaseFirestore.instance,
+  );
+  getIt.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
 
-  // 2. Auth Feature Layering
-  sl.registerLazySingleton<AuthRemoteDataSource>(
-    () => AuthRemoteDataSourceImpl(),
-  );
-  sl.registerLazySingleton<AuthLocalDataSource>(
-    () => AuthLocalDataSourceImpl(sl()),
-  );
-  sl.registerLazySingleton<AuthRepository>(
-    () => AuthRepositoryImpl(
-      remoteDataSource: sl(),
-      localDataSource: sl(),
+  // 2. Auth Feature Singletons
+  getIt.registerLazySingleton<AuthRemoteDataSource>(
+    () => AuthRemoteDataSourceImpl(
+      firebaseAuth: getIt<FirebaseAuth>(),
+      firestore: getIt<FirebaseFirestore>(),
     ),
   );
-  sl.registerLazySingleton<AuthCubit>(
-    () => AuthCubit(authRepository: sl()),
+  getIt.registerLazySingleton<AuthLocalDataSource>(
+    () => AuthLocalDataSourceImpl(getIt<SharedPreferences>()),
+  );
+  getIt.registerLazySingleton<AuthRepository>(
+    () => AuthRepositoryImpl(
+      remoteDataSource: getIt<AuthRemoteDataSource>(),
+      localDataSource: getIt<AuthLocalDataSource>(),
+    ),
+  );
+  getIt.registerLazySingleton<AuthCubit>(
+    () => AuthCubit(authRepository: getIt<AuthRepository>()),
   );
 
-  // 3. Beneficiary Feature Layering
-  sl.registerLazySingleton<BeneficiaryRemoteDataSource>(
-    () => BeneficiaryRemoteDataSourceImpl(),
+  // 3. Beneficiary Feature Singletons & Factories
+  getIt.registerLazySingleton<BeneficiaryRemoteDataSource>(
+    () =>
+        BeneficiaryRemoteDataSourceImpl(firestore: getIt<FirebaseFirestore>()),
   );
-  sl.registerLazySingleton<BeneficiaryRepository>(
-    () => BeneficiaryRepositoryImpl(remoteDataSource: sl()),
+  getIt.registerLazySingleton<BeneficiaryRepository>(
+    () => BeneficiaryRepositoryImpl(
+      remoteDataSource: getIt<BeneficiaryRemoteDataSource>(),
+    ),
   );
-  sl.registerFactory<BeneficiaryCubit>(
-    () => BeneficiaryCubit(repository: sl()),
-  );
-
-  // 4. Merchant Feature Layering
-  sl.registerLazySingleton<MerchantRemoteDataSource>(
-    () => MerchantRemoteDataSourceImpl(),
-  );
-  sl.registerLazySingleton<MerchantRepository>(
-    () => MerchantRepositoryImpl(remoteDataSource: sl()),
-  );
-  sl.registerFactory<MerchantCubit>(
-    () => MerchantCubit(repository: sl()),
+  getIt.registerFactory<BeneficiaryCubit>(
+    () => BeneficiaryCubit(repository: getIt<BeneficiaryRepository>()),
   );
 
-  // 5. Admin Feature Layering
-  sl.registerLazySingleton<AdminRemoteDataSource>(
-    () => AdminRemoteDataSourceImpl(),
+  // 4. Merchant Feature Singletons & Focused Factories
+  getIt.registerLazySingleton<MerchantRemoteDataSource>(
+    () => MerchantRemoteDataSourceImpl(firestore: getIt<FirebaseFirestore>()),
   );
-  sl.registerLazySingleton<AdminRepository>(
-    () => AdminRepositoryImpl(remoteDataSource: sl()),
+  getIt.registerLazySingleton<MerchantRepository>(
+    () => MerchantRepositoryImpl(
+      remoteDataSource: getIt<MerchantRemoteDataSource>(),
+    ),
   );
-  sl.registerFactory<AdminCubit>(
-    () => AdminCubit(repository: sl()),
+  getIt.registerFactory<MerchantDashboardCubit>(
+    () => MerchantDashboardCubit(repository: getIt<MerchantRepository>()),
+  );
+  getIt.registerFactory<RedemptionCubit>(
+    () => RedemptionCubit(repository: getIt<MerchantRepository>()),
   );
 
-  // 6. Info & Content Feature Layering
-  sl.registerLazySingleton<InfoRemoteDataSource>(
-    () => InfoRemoteDataSourceImpl(),
+  // 5. Admin Feature Singletons & Focused Factories
+  getIt.registerLazySingleton<AdminRemoteDataSource>(
+    () => AdminRemoteDataSourceImpl(firestore: getIt<FirebaseFirestore>()),
   );
-  sl.registerLazySingleton<InfoRepository>(
-    () => InfoRepositoryImpl(remoteDataSource: sl()),
+  getIt.registerLazySingleton<AdminRepository>(
+    () => AdminRepositoryImpl(remoteDataSource: getIt<AdminRemoteDataSource>()),
   );
-  sl.registerFactory<InfoCubit>(
-    () => InfoCubit(repository: sl()),
+  getIt.registerFactory<AdminOverviewCubit>(
+    () => AdminOverviewCubit(repository: getIt<AdminRepository>()),
+  );
+  getIt.registerFactory<AdminMerchantsCubit>(
+    () => AdminMerchantsCubit(repository: getIt<AdminRepository>()),
+  );
+
+  // 6. Info & Content Feature Singletons & Factories
+  getIt.registerLazySingleton<InfoRemoteDataSource>(
+    () => InfoRemoteDataSourceImpl(firestore: getIt<FirebaseFirestore>()),
+  );
+  getIt.registerLazySingleton<InfoRepository>(
+    () => InfoRepositoryImpl(remoteDataSource: getIt<InfoRemoteDataSource>()),
+  );
+  getIt.registerFactory<InfoCubit>(
+    () => InfoCubit(repository: getIt<InfoRepository>()),
+  );
+
+  // 7. Splash & Onboarding Feature Factories
+  getIt.registerFactory<SplashCubit>(
+    () => SplashCubit(
+      prefs: getIt<SharedPreferences>(),
+      authRepository: getIt<AuthRepository>(),
+      authCubit: getIt<AuthCubit>(),
+    ),
+  );
+  getIt.registerFactory<OnboardingCubit>(
+    () => OnboardingCubit(prefs: getIt<SharedPreferences>()),
   );
 }

@@ -11,11 +11,24 @@ import '../../../../core/widgets/profile/profile_language_tile.dart';
 import '../../../../core/widgets/profile/profile_section_card.dart';
 import '../../../auth/view_models/auth_cubit.dart';
 import '../../../auth/view_models/auth_state.dart';
-import '../../view_models/admin_cubit.dart';
-import '../../view_models/admin_state.dart';
+import '../../../../app/service_locator.dart';
+import '../../view_models/admin_overview_cubit.dart';
+import '../../view_models/admin_overview_state.dart';
 
 class AdminProfileTab extends StatelessWidget {
   const AdminProfileTab({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => getIt<AdminOverviewCubit>(),
+      child: const _AdminProfileTabBody(),
+    );
+  }
+}
+
+class _AdminProfileTabBody extends StatelessWidget {
+  const _AdminProfileTabBody();
 
   @override
   Widget build(BuildContext context) {
@@ -32,19 +45,13 @@ class AdminProfileTab extends StatelessWidget {
         ? user!.city!
         : 'المقر الرئيسي';
 
-    return BlocBuilder<AdminCubit, AdminState>(
+    return BlocBuilder<AdminOverviewCubit, AdminOverviewState>(
       builder: (context, state) {
         return Scaffold(
           backgroundColor: AppColors.backgroundLight,
           appBar: AppBar(
             title: const Text('الملف الإداري العام'),
             automaticallyImplyLeading: false,
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.logout_rounded, color: AppColors.error),
-                onPressed: () => LogoutConfirmDialog.show(context),
-              ),
-            ],
           ),
           body: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),

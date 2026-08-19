@@ -17,7 +17,7 @@ class ContactSupportView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => sl<InfoCubit>(),
+      create: (_) => getIt<InfoCubit>(),
       child: const _ContactSupportViewBody(),
     );
   }
@@ -46,7 +46,8 @@ class _ContactSupportViewBody extends StatelessWidget {
           final contact = state.contactSupport;
           if (contact == null) {
             return AppErrorStateWidget(
-              errorMessage: state.errorMessage ?? 'تعذر تحميل بيانات الدعم والمساعدة',
+              errorMessage:
+                  state.errorMessage ?? 'تعذر تحميل بيانات الدعم والمساعدة',
               onRetry: () => context.read<InfoCubit>().loadAllInfo(),
             );
           }

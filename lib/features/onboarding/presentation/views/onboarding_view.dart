@@ -21,7 +21,7 @@ class OnboardingView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => OnboardingCubit(prefs: sl()),
+      create: (context) => getIt<OnboardingCubit>(),
       child: const _OnboardingViewBody(),
     );
   }
@@ -244,10 +244,9 @@ class _OnboardingViewBodyState extends State<_OnboardingViewBody> {
 
                       // Primary Call-to-Action Button with Pulse Animation on Last Step
                       PrimaryButton(
-                        text: (isLastPage
-                                ? 'common.get_started'
-                                : 'common.next')
-                            .tr(),
+                        text:
+                            (isLastPage ? 'common.get_started' : 'common.next')
+                                .tr(),
                         trailingIcon: Icons.arrow_forward_rounded,
                         onPressed: () {
                           if (isLastPage) {

@@ -3,20 +3,34 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 
+import '../../../../app/service_locator.dart';
 import '../../../../core/constants/app_colors.dart';
-import '../../view_models/admin_cubit.dart';
-import '../../view_models/admin_state.dart';
+import '../../view_models/admin_merchants_cubit.dart';
+import '../../view_models/admin_merchants_state.dart';
 
 class AdminMerchantsTab extends StatelessWidget {
   const AdminMerchantsTab({super.key});
 
   @override
   Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => getIt<AdminMerchantsCubit>(),
+      child: const _AdminMerchantsTabBody(),
+    );
+  }
+}
+
+class _AdminMerchantsTabBody extends StatelessWidget {
+  const _AdminMerchantsTabBody();
+
+  @override
+  Widget build(BuildContext context) {
     final currencyFormatter = NumberFormat('#,###');
 
-    return BlocBuilder<AdminCubit, AdminState>(
+    return BlocBuilder<AdminMerchantsCubit, AdminMerchantsState>(
       builder: (context, state) {
-        final cubit = context.read<AdminCubit>();
+        final cubit = context.read<AdminMerchantsCubit>();
+        final merchants = state.filteredMerchants;
 
         return Scaffold(
           backgroundColor: AppColors.backgroundLight,
@@ -26,10 +40,10 @@ class AdminMerchantsTab extends StatelessWidget {
           ),
           body: ListView.separated(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            itemCount: state.merchants.length,
+            itemCount: merchants.length,
             separatorBuilder: (context, index) => const Gap(14),
             itemBuilder: (context, index) {
-              final merchant = state.merchants[index];
+              final merchant = merchants[index];
 
               return Container(
                 padding: const EdgeInsets.all(18),
@@ -67,7 +81,7 @@ class AdminMerchantsTab extends StatelessWidget {
                             color: merchant.isActive
                                 ? AppColors.primary
                                 : AppColors.error,
-                            size: 24,
+                            size: 22,
                           ),
                         ),
                         const Gap(12),
@@ -84,37 +98,39 @@ class AdminMerchantsTab extends StatelessWidget {
                                 ),
                               ),
                               const Gap(2),
-                              Text(
-                                '${merchant.storeType} • ${merchant.city}',
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: AppColors.textSecondaryLight,
-                                ),
+                              Row(
+                                children: [
+                                  Text(
+                                    merchant.storeType,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: AppColors.textSecondaryLight,
+                                    ),
+                                  ),
+                                  const Text(
+                                    ' • ',
+                                    style: TextStyle(
+                                      color: AppColors.textSecondaryLight,
+                                    ),
+                                  ),
+                                  Text(
+                                    merchant.city,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: AppColors.textSecondaryLight,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
                         ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: merchant.isActive
-                                ? AppColors.success.withValues(alpha: 0.12)
-                                : AppColors.error.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            merchant.isActive ? 'نشط ومعتمد' : 'موقوف مؤقتاً',
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                              color: merchant.isActive
-                                  ? AppColors.success
-                                  : AppColors.error,
-                            ),
-                          ),
+                        Switch(
+                          value: merchant.isActive,
+                          activeThumbColor: AppColors.success,
+                          onChanged: (_) {
+                            cubit.toggleMerchantStatus(merchant.id);
+                          },
                         ),
                       ],
                     ),
@@ -128,17 +144,19 @@ class AdminMerchantsTab extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text(
-                              'السجل التجاري',
+                              'إجمالي العمليات المنفذة',
                               style: TextStyle(
                                 fontSize: 11,
-                                color: AppColors.textMutedLight,
+                                color: AppColors.textSecondaryLight,
                               ),
                             ),
-                            const Gap(2),
+                            const Gap(4),
                             Text(
-                              merchant.commercialReg,
+                              currencyFormatter.format(
+                                merchant.totalTransactions,
+                              ),
                               style: const TextStyle(
-                                fontSize: 13,
+                                fontSize: 15,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.textPrimaryLight,
                               ),
@@ -146,41 +164,20 @@ class AdminMerchantsTab extends StatelessWidget {
                           ],
                         ),
                         Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             const Text(
-                              'العمليات المنفذة',
+                              'إجمالي المبالغ المصروفة',
                               style: TextStyle(
                                 fontSize: 11,
-                                color: AppColors.textMutedLight,
+                                color: AppColors.textSecondaryLight,
                               ),
                             ),
-                            const Gap(2),
-                            Text(
-                              '${merchant.totalTransactions} عملية',
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimaryLight,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'إجمالي المصروف',
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: AppColors.textMutedLight,
-                              ),
-                            ),
-                            const Gap(2),
+                            const Gap(4),
                             Text(
                               '${currencyFormatter.format(merchant.totalDisbursed)} ${'common.currency'.tr()}',
                               style: const TextStyle(
-                                fontSize: 13,
+                                fontSize: 15,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.primary,
                               ),
@@ -189,43 +186,33 @@ class AdminMerchantsTab extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const Gap(14),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 40,
-                      child: OutlinedButton.icon(
-                        onPressed: () => cubit.toggleMerchantStatus(merchant.id),
-                        icon: Icon(
-                          merchant.isActive
-                              ? Icons.pause_circle_outline_rounded
-                              : Icons.check_circle_outline_rounded,
-                          size: 18,
-                          color: merchant.isActive
-                              ? AppColors.error
-                              : AppColors.success,
-                        ),
-                        label: Text(
-                          merchant.isActive
-                              ? 'إيقاف الصرف مؤقتاً'
-                              : 'تفعيل وتنشيط المنفذ',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            color: merchant.isActive
-                                ? AppColors.error
-                                : AppColors.success,
+                    const Gap(10),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.backgroundLight,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.badge_outlined,
+                            size: 14,
+                            color: AppColors.textSecondaryLight,
                           ),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(
-                            color: merchant.isActive
-                                ? AppColors.error.withValues(alpha: 0.5)
-                                : AppColors.success.withValues(alpha: 0.5),
+                          const Gap(6),
+                          Text(
+                            'سجل تجاري: ${merchant.commercialReg}',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: AppColors.textSecondaryLight,
+                            ),
                           ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
+                        ],
                       ),
                     ),
                   ],

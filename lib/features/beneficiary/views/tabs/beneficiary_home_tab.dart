@@ -10,7 +10,9 @@ import '../../view_models/beneficiary_state.dart';
 import '../../widgets/digital_aid_card_widget.dart';
 
 class BeneficiaryHomeTab extends StatelessWidget {
-  const BeneficiaryHomeTab({super.key});
+  final VoidCallback? onSwitchToHistory;
+
+  const BeneficiaryHomeTab({super.key, this.onSwitchToHistory});
 
   @override
   Widget build(BuildContext context) {
@@ -20,8 +22,6 @@ class BeneficiaryHomeTab extends StatelessWidget {
 
     return BlocBuilder<BeneficiaryCubit, BeneficiaryState>(
       builder: (context, state) {
-        final cubit = context.read<BeneficiaryCubit>();
-
         return Scaffold(
           backgroundColor: AppColors.backgroundLight,
           body: SafeArea(
@@ -192,7 +192,7 @@ class BeneficiaryHomeTab extends StatelessWidget {
                         ),
                       ),
                       TextButton(
-                        onPressed: () => cubit.setTab(1),
+                        onPressed: onSwitchToHistory,
                         child: const Text(
                           'عرض الكل',
                           style: TextStyle(

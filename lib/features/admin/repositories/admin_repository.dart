@@ -1,4 +1,5 @@
-import '../view_models/admin_state.dart';
+import '../models/admin_merchant_item.dart';
+import '../models/admin_redemption_item.dart';
 
 abstract class AdminRepository {
   Stream<Map<String, dynamic>> getGlobalStatsStream();

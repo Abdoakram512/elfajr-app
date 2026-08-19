@@ -7,22 +7,22 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/widgets/feedback/app_empty_state_widget.dart';
 import '../../../../core/widgets/transactions/transaction_list_item.dart';
-import '../../view_models/merchant_cubit.dart';
-import '../../view_models/merchant_state.dart';
+import '../../view_models/merchant_dashboard_cubit.dart';
+import '../../view_models/merchant_dashboard_state.dart';
 import '../merchant_scanner_view.dart';
 
 class MerchantHomeTab extends StatelessWidget {
-  const MerchantHomeTab({super.key});
+  final VoidCallback? onSwitchToHistory;
+
+  const MerchantHomeTab({super.key, this.onSwitchToHistory});
 
   @override
   Widget build(BuildContext context) {
     final currencyFormatter = NumberFormat('#,###');
     final isArabic = context.locale.languageCode == 'ar';
 
-    return BlocBuilder<MerchantCubit, MerchantState>(
+    return BlocBuilder<MerchantDashboardCubit, MerchantDashboardState>(
       builder: (context, state) {
-        final cubit = context.read<MerchantCubit>();
-
         return Scaffold(
           backgroundColor: AppColors.backgroundLight,
           body: SafeArea(
@@ -162,10 +162,7 @@ class MerchantHomeTab extends StatelessWidget {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => BlocProvider.value(
-                                    value: cubit,
-                                    child: const MerchantScannerView(),
-                                  ),
+                                  builder: (_) => const MerchantScannerView(),
                                 ),
                               );
                             },
@@ -304,7 +301,7 @@ class MerchantHomeTab extends StatelessWidget {
                         ),
                       ),
                       TextButton(
-                        onPressed: () => cubit.setTab(1),
+                        onPressed: onSwitchToHistory,
                         child: Text(
                           'dashboard.tabs.history'.tr(),
                           style: const TextStyle(

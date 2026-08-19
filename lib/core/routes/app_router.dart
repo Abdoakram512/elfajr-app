@@ -38,7 +38,7 @@ class AppRouter {
       GoRoute(
         path: RouteNames.login,
         builder: (context, state) => BlocProvider(
-          create: (_) => sl<AuthCubit>(),
+          create: (_) => getIt<AuthCubit>(),
           child: const LoginView(),
         ),
       ),
@@ -49,7 +49,7 @@ class AppRouter {
               ? state.extra as UserRole
               : UserRole.beneficiary;
           return BlocProvider(
-            create: (_) => sl<AuthCubit>(),
+            create: (_) => getIt<AuthCubit>(),
             child: RegisterView(initialRole: role),
           );
         },
@@ -57,7 +57,7 @@ class AppRouter {
       GoRoute(
         path: RouteNames.forgotPassword,
         builder: (context, state) => BlocProvider(
-          create: (_) => sl<AuthCubit>(),
+          create: (_) => getIt<AuthCubit>(),
           child: const ForgotPasswordView(),
         ),
       ),

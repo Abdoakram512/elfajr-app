@@ -4,20 +4,33 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+import '../../../../app/service_locator.dart';
 import '../../../../core/constants/app_colors.dart';
-import '../view_models/merchant_cubit.dart';
-import '../view_models/merchant_state.dart';
+import '../view_models/redemption_cubit.dart';
+import '../view_models/redemption_state.dart';
 import '../widgets/manual_search_sheet.dart';
 import '../widgets/redemption_confirmation_sheet.dart';
 
-class MerchantScannerView extends StatefulWidget {
+class MerchantScannerView extends StatelessWidget {
   const MerchantScannerView({super.key});
 
   @override
-  State<MerchantScannerView> createState() => _MerchantScannerViewState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => getIt<RedemptionCubit>(),
+      child: const _MerchantScannerBody(),
+    );
+  }
 }
 
-class _MerchantScannerViewState extends State<MerchantScannerView> {
+class _MerchantScannerBody extends StatefulWidget {
+  const _MerchantScannerBody();
+
+  @override
+  State<_MerchantScannerBody> createState() => _MerchantScannerBodyState();
+}
+
+class _MerchantScannerBodyState extends State<_MerchantScannerBody> {
   final MobileScannerController _scannerController = MobileScannerController(
     detectionSpeed: DetectionSpeed.normal,
     facing: CameraFacing.back,
@@ -39,13 +52,12 @@ class _MerchantScannerViewState extends State<MerchantScannerView> {
     if (barcodes.isNotEmpty && barcodes.first.rawValue != null) {
       final code = barcodes.first.rawValue!;
       setState(() => _isProcessing = true);
-      context.read<MerchantCubit>().onQrCodeScanned(code);
+      context.read<RedemptionCubit>().onQrCodeScanned(code);
     }
   }
 
-  void _showRedemptionSheet(BuildContext context, MerchantState state) {
-    if (state.scannedCard == null) return;
-    final cubit = context.read<MerchantCubit>();
+  void _showRedemptionSheet(BuildContext context, RedemptionCardLoaded state) {
+    final cubit = context.read<RedemptionCubit>();
 
     showModalBottomSheet(
       context: context,
@@ -54,60 +66,93 @@ class _MerchantScannerViewState extends State<MerchantScannerView> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      builder: (sheetContext) {
-        return RedemptionConfirmationSheet(
-          card: state.scannedCard!,
-          onConfirm: (amount, baskets, notes) {
-            Navigator.pop(sheetContext);
-            cubit.redeemAid(amount: amount, foodBaskets: baskets, notes: notes);
-          },
-        );
-      },
+      builder: (_) => BlocProvider.value(
+        value: cubit,
+        child: RedemptionConfirmationSheet(card: state.card),
+      ),
     ).whenComplete(() {
       if (mounted) {
         setState(() => _isProcessing = false);
       }
-      cubit.clearScannedCard();
+      cubit.reset();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<MerchantCubit, MerchantState>(
+    return BlocConsumer<RedemptionCubit, RedemptionState>(
       listener: (context, state) {
-        if (state.scannedCard != null) {
+        if (state is RedemptionCardLoaded) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (context.mounted && state.scannedCard != null) {
+            if (context.mounted) {
               _showRedemptionSheet(context, state);
             }
           });
-        }
-        if (state.successMessage != null) {
+        } else if (state is RedemptionSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
-                'merchant.redemption_success'.tr(args: [state.successMessage!]),
+              content: Row(
+                children: [
+                  const Icon(Icons.check_circle_rounded, color: Colors.white),
+                  const Gap(10),
+                  Expanded(
+                    child: Text(
+                      'merchant.redemption_success'.tr(args: [
+                        state.transaction.amountDeducted > 0
+                            ? state.transaction.amountDeducted.toStringAsFixed(0)
+                            : '${state.transaction.foodBasketsDeducted} سلة'
+                      ]),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                ],
               ),
               backgroundColor: AppColors.success,
+              behavior: SnackBarBehavior.floating,
+              margin: const EdgeInsets.all(16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+              duration: const Duration(seconds: 4),
             ),
           );
-          context.read<MerchantCubit>().clearMessages();
-        }
-        if (state.errorMessage != null) {
+        } else if (state is RedemptionFailure) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.errorMessage!.tr()),
+              content: Row(
+                children: [
+                  const Icon(Icons.error_outline_rounded, color: Colors.white),
+                  const Gap(10),
+                  Expanded(
+                    child: Text(
+                      state.errorMessage.tr(),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
               backgroundColor: AppColors.error,
+              behavior: SnackBarBehavior.floating,
+              margin: const EdgeInsets.all(16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+              duration: const Duration(seconds: 4),
             ),
           );
           if (mounted) {
             setState(() => _isProcessing = false);
           }
-          context.read<MerchantCubit>().clearMessages();
         }
       },
       builder: (context, state) {
-        final cubit = context.read<MerchantCubit>();
+        final cubit = context.read<RedemptionCubit>();
 
         return Scaffold(
           backgroundColor: Colors.black,
@@ -232,7 +277,7 @@ class _MerchantScannerViewState extends State<MerchantScannerView> {
 
                     const Gap(12),
 
-                    // Instruction Card with Emerald Focus Icon and crisp text
+                    // Instruction Card with Emerald Focus Icon
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 18,

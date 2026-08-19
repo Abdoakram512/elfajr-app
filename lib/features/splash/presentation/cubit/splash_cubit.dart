@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../../app/service_locator.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../auth/repositories/auth_repository.dart';
 import '../../../auth/view_models/auth_cubit.dart';
@@ -9,9 +8,16 @@ import 'splash_state.dart';
 
 class SplashCubit extends Cubit<SplashState> {
   final SharedPreferences _prefs;
+  final AuthRepository _authRepository;
+  final AuthCubit _authCubit;
 
-  SplashCubit({required SharedPreferences prefs})
-      : _prefs = prefs,
+  SplashCubit({
+    required SharedPreferences prefs,
+    required AuthRepository authRepository,
+    required AuthCubit authCubit,
+  })  : _prefs = prefs,
+        _authRepository = authRepository,
+        _authCubit = authCubit,
         super(SplashInitial());
 
   Future<void> initApp() async {
@@ -29,11 +35,10 @@ class SplashCubit extends Cubit<SplashState> {
     }
 
     try {
-      final authRepo = sl<AuthRepository>();
-      final cachedUser = await authRepo.getCurrentUser();
+      final cachedUser = await _authRepository.getCurrentUser();
 
       if (cachedUser != null) {
-        sl<AuthCubit>().emit(Authenticated(cachedUser));
+        _authCubit.emit(Authenticated(cachedUser));
         emit(SplashNavigateToDashboard(cachedUser.role.name));
       } else {
         emit(SplashNavigateToLogin());

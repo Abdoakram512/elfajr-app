@@ -3,23 +3,34 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 
+import '../../../../app/service_locator.dart';
 import '../../../../core/constants/app_colors.dart';
-import '../../../../core/constants/app_constants.dart';
 import '../../../../core/widgets/cards/stat_kpi_card.dart';
 import '../../../../core/widgets/feedback/app_empty_state_widget.dart';
 import '../../../../core/widgets/transactions/transaction_list_item.dart';
-import '../../view_models/admin_cubit.dart';
-import '../../view_models/admin_state.dart';
+import '../../view_models/admin_overview_cubit.dart';
+import '../../view_models/admin_overview_state.dart';
 
 class AdminOverviewTab extends StatelessWidget {
   const AdminOverviewTab({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final currencyFormatter = NumberFormat('#,###');
-    final isArabic = context.locale.languageCode == 'ar';
+    return BlocProvider(
+      create: (_) => getIt<AdminOverviewCubit>(),
+      child: const _AdminOverviewTabBody(),
+    );
+  }
+}
 
-    return BlocBuilder<AdminCubit, AdminState>(
+class _AdminOverviewTabBody extends StatelessWidget {
+  const _AdminOverviewTabBody();
+
+  @override
+  Widget build(BuildContext context) {
+    final currencyFormatter = NumberFormat('#,###');
+
+    return BlocBuilder<AdminOverviewCubit, AdminOverviewState>(
       builder: (context, state) {
         return Scaffold(
           backgroundColor: AppColors.backgroundLight,
@@ -60,7 +71,7 @@ class AdminOverviewTab extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                'dashboard.admin.greeting'.tr(),
+                                'admin.portal_title'.tr(),
                                 style: const TextStyle(
                                   fontSize: 12,
                                   color: AppColors.textSecondaryLight,
@@ -70,126 +81,33 @@ class AdminOverviewTab extends StatelessWidget {
                           ),
                         ],
                       ),
-                      // Language Switcher Pill
-                      InkWell(
-                        onTap: () {
-                          final newLocale = isArabic
-                              ? AppConstants.englishLocale
-                              : AppConstants.arabicLocale;
-                          context.setLocale(newLocale);
-                        },
-                        borderRadius: BorderRadius.circular(20),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: AppColors.borderLight),
-                          ),
-                          child: Text(
-                            isArabic ? 'English' : 'العربية',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primary,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const Gap(20),
-
-                  // 2x2 KPI Grid using StatKpiCard
-                  Row(
-                    children: [
-                      Expanded(
-                        child: StatKpiCard(
-                          title: 'إجمالي المبالغ المصروفة',
-                          value:
-                              '${currencyFormatter.format(state.totalFundsDisbursed)} ${'common.currency'.tr()}',
-                          icon: Icons.account_balance_wallet_rounded,
-                          accentColor: AppColors.primary,
-                        ),
-                      ),
-                      const Gap(12),
-                      Expanded(
-                        child: StatKpiCard(
-                          title: 'الأسر المستفيدة',
-                          value: '${state.totalBeneficiariesCount}',
-                          icon: Icons.family_restroom_rounded,
-                          accentColor: AppColors.accent,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const Gap(12),
-
-                  Row(
-                    children: [
-                      Expanded(
-                        child: StatKpiCard(
-                          title: 'منافذ الصرف المعتمدة',
-                          value: '${state.activeMerchantsCount}',
-                          icon: Icons.storefront_rounded,
-                          accentColor: const Color(0xFF0284C7),
-                        ),
-                      ),
-                      const Gap(12),
-                      Expanded(
-                        child: StatKpiCard(
-                          title: 'إجمالي عمليات الصرف',
-                          value: currencyFormatter.format(state.totalRedemptionsCount),
-                          icon: Icons.receipt_long_rounded,
-                          accentColor: const Color(0xFF16A34A),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const Gap(28),
-
-                  // Section Title: Live Redemptions Stream
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'عمليات الصرف اللحظية في المنافذ',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimaryLight,
-                        ),
-                      ),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
+                          horizontal: 12,
+                          vertical: 6,
                         ),
                         decoration: BoxDecoration(
                           color: AppColors.success.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: AppColors.success.withValues(alpha: 0.3),
+                          ),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Container(
-                              width: 6,
-                              height: 6,
+                              width: 8,
+                              height: 8,
                               decoration: const BoxDecoration(
                                 color: AppColors.success,
                                 shape: BoxShape.circle,
                               ),
                             ),
-                            const Gap(4),
-                            const Text(
-                              'بث مباشر',
-                              style: TextStyle(
+                            const Gap(6),
+                            Text(
+                              'admin.system_live'.tr(),
+                              style: const TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.success,
@@ -201,23 +119,124 @@ class AdminOverviewTab extends StatelessWidget {
                     ],
                   ),
 
+                  const Gap(24),
+
+                  // Section Title: Executive Overview
+                  Text(
+                    'admin.executive_overview'.tr(),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimaryLight,
+                    ),
+                  ),
                   const Gap(14),
 
-                  // List of Live Redemptions
+                  // Global Stats Grid
+                  Row(
+                    children: [
+                      Expanded(
+                        child: StatKpiCard(
+                          title: 'admin.stats.total_disbursed'.tr(),
+                          value:
+                              '${currencyFormatter.format(state.totalFundsDisbursed)} ${'common.currency'.tr()}',
+                          icon: Icons.account_balance_wallet_rounded,
+                          accentColor: AppColors.primary,
+                        ),
+                      ),
+                      const Gap(12),
+                      Expanded(
+                        child: StatKpiCard(
+                          title: 'admin.stats.total_redemptions'.tr(),
+                          value: currencyFormatter.format(
+                            state.totalRedemptionsCount,
+                          ),
+                          icon: Icons.receipt_long_rounded,
+                          accentColor: AppColors.accent,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Gap(12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: StatKpiCard(
+                          title: 'admin.stats.total_beneficiaries'.tr(),
+                          value: currencyFormatter.format(
+                            state.totalBeneficiariesCount,
+                          ),
+                          icon: Icons.people_alt_rounded,
+                          accentColor: AppColors.info,
+                        ),
+                      ),
+                      const Gap(12),
+                      Expanded(
+                        child: StatKpiCard(
+                          title: 'admin.stats.active_merchants'.tr(),
+                          value: state.activeMerchantsCount.toString(),
+                          icon: Icons.storefront_rounded,
+                          accentColor: AppColors.success,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const Gap(28),
+
+                  // Live Feed Header
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'admin.live_feed'.tr(),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimaryLight,
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          Container(
+                            width: 6,
+                            height: 6,
+                            decoration: const BoxDecoration(
+                              color: AppColors.success,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const Gap(4),
+                          Text(
+                            'admin.live_sync'.tr(),
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: AppColors.textSecondaryLight,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const Gap(14),
+
+                  // Recent Redemptions Feed List
                   if (state.recentRedemptions.isEmpty)
                     const AppEmptyStateWidget(
-                      title: 'لا توجد عمليات صرف مسجلة حتى الآن',
-                      description: 'ستظهر هنا كافة عمليات الخصم وسحب الإعانات فور تنفيذها في منافذ الصرف',
-                      icon: Icons.receipt_long_outlined,
+                      title: 'لا توجد عمليات صرف مسجلة حالياً',
+                      description:
+                          'ستظهر هنا كافة عمليات الخصم وسحب الإعانات لحظياً فور تنفيذها في منافذ الصرف المعتمدة',
+                      icon: Icons.sync_rounded,
                     )
                   else
                     ListView.separated(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: state.recentRedemptions.length,
-                      separatorBuilder: (_, _) => const Gap(10),
+                      separatorBuilder: (context, index) => const Gap(12),
                       itemBuilder: (context, index) {
                         final item = state.recentRedemptions[index];
+
                         return TransactionListItem(
                           cardId: item.cardId,
                           beneficiaryName: item.beneficiaryName,
@@ -230,6 +249,7 @@ class AdminOverviewTab extends StatelessWidget {
                         );
                       },
                     ),
+                  const Gap(24),
                 ],
               ),
             ),

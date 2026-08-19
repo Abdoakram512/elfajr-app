@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 
+import '../../../../app/service_locator.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/widgets/dialogs/logout_confirm_dialog.dart';
 import '../../../../core/widgets/profile/profile_info_content_links.dart';
@@ -19,7 +20,7 @@ class BeneficiaryProfileTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authState = context.watch<AuthCubit>().state;
+    final authState = getIt<AuthCubit>().state;
     final user = authState is Authenticated ? authState.user : null;
     final dateFormatter = DateFormat('yyyy/MM/dd');
 
@@ -39,12 +40,6 @@ class BeneficiaryProfileTab extends StatelessWidget {
           appBar: AppBar(
             title: const Text('الملف الشخصي والبيانات'),
             automaticallyImplyLeading: false,
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.logout_rounded, color: AppColors.error),
-                onPressed: () => LogoutConfirmDialog.show(context),
-              ),
-            ],
           ),
           body: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),

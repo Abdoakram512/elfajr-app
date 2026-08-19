@@ -1,5 +1,6 @@
 import '../data_sources/admin_remote_data_source.dart';
-import '../view_models/admin_state.dart';
+import '../models/admin_merchant_item.dart';
+import '../models/admin_redemption_item.dart';
 import 'admin_repository.dart';
 
 class AdminRepositoryImpl implements AdminRepository {

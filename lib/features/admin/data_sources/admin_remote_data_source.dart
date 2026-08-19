@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../view_models/admin_state.dart';
+import '../models/admin_merchant_item.dart';
+import '../models/admin_redemption_item.dart';
 
 abstract class AdminRemoteDataSource {
   Stream<Map<String, dynamic>> getGlobalStatsStream();

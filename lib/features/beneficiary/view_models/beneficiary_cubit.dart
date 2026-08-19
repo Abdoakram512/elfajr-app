@@ -13,17 +13,13 @@ class BeneficiaryCubit extends Cubit<BeneficiaryState> {
   StreamSubscription<List<BeneficiaryRedemptionItem>>? _redemptionsSubscription;
 
   BeneficiaryCubit({BeneficiaryRepository? repository})
-      : _repository = repository ?? sl<BeneficiaryRepository>(),
+      : _repository = repository ?? getIt<BeneficiaryRepository>(),
         super(const BeneficiaryState()) {
     initDataStreams();
   }
 
-  void setTab(int index) {
-    emit(state.copyWith(currentTabIndex: index));
-  }
-
   void initDataStreams() {
-    final authState = sl<AuthCubit>().state;
+    final authState = getIt<AuthCubit>().state;
     final user = authState is Authenticated ? authState.user : null;
 
     final beneficiaryId = user?.uid ?? 'usr_ben_ahmed';
