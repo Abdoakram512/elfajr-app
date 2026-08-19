@@ -40,6 +40,11 @@ class AdminOverviewCubit extends Cubit<AdminOverviewState> {
     });
   }
 
+  Future<void> refreshData() async {
+    initDataStreams();
+    await Future.delayed(const Duration(milliseconds: 600));
+  }
+
   @override
   Future<void> close() {
     _statsSubscription?.cancel();

@@ -17,9 +17,15 @@ class AdminMerchantsCubit extends Cubit<AdminMerchantsState> {
 
   void initMerchantsStream() {
     _merchantsSubscription?.cancel();
-    _merchantsSubscription = _repository.getMerchantsStream().listen((merchants) {
+    _merchantsSubscription =
+        _repository.getMerchantsStream().listen((merchants) {
       emit(state.copyWith(merchants: merchants));
     });
+  }
+
+  Future<void> refreshMerchants() async {
+    initMerchantsStream();
+    await Future.delayed(const Duration(milliseconds: 600));
   }
 
   void setSearchQuery(String query) {

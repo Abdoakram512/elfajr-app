@@ -44,6 +44,11 @@ class BeneficiaryCubit extends Cubit<BeneficiaryState> {
     });
   }
 
+  Future<void> refreshData() async {
+    initDataStreams();
+    await Future.delayed(const Duration(milliseconds: 600));
+  }
+
   @override
   Future<void> close() {
     _cardSubscription?.cancel();

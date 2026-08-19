@@ -8,6 +8,7 @@ import 'package:qout/core/constants/app_colors.dart';
 import '../../../../app/service_locator.dart';
 import '../../../../core/widgets/feedback/app_error_state_widget.dart';
 import '../../../../core/widgets/feedback/app_loading_indicator.dart';
+import '../../../../core/widgets/feedback/qout_refresh_indicator.dart';
 import '../view_models/info_cubit.dart';
 import '../view_models/info_state.dart';
 
@@ -68,6 +69,7 @@ class _TermsPrivacyViewBody extends StatelessWidget {
               children: [
                 // 1. Terms Tab
                 _buildListTab(
+                  context: context,
                   icon: Icons.gavel_rounded,
                   title: data.termsTitle,
                   items: data.termsList,
@@ -76,6 +78,7 @@ class _TermsPrivacyViewBody extends StatelessWidget {
 
                 // 2. Privacy Tab
                 _buildListTab(
+                  context: context,
                   icon: Icons.security_rounded,
                   title: data.privacyTitle,
                   items: data.privacyList,
@@ -90,13 +93,17 @@ class _TermsPrivacyViewBody extends StatelessWidget {
   }
 
   Widget _buildListTab({
+    required BuildContext context,
     required IconData icon,
     required String title,
     required List<String> items,
     required String lastUpdated,
   }) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+    return QoutRefreshIndicator(
+      onRefresh: () => context.read<InfoCubit>().loadAllInfo(),
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -203,6 +210,7 @@ class _TermsPrivacyViewBody extends StatelessWidget {
           const Gap(24),
         ],
       ),
+    ),
     );
   }
 }

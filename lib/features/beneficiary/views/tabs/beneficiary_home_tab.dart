@@ -5,6 +5,7 @@ import 'package:gap/gap.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/widgets/feedback/qout_refresh_indicator.dart';
 import '../../view_models/beneficiary_cubit.dart';
 import '../../view_models/beneficiary_state.dart';
 import '../../widgets/digital_aid_card_widget.dart';
@@ -25,8 +26,11 @@ class BeneficiaryHomeTab extends StatelessWidget {
         return Scaffold(
           backgroundColor: AppColors.backgroundLight,
           body: SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            child: QoutRefreshIndicator(
+              onRefresh: () => context.read<BeneficiaryCubit>().refreshData(),
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -299,6 +303,7 @@ class BeneficiaryHomeTab extends StatelessWidget {
                 ],
               ),
             ),
+          ),
           ),
         );
       },

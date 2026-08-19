@@ -5,6 +5,7 @@ import 'package:gap/gap.dart';
 
 import '../../../../app/service_locator.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/widgets/feedback/qout_refresh_indicator.dart';
 import '../../view_models/admin_merchants_cubit.dart';
 import '../../view_models/admin_merchants_state.dart';
 
@@ -38,10 +39,14 @@ class _AdminMerchantsTabBody extends StatelessWidget {
             title: const Text('منافذ الصرف المعتمدة'),
             automaticallyImplyLeading: false,
           ),
-          body: ListView.separated(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            itemCount: merchants.length,
-            separatorBuilder: (context, index) => const Gap(14),
+          body: QoutRefreshIndicator(
+            onRefresh: () =>
+                context.read<AdminMerchantsCubit>().refreshMerchants(),
+            child: ListView.separated(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              itemCount: merchants.length,
+              separatorBuilder: (context, index) => const Gap(14),
             itemBuilder: (context, index) {
               final merchant = merchants[index];
 
@@ -219,6 +224,7 @@ class _AdminMerchantsTabBody extends StatelessWidget {
                 ),
               );
             },
+          ),
           ),
         );
       },

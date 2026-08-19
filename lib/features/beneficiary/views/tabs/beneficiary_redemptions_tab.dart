@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/widgets/feedback/qout_refresh_indicator.dart';
 import '../../view_models/beneficiary_cubit.dart';
 import '../../view_models/beneficiary_state.dart';
 
@@ -23,40 +24,49 @@ class BeneficiaryRedemptionsTab extends StatelessWidget {
             title: const Text('سجل حركات الصرف'),
             automaticallyImplyLeading: false,
           ),
-          body: state.redemptions.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+          body: QoutRefreshIndicator(
+            onRefresh: () => context.read<BeneficiaryCubit>().refreshData(),
+            child: state.redemptions.isEmpty
+                ? ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 80),
                     children: [
-                      Icon(
-                        Icons.receipt_long_outlined,
-                        size: 64,
-                        color: AppColors.textMutedLight,
-                      ),
-                      const Gap(16),
-                      Text(
-                        'لا توجد عمليات صرف مسجلة حتى الآن',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textSecondaryLight,
-                        ),
-                      ),
-                      const Gap(6),
-                      Text(
-                        'عند زيارتك لأي منفذ صرف معتمد ستظهر فواتيرك هنا.',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: AppColors.textMutedLight,
+                      Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.receipt_long_outlined,
+                              size: 64,
+                              color: AppColors.textMutedLight,
+                            ),
+                            const Gap(16),
+                            Text(
+                              'لا توجد عمليات صرف مسجلة حتى الآن',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textSecondaryLight,
+                              ),
+                            ),
+                            const Gap(6),
+                            Text(
+                              'عند زيارتك لأي منفذ صرف معتمد ستظهر فواتيرك هنا.',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: AppColors.textMutedLight,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
-                  ),
-                )
-              : ListView.separated(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                  itemCount: state.redemptions.length,
-                  separatorBuilder: (context, index) => const Gap(12),
+                  )
+                : ListView.separated(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                    itemCount: state.redemptions.length,
+                    separatorBuilder: (context, index) => const Gap(12),
                   itemBuilder: (context, index) {
                     final item = state.redemptions[index];
                     return Container(
@@ -151,6 +161,7 @@ class BeneficiaryRedemptionsTab extends StatelessWidget {
                     );
                   },
                 ),
+          ),
         );
       },
     );

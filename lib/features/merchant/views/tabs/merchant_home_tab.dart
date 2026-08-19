@@ -6,6 +6,7 @@ import 'package:gap/gap.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/widgets/feedback/app_empty_state_widget.dart';
+import '../../../../core/widgets/feedback/qout_refresh_indicator.dart';
 import '../../../../core/widgets/transactions/transaction_list_item.dart';
 import '../../view_models/merchant_dashboard_cubit.dart';
 import '../../view_models/merchant_dashboard_state.dart';
@@ -26,8 +27,11 @@ class MerchantHomeTab extends StatelessWidget {
         return Scaffold(
           backgroundColor: AppColors.backgroundLight,
           body: SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            child: QoutRefreshIndicator(
+              onRefresh: () => context.read<MerchantDashboardCubit>().refreshData(),
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -345,6 +349,7 @@ class MerchantHomeTab extends StatelessWidget {
                 ],
               ),
             ),
+          ),
           ),
         );
       },

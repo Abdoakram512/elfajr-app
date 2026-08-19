@@ -8,6 +8,7 @@ import 'package:qout/core/constants/app_colors.dart';
 import '../../../../app/service_locator.dart';
 import '../../../../core/widgets/feedback/app_error_state_widget.dart';
 import '../../../../core/widgets/feedback/app_loading_indicator.dart';
+import '../../../../core/widgets/feedback/qout_refresh_indicator.dart';
 import '../view_models/info_cubit.dart';
 import '../view_models/info_state.dart';
 
@@ -51,8 +52,11 @@ class _AboutUsViewBody extends StatelessWidget {
             );
           }
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          return QoutRefreshIndicator(
+            onRefresh: () => context.read<InfoCubit>().loadAllInfo(),
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -262,6 +266,7 @@ class _AboutUsViewBody extends StatelessWidget {
                 const Gap(24),
               ],
             ),
+          ),
           );
         },
       ),
