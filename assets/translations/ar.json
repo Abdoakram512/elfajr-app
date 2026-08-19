@@ -39,6 +39,7 @@
     "password": "كلمة المرور",
     "confirm_password": "تأكيد كلمة المرور",
     "forgot_password": "نسيت كلمة المرور؟",
+    "remember_me": "تذكر بيانات دخولي",
     "login": "تسجيل الدخول",
     "register": "إنشاء حساب جديد",
     "dont_have_account": "ليس لديك حساب؟",

@@ -4,7 +4,9 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../../app/service_locator.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/routes/route_names.dart';
@@ -25,6 +27,44 @@ class _LoginViewState extends State<LoginView> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _rememberMe = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedCredentials();
+  }
+
+  void _loadSavedCredentials() {
+    try {
+      final prefs = sl<SharedPreferences>();
+      final savedRememberMe =
+          prefs.getBool(AppConstants.prefsKeyRememberMe) ?? true;
+      final savedEmail = prefs.getString(AppConstants.prefsKeySavedEmail) ?? '';
+
+      setState(() {
+        _rememberMe = savedRememberMe;
+        if (savedRememberMe && savedEmail.isNotEmpty) {
+          _emailController.text = savedEmail;
+        }
+      });
+    } catch (_) {}
+  }
+
+  void _saveCredentialsState() {
+    try {
+      final prefs = sl<SharedPreferences>();
+      prefs.setBool(AppConstants.prefsKeyRememberMe, _rememberMe);
+      if (_rememberMe) {
+        prefs.setString(
+          AppConstants.prefsKeySavedEmail,
+          _emailController.text.trim(),
+        );
+      } else {
+        prefs.remove(AppConstants.prefsKeySavedEmail);
+      }
+    } catch (_) {}
+  }
 
   @override
   void dispose() {
@@ -35,6 +75,7 @@ class _LoginViewState extends State<LoginView> {
 
   void _submitLogin() {
     if (_formKey.currentState?.validate() ?? false) {
+      _saveCredentialsState();
       context.read<AuthCubit>().login(
         email: _emailController.text.trim(),
         password: _passwordController.text,
@@ -60,17 +101,15 @@ class _LoginViewState extends State<LoginView> {
             case UserRole.admin:
               context.go(RouteNames.adminDashboard);
               break;
-            case UserRole.volunteer:
-              context.go(RouteNames.volunteerDashboard);
-              break;
-            case UserRole.donor:
-              context.go(RouteNames.donorDashboard);
-              break;
             case UserRole.beneficiary:
               context.go(RouteNames.beneficiaryDashboard);
               break;
             case UserRole.merchant:
               context.go(RouteNames.merchantDashboard);
+              break;
+            case UserRole.volunteer:
+            case UserRole.donor:
+              context.go(RouteNames.beneficiaryDashboard);
               break;
           }
         } else if (state is AuthError) {
@@ -99,12 +138,13 @@ class _LoginViewState extends State<LoginView> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        // Brand Indicator
                         Row(
                           children: [
                             Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                color: AppColors.primary.withValues(alpha: 0.1),
+                                color: AppColors.primarySubtle,
                                 shape: BoxShape.circle,
                               ),
                               child: const Icon(
@@ -244,28 +284,85 @@ class _LoginViewState extends State<LoginView> {
                         .fadeIn(delay: 300.ms, duration: 400.ms)
                         .slideX(begin: 0.1, end: 0),
 
-                    const Gap(12),
+                    const Gap(14),
 
-                    // Forgot Password
-                    Align(
-                      alignment: isArabic
-                          ? Alignment.centerLeft
-                          : Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: () =>
-                            context.push(RouteNames.forgotPassword),
-                        child: Text(
-                          'auth.forgot_password'.tr(),
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.primary,
+                    // Remember Me & Forgot Password Row
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Remember Me Checkbox
+                        InkWell(
+                          onTap: () {
+                            setState(() {
+                              _rememberMe = !_rememberMe;
+                            });
+                          },
+                          borderRadius: BorderRadius.circular(8),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  width: 20,
+                                  height: 20,
+                                  decoration: BoxDecoration(
+                                    color: _rememberMe
+                                        ? AppColors.primary
+                                        : Colors.white,
+                                    borderRadius: BorderRadius.circular(6),
+                                    border: Border.all(
+                                      color: _rememberMe
+                                          ? AppColors.primary
+                                          : AppColors.borderLight,
+                                      width: 1.5,
+                                    ),
+                                  ),
+                                  child: _rememberMe
+                                      ? const Icon(
+                                          Icons.check_rounded,
+                                          size: 14,
+                                          color: Colors.white,
+                                        )
+                                      : null,
+                                ),
+                                const Gap(8),
+                                Text(
+                                  'auth.remember_me'.tr(),
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.textSecondaryLight,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
+
+                        // Forgot Password Link
+                        TextButton(
+                          onPressed: () =>
+                              context.push(RouteNames.forgotPassword),
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: Text(
+                            'auth.forgot_password'.tr(),
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
 
-                    const Gap(24),
+                    const Gap(28),
 
                     // Login Button
                     PrimaryButton(
