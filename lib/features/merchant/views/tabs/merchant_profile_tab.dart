@@ -45,7 +45,7 @@ class MerchantProfileTab extends StatelessWidget {
         return Scaffold(
           backgroundColor: AppColors.backgroundLight,
           appBar: AppBar(
-            title: const Text('الملف التعريفي للمنفذ'),
+            title: Text('profile.merchant_title'.tr()),
             automaticallyImplyLeading: false,
           ),
           body: SingleChildScrollView(
@@ -130,7 +130,7 @@ class MerchantProfileTab extends StatelessWidget {
                             ),
                             const Gap(6),
                             Text(
-                              'منفذ صرف وتموينات معتمد',
+                              'profile.merchant_role_badge'.tr(),
                               style: const TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
@@ -148,7 +148,7 @@ class MerchantProfileTab extends StatelessWidget {
 
                 // 2. Commercial & Registry Information
                 ProfileSectionCard(
-                  title: 'بيانات الاعتماد والترخيص التجاري',
+                  title: 'profile.merchant_license_title'.tr(),
                   icon: Icons.domain_rounded,
                   children: [
                     ProfileInfoRow(
@@ -156,16 +156,16 @@ class MerchantProfileTab extends StatelessWidget {
                       value: storeName,
                     ),
                     ProfileInfoRow(
-                      label: 'رقم السجل التجاري / المنشأة',
+                      label: 'profile.cr_number_label'.tr(),
                       value: commercialReg,
                     ),
                     ProfileInfoRow(
-                      label: 'حالة الترخيص والاعتماد',
-                      value: 'معتمد ونشط بالشبكة',
+                      label: 'profile.license_status_label'.tr(),
+                      value: 'profile.active_and_verified'.tr(),
                       valueColor: AppColors.success,
                     ),
                     ProfileInfoRow(
-                      label: 'المدينة والمنطقة',
+                      label: 'auth.city'.tr(),
                       value: displayCity,
                       showDivider: false,
                     ),
@@ -176,23 +176,23 @@ class MerchantProfileTab extends StatelessWidget {
 
                 // 3. Overall Operational Metrics
                 ProfileSectionCard(
-                  title: 'إحصائيات الصرف التراكمية للمنفذ',
+                  title: 'profile.merchant_stats_title'.tr(),
                   icon: Icons.insights_rounded,
                   children: [
                     ProfileInfoRow(
-                      label: 'إجمالي المبالغ المنصرفة',
+                      label: 'dashboard.admin.total_disbursed_label'.tr(),
                       value:
                           '${currencyFormatter.format(state.todayDispensedAmount)} ${'common.currency'.tr()}',
                       valueColor: AppColors.primaryDark,
                     ),
                     ProfileInfoRow(
-                      label: 'إجمالي السلال الغذائية المسلّمة',
-                      value: '$totalBasketsDispensed سلة غذائية',
+                      label: 'profile.total_baskets_label'.tr(),
+                      value: '$totalBasketsDispensed ${'profile.baskets_unit'.tr()}',
                       valueColor: AppColors.accentDark,
                     ),
                     ProfileInfoRow(
-                      label: 'عدد المعاملات المسجلة',
-                      value: '${state.recentTransactions.length} عملية',
+                      label: 'profile.transactions_count_label'.tr(),
+                      value: '${state.recentTransactions.length} ${'profile.txns_unit'.tr()}',
                       showDivider: false,
                     ),
                   ],
@@ -202,7 +202,7 @@ class MerchantProfileTab extends StatelessWidget {
 
                 // 4. Contact & Support
                 ProfileSectionCard(
-                  title: 'معلومات الاتصال والمسؤول',
+                  title: 'profile.contact_info_title'.tr(),
                   icon: Icons.contact_phone_outlined,
                   children: [
                     ProfileInfoRow(
@@ -221,7 +221,7 @@ class MerchantProfileTab extends StatelessWidget {
 
                 // 5. System Settings & Info Content Links
                 ProfileSectionCard(
-                  title: 'إعدادات الحساب والدعم',
+                  title: 'profile.system_info'.tr(),
                   icon: Icons.settings_outlined,
                   children: const [
                     ProfileLanguageTile(),

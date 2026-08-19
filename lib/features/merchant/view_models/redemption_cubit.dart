@@ -27,7 +27,7 @@ class RedemptionCubit extends Cubit<RedemptionState> {
       if (card != null) {
         emit(RedemptionCardLoaded(card: card));
       } else {
-        emit(const RedemptionFailure('كارت الإغاثة غير مسجل أو غير صالح'));
+        emit(const RedemptionFailure('merchant.card_not_registered'));
       }
     } catch (e) {
       emit(RedemptionFailure(e.toString().replaceAll('AppException: ', '')));
@@ -37,7 +37,7 @@ class RedemptionCubit extends Cubit<RedemptionState> {
   Future<void> searchCardManual(String query) async {
     final clean = query.trim();
     if (clean.isEmpty) {
-      emit(const RedemptionFailure('يرجى إدخال رقم الهوية الوطنية أو رقم الكارت'));
+      emit(const RedemptionFailure('merchant.search_query_empty'));
       return;
     }
 
@@ -48,7 +48,7 @@ class RedemptionCubit extends Cubit<RedemptionState> {
       if (card != null) {
         emit(RedemptionCardLoaded(card: card));
       } else {
-        emit(const RedemptionFailure('لم يتم العثور على أي كارت برقم الهوية أو الكارت المدخل'));
+        emit(const RedemptionFailure('merchant.card_not_found'));
       }
     } catch (e) {
       emit(RedemptionFailure(e.toString().replaceAll('AppException: ', '')));

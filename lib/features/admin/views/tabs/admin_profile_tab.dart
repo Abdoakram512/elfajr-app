@@ -50,7 +50,7 @@ class _AdminProfileTabBody extends StatelessWidget {
         return Scaffold(
           backgroundColor: AppColors.backgroundLight,
           appBar: AppBar(
-            title: const Text('الملف الإداري العام'),
+            title: Text('profile.admin_title'.tr()),
             automaticallyImplyLeading: false,
           ),
           body: SingleChildScrollView(
@@ -125,18 +125,18 @@ class _AdminProfileTabBody extends StatelessWidget {
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(color: Colors.white30),
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.security_rounded,
                               size: 15,
                               color: AppColors.accentLight,
                             ),
-                            Gap(6),
+                            const Gap(6),
                             Text(
-                              'إدارة الحوكمة والرقابة العليا',
-                              style: TextStyle(
+                              'profile.admin_role_badge'.tr(),
+                              style: const TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
@@ -153,25 +153,25 @@ class _AdminProfileTabBody extends StatelessWidget {
 
                 // 2. Administrative Authority & Responsibilities
                 ProfileSectionCard(
-                  title: 'الصلاحيات والمسؤوليات الإدارية',
+                  title: 'profile.admin_authority_title'.tr(),
                   icon: Icons.shield_outlined,
-                  children: const [
+                  children: [
                     ProfileInfoRow(
-                      label: 'الرتبة في المنظومة',
-                      value: 'مشرف عام ومراقب مالي',
+                      label: 'profile.admin_role_label'.tr(),
+                      value: 'profile.admin_role_value'.tr(),
                       valueColor: AppColors.primary,
                     ),
                     ProfileInfoRow(
-                      label: 'مستوى الوصول للبيانات',
-                      value: 'وصول شامل (Full Superadmin Access)',
+                      label: 'profile.admin_access_label'.tr(),
+                      value: 'profile.admin_access_value'.tr(),
                     ),
                     ProfileInfoRow(
-                      label: 'صلاحية منافذ الصرف',
-                      value: 'اعتماد، تجميد، وإلغاء المنافذ',
+                      label: 'profile.admin_merchants_perm'.tr(),
+                      value: 'profile.admin_merchants_perm_val'.tr(),
                     ),
                     ProfileInfoRow(
-                      label: 'صلاحية التتبع المالي',
-                      value: 'متابعة الصرف والخصومات اللحظية',
+                      label: 'profile.admin_finance_perm'.tr(),
+                      value: 'profile.admin_finance_perm_val'.tr(),
                       showDivider: false,
                     ),
                   ],
@@ -181,26 +181,26 @@ class _AdminProfileTabBody extends StatelessWidget {
 
                 // 3. Central System High-level KPIs
                 ProfileSectionCard(
-                  title: 'مؤشرات المنظومة المركزية',
+                  title: 'profile.system_kpis_title'.tr(),
                   icon: Icons.analytics_outlined,
                   children: [
                     ProfileInfoRow(
-                      label: 'إجمالي أموال الدعم المصروفة',
+                      label: 'admin.stats.total_disbursed'.tr(),
                       value:
                           '${currencyFormatter.format(state.totalFundsDisbursed)} ${'common.currency'.tr()}',
                       valueColor: AppColors.primaryDark,
                     ),
                     ProfileInfoRow(
-                      label: 'إجمالي الأسر المستفيدة المسجلة',
-                      value: '${state.totalBeneficiariesCount} أسرة',
+                      label: 'admin.stats.total_beneficiaries'.tr(),
+                      value: '${state.totalBeneficiariesCount} ${'profile.families_unit'.tr()}',
                     ),
                     ProfileInfoRow(
-                      label: 'منافذ الصرف النشطة المعتمدة',
-                      value: '${state.activeMerchantsCount} منفذ',
+                      label: 'admin.stats.active_merchants'.tr(),
+                      value: '${state.activeMerchantsCount} ${'profile.stores_unit'.tr()}',
                     ),
                     ProfileInfoRow(
-                      label: 'إجمالي عمليات الصرف الموثقة',
-                      value: '${state.totalRedemptionsCount} عملية',
+                      label: 'admin.stats.total_redemptions'.tr(),
+                      value: '${state.totalRedemptionsCount} ${'profile.txns_unit'.tr()}',
                       showDivider: false,
                     ),
                   ],
@@ -210,7 +210,7 @@ class _AdminProfileTabBody extends StatelessWidget {
 
                 // 4. Contact & Headquarters
                 ProfileSectionCard(
-                  title: 'معلومات الإدارة والمقر',
+                  title: 'profile.contact_hq_title'.tr(),
                   icon: Icons.business_rounded,
                   children: [
                     ProfileInfoRow(
@@ -222,7 +222,7 @@ class _AdminProfileTabBody extends StatelessWidget {
                       value: displayEmail,
                     ),
                     ProfileInfoRow(
-                      label: 'المقر والفرع الإداري',
+                      label: 'info_content.headquarters'.tr(),
                       value: displayCity,
                       showDivider: false,
                     ),
@@ -233,7 +233,7 @@ class _AdminProfileTabBody extends StatelessWidget {
 
                 // 5. System Settings & Info Content Links
                 ProfileSectionCard(
-                  title: 'إعدادات النظام والدعم',
+                  title: 'profile.system_info'.tr(),
                   icon: Icons.settings_outlined,
                   children: const [
                     ProfileLanguageTile(),

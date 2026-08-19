@@ -149,9 +149,9 @@ class BeneficiaryHomeTab extends StatelessWidget {
                               ),
                             ),
                             const Gap(10),
-                            const Text(
-                              'كيف تصرف مستحقاتك من المنافذ؟',
-                              style: TextStyle(
+                            Text(
+                              'dashboard.beneficiary.how_to_use_title'.tr(),
+                              style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.textPrimaryLight,
@@ -162,20 +162,20 @@ class BeneficiaryHomeTab extends StatelessWidget {
                         const Gap(16),
                         _buildInstructionStep(
                           stepNumber: '1',
-                          title: 'التوجه لمنفذ الصرف المعتمد',
-                          desc: 'توجه لأي سوبرماركت أو صيدلية معتمدة تابعة لمنظومة قوت.',
+                          title: 'dashboard.beneficiary.how_to_use_step_1_title'.tr(),
+                          desc: 'dashboard.beneficiary.how_to_use_step_1_desc'.tr(),
                         ),
                         const Gap(12),
                         _buildInstructionStep(
                           stepNumber: '2',
-                          title: 'إبراز باركود الـ QR من التطبيق',
-                          desc: 'اعرض الكارت أعلاه للكاشير لمسحه مباشرة بكاميرا هاتفه.',
+                          title: 'dashboard.beneficiary.how_to_use_step_2_title'.tr(),
+                          desc: 'dashboard.beneficiary.how_to_use_step_2_desc'.tr(),
                         ),
                         const Gap(12),
                         _buildInstructionStep(
                           stepNumber: '3',
-                          title: 'الخصم الفوري واستلام السلع',
-                          desc: 'يتم خصم المبلغ أو السلة ويتحدث رصيدك اللحظي فوراً.',
+                          title: 'dashboard.beneficiary.how_to_use_step_3_title'.tr(),
+                          desc: 'dashboard.beneficiary.how_to_use_step_3_desc'.tr(),
                         ),
                       ],
                     ),
@@ -187,9 +187,9 @@ class BeneficiaryHomeTab extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'سجل عمليات الصرف الأخيرة',
-                        style: TextStyle(
+                      Text(
+                        'dashboard.beneficiary.recent_redemptions_title'.tr(),
+                        style: const TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.bold,
                           color: AppColors.textPrimaryLight,
@@ -197,9 +197,9 @@ class BeneficiaryHomeTab extends StatelessWidget {
                       ),
                       TextButton(
                         onPressed: onSwitchToHistory,
-                        child: const Text(
-                          'عرض الكل',
-                          style: TextStyle(
+                        child: Text(
+                          'common.view_all'.tr(),
+                          style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
                             color: AppColors.primary,
@@ -216,8 +216,8 @@ class BeneficiaryHomeTab extends StatelessWidget {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 24),
                         child: Text(
-                          'لم تقم بأي عمليات صرف بعد.',
-                          style: TextStyle(
+                          'dashboard.beneficiary.no_redemptions_title'.tr(),
+                          style: const TextStyle(
                             fontSize: 14,
                             color: AppColors.textMutedLight,
                           ),
@@ -245,14 +245,19 @@ class BeneficiaryHomeTab extends StatelessWidget {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    item.merchantStoreName,
-                                    style: const TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.textPrimaryLight,
+                                  Expanded(
+                                    child: Text(
+                                      item.merchantStoreName,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.textPrimaryLight,
+                                      ),
                                     ),
                                   ),
+                                  const Gap(8),
                                   Text(
                                     '-${currencyFormatter.format(item.amountDeducted)} ${'common.currency'.tr()}',
                                     style: const TextStyle(

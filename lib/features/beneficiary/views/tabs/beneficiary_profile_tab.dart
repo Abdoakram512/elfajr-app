@@ -38,7 +38,7 @@ class BeneficiaryProfileTab extends StatelessWidget {
         return Scaffold(
           backgroundColor: AppColors.backgroundLight,
           appBar: AppBar(
-            title: const Text('الملف الشخصي والبيانات'),
+            title: Text('profile.beneficiary_title'.tr()),
             automaticallyImplyLeading: false,
           ),
           body: SingleChildScrollView(
@@ -141,7 +141,7 @@ class BeneficiaryProfileTab extends StatelessWidget {
 
                 // 2. Beneficiary Official Card Details
                 ProfileSectionCard(
-                  title: 'بيانات كارت الإغاثة المعتمد',
+                  title: 'profile.beneficiary_card_title'.tr(),
                   icon: Icons.credit_card_rounded,
                   children: [
                     ProfileInfoRow(
@@ -149,7 +149,7 @@ class BeneficiaryProfileTab extends StatelessWidget {
                       value: card?.cardId ?? '-',
                     ),
                     ProfileInfoRow(
-                      label: 'الرقم الوطني / الإقامة',
+                      label: 'profile.national_id_label'.tr(),
                       value: card?.nationalId ?? '-',
                     ),
                     ProfileInfoRow(
@@ -159,7 +159,7 @@ class BeneficiaryProfileTab extends StatelessWidget {
                           : '-',
                     ),
                     ProfileInfoRow(
-                      label: 'حالة الاستحقاق',
+                      label: 'profile.eligibility_status_label'.tr(),
                       value: card != null && card.isActive
                           ? 'digital_card.status_active'.tr()
                           : 'digital_card.status_pending'.tr(),
@@ -168,7 +168,7 @@ class BeneficiaryProfileTab extends StatelessWidget {
                           : AppColors.warning,
                     ),
                     ProfileInfoRow(
-                      label: 'تاريخ انتهاء الصلاحية',
+                      label: 'profile.expires_at_label'.tr(),
                       value: card != null
                           ? dateFormatter.format(card.expiresAt)
                           : '-',
@@ -181,7 +181,7 @@ class BeneficiaryProfileTab extends StatelessWidget {
 
                 // 3. Contact Details
                 ProfileSectionCard(
-                  title: 'معلومات الاتصال والإقامة',
+                  title: 'profile.contact_info_title'.tr(),
                   icon: Icons.contact_phone_outlined,
                   children: [
                     ProfileInfoRow(
@@ -193,7 +193,7 @@ class BeneficiaryProfileTab extends StatelessWidget {
                       value: displayEmail,
                     ),
                     ProfileInfoRow(
-                      label: 'المدينة والمنطقة',
+                      label: 'auth.city'.tr(),
                       value: displayCity,
                       showDivider: false,
                     ),
@@ -204,7 +204,7 @@ class BeneficiaryProfileTab extends StatelessWidget {
 
                 // 4. System Settings & Info Content Links
                 ProfileSectionCard(
-                  title: 'إعدادات الحساب والدعم',
+                  title: 'profile.system_info'.tr(),
                   icon: Icons.settings_outlined,
                   children: const [
                     ProfileLanguageTile(),

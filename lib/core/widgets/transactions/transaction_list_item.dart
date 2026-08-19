@@ -49,44 +49,53 @@ class TransactionListItem extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: AppColors.primarySubtle,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(
-                        Icons.receipt_long_rounded,
-                        color: AppColors.primary,
-                        size: 20,
-                      ),
-                    ),
-                    const Gap(10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          merchantStoreName ?? beneficiaryName,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimaryLight,
-                          ),
+                Expanded(
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: AppColors.primarySubtle,
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        if (merchantStoreName != null)
-                          Text(
-                            'المستفيد: $beneficiaryName',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: AppColors.textSecondaryLight,
+                        child: const Icon(
+                          Icons.receipt_long_rounded,
+                          color: AppColors.primary,
+                          size: 20,
+                        ),
+                      ),
+                      const Gap(10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              merchantStoreName ?? beneficiaryName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimaryLight,
+                              ),
                             ),
-                          ),
-                      ],
-                    ),
-                  ],
+                            if (merchantStoreName != null)
+                              Text(
+                                '${'merchant.beneficiary_label'.tr()}: $beneficiaryName',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: AppColors.textSecondaryLight,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
+                const Gap(8),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
@@ -117,47 +126,54 @@ class TransactionListItem extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Text(
-                      '${'digital_card.card_number'.tr()}: $cardId${city != null ? ' • $city' : ''}',
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: AppColors.textMutedLight,
-                      ),
-                    ),
-                    if (showPrintButton) ...[
-                      const Gap(6),
-                      InkWell(
-                        onTap: () {
-                          CardPrinterService.printAidCard(
-                            card: AidCardModel(
-                              cardId: cardId,
-                              beneficiaryId: '',
-                              beneficiaryName: beneficiaryName,
-                              nationalId: '1089283746',
-                              familyCount: 5,
-                              totalBalance: amount,
-                              foodBasketsQuota: foodBaskets,
-                              status: AidCardStatus.active,
-                              expiresAt: DateTime.now().add(const Duration(days: 180)),
-                              securityHash: '',
-                            ),
-                          );
-                        },
-                        borderRadius: BorderRadius.circular(6),
-                        child: const Padding(
-                          padding: EdgeInsets.all(2.0),
-                          child: Icon(
-                            Icons.print_rounded,
-                            size: 14,
-                            color: AppColors.primary,
+                Expanded(
+                  child: Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          '${'digital_card.card_number'.tr()}: $cardId${city != null ? ' • $city' : ''}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: AppColors.textMutedLight,
                           ),
                         ),
                       ),
+                      if (showPrintButton) ...[
+                        const Gap(6),
+                        InkWell(
+                          onTap: () {
+                            CardPrinterService.printAidCard(
+                              card: AidCardModel(
+                                cardId: cardId,
+                                beneficiaryId: '',
+                                beneficiaryName: beneficiaryName,
+                                nationalId: '1089283746',
+                                familyCount: 5,
+                                totalBalance: amount,
+                                foodBasketsQuota: foodBaskets,
+                                status: AidCardStatus.active,
+                                expiresAt: DateTime.now().add(const Duration(days: 180)),
+                                securityHash: '',
+                              ),
+                            );
+                          },
+                          borderRadius: BorderRadius.circular(6),
+                          child: const Padding(
+                            padding: EdgeInsets.all(2.0),
+                            child: Icon(
+                              Icons.print_rounded,
+                              size: 14,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
+                const Gap(8),
                 Text(
                   dateFormatter.format(timestamp),
                   style: const TextStyle(

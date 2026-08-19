@@ -36,7 +36,7 @@ class _AdminMerchantsTabBody extends StatelessWidget {
         return Scaffold(
           backgroundColor: AppColors.backgroundLight,
           appBar: AppBar(
-            title: const Text('منافذ الصرف المعتمدة'),
+            title: Text('dashboard.admin.merchants_tab_title'.tr()),
             automaticallyImplyLeading: false,
           ),
           body: QoutRefreshIndicator(
@@ -148,9 +148,9 @@ class _AdminMerchantsTabBody extends StatelessWidget {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'إجمالي العمليات المنفذة',
-                              style: TextStyle(
+                            Text(
+                              'dashboard.admin.total_transactions_label'.tr(),
+                              style: const TextStyle(
                                 fontSize: 11,
                                 color: AppColors.textSecondaryLight,
                               ),
@@ -171,9 +171,9 @@ class _AdminMerchantsTabBody extends StatelessWidget {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            const Text(
-                              'إجمالي المبالغ المصروفة',
-                              style: TextStyle(
+                            Text(
+                              'dashboard.admin.total_disbursed_label'.tr(),
+                              style: const TextStyle(
                                 fontSize: 11,
                                 color: AppColors.textSecondaryLight,
                               ),
@@ -211,7 +211,7 @@ class _AdminMerchantsTabBody extends StatelessWidget {
                           ),
                           const Gap(6),
                           Text(
-                            'سجل تجاري: ${merchant.commercialReg}',
+                            '${'dashboard.admin.cr_label'.tr()}: ${merchant.commercialReg}',
                             style: const TextStyle(
                               fontSize: 11,
                               color: AppColors.textSecondaryLight,

@@ -227,10 +227,9 @@ class _AdminOverviewTabBody extends StatelessWidget {
 
                   // Recent Redemptions Feed List
                   if (state.recentRedemptions.isEmpty)
-                    const AppEmptyStateWidget(
-                      title: 'لا توجد عمليات صرف مسجلة حالياً',
-                      description:
-                          'ستظهر هنا كافة عمليات الخصم وسحب الإعانات لحظياً فور تنفيذها في منافذ الصرف المعتمدة',
+                    AppEmptyStateWidget(
+                      title: 'admin.empty_redemptions_title'.tr(),
+                      description: 'admin.empty_redemptions_desc'.tr(),
                       icon: Icons.sync_rounded,
                     )
                   else

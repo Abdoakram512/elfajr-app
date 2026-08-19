@@ -21,7 +21,7 @@ class BeneficiaryRedemptionsTab extends StatelessWidget {
         return Scaffold(
           backgroundColor: AppColors.backgroundLight,
           appBar: AppBar(
-            title: const Text('سجل حركات الصرف'),
+            title: Text('dashboard.beneficiary.redemptions_history'.tr()),
             automaticallyImplyLeading: false,
           ),
           body: QoutRefreshIndicator(
@@ -35,15 +35,15 @@ class BeneficiaryRedemptionsTab extends StatelessWidget {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.receipt_long_outlined,
                               size: 64,
                               color: AppColors.textMutedLight,
                             ),
                             const Gap(16),
                             Text(
-                              'لا توجد عمليات صرف مسجلة حتى الآن',
-                              style: TextStyle(
+                              'dashboard.beneficiary.no_redemptions_title'.tr(),
+                              style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.textSecondaryLight,
@@ -51,8 +51,8 @@ class BeneficiaryRedemptionsTab extends StatelessWidget {
                             ),
                             const Gap(6),
                             Text(
-                              'عند زيارتك لأي منفذ صرف معتمد ستظهر فواتيرك هنا.',
-                              style: TextStyle(
+                              'dashboard.beneficiary.no_redemptions_desc'.tr(),
+                              style: const TextStyle(
                                 fontSize: 13,
                                 color: AppColors.textMutedLight,
                               ),
@@ -89,31 +89,38 @@ class BeneficiaryRedemptionsTab extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.primarySubtle,
-                                      borderRadius: BorderRadius.circular(12),
+                              Expanded(
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.primarySubtle,
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: const Icon(
+                                        Icons.storefront_rounded,
+                                        color: AppColors.primary,
+                                        size: 20,
+                                      ),
                                     ),
-                                    child: const Icon(
-                                      Icons.storefront_rounded,
-                                      color: AppColors.primary,
-                                      size: 20,
+                                    const Gap(10),
+                                    Expanded(
+                                      child: Text(
+                                        item.merchantStoreName,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.textPrimaryLight,
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                  const Gap(10),
-                                  Text(
-                                    item.merchantStoreName,
-                                    style: const TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.textPrimaryLight,
-                                    ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
+                              const Gap(8),
                               Text(
                                 '-${currencyFormatter.format(item.amountDeducted)} ${'common.currency'.tr()}',
                                 style: const TextStyle(
@@ -130,13 +137,18 @@ class BeneficiaryRedemptionsTab extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                'رقم العملية: ${item.transactionId}',
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: AppColors.textSecondaryLight,
+                              Expanded(
+                                child: Text(
+                                  '${'dashboard.beneficiary.txn_number'.tr()}: ${item.transactionId}',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: AppColors.textSecondaryLight,
+                                  ),
                                 ),
                               ),
+                              const Gap(8),
                               Text(
                                 dateFormatter.format(item.timestamp),
                                 style: const TextStyle(
@@ -149,7 +161,9 @@ class BeneficiaryRedemptionsTab extends StatelessWidget {
                           if (item.notes != null && item.notes!.isNotEmpty) ...[
                             const Gap(8),
                             Text(
-                              'البيان: ${item.notes}',
+                              '${'dashboard.beneficiary.notes'.tr()}: ${item.notes}',
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontSize: 12,
                                 color: AppColors.textPrimaryLight.withValues(alpha: 0.8),

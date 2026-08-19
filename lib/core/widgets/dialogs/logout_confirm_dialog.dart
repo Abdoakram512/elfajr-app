@@ -31,11 +31,11 @@ class LogoutConfirmDialog extends StatelessWidget {
         children: [
           const Icon(Icons.logout_rounded, color: AppColors.error),
           const SizedBox(width: 8),
-          Text(title ?? 'تأكيد تسجيل الخروج'),
+          Text(title ?? 'profile.logout_confirm_title'.tr()),
         ],
       ),
       content: Text(
-        message ?? 'هل أنت متأكد من رغبتك في تسجيل الخروج من حسابك؟',
+        message ?? 'profile.logout_confirm_desc'.tr(),
         style: const TextStyle(fontSize: 14, height: 1.4),
       ),
       actions: [
