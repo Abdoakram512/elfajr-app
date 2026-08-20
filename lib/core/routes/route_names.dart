@@ -16,4 +16,6 @@ abstract class RouteNames {
   static const String faq = '/faq';
   static const String termsPrivacy = '/terms-privacy';
   static const String contactSupport = '/contact-support';
+  static const String accountSuspended = '/account-suspended';
 }
+

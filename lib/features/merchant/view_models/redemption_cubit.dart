@@ -79,7 +79,7 @@ class RedemptionCubit extends Cubit<RedemptionState> {
       return false;
     }
 
-    if (amount <= 0 && foodBaskets <= 0) {
+    if (amount <= 0) {
       emit(RedemptionCardLoaded(
         card: currentCard,
         amountError: 'merchant.enter_deduction_amount',
@@ -87,7 +87,7 @@ class RedemptionCubit extends Cubit<RedemptionState> {
       return false;
     }
 
-    if (amount > currentCard.totalBalance || foodBaskets > currentCard.foodBasketsQuota) {
+    if (amount > currentCard.totalBalance) {
       emit(RedemptionCardLoaded(
         card: currentCard,
         amountError: 'merchant.insufficient_balance',

@@ -39,7 +39,11 @@ class SplashCubit extends Cubit<SplashState> {
 
       if (cachedUser != null) {
         _authCubit.emit(Authenticated(cachedUser));
-        emit(SplashNavigateToDashboard(cachedUser.role.name));
+        if (!cachedUser.isActive || !cachedUser.isApproved) {
+          emit(const SplashNavigateToDashboard('suspended'));
+        } else {
+          emit(SplashNavigateToDashboard(cachedUser.role.name));
+        }
       } else {
         emit(SplashNavigateToLogin());
       }
@@ -48,3 +52,4 @@ class SplashCubit extends Cubit<SplashState> {
     }
   }
 }
+

@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/utils/app_formatters.dart';
 import '../../../../core/widgets/feedback/qout_refresh_indicator.dart';
 import '../../view_models/beneficiary_cubit.dart';
 import '../../view_models/beneficiary_state.dart';
@@ -13,9 +14,6 @@ class BeneficiaryRedemptionsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currencyFormatter = NumberFormat('#,###');
-    final dateFormatter = DateFormat('yyyy/MM/dd - HH:mm');
-
     return BlocBuilder<BeneficiaryCubit, BeneficiaryState>(
       builder: (context, state) {
         return Scaffold(
@@ -64,6 +62,8 @@ class BeneficiaryRedemptionsTab extends StatelessWidget {
                   )
                 : ListView.separated(
                     physics: const AlwaysScrollableScrollPhysics(),
+                    addRepaintBoundaries: true,
+                    addAutomaticKeepAlives: false,
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                     itemCount: state.redemptions.length,
                     separatorBuilder: (context, index) => const Gap(12),
@@ -122,7 +122,7 @@ class BeneficiaryRedemptionsTab extends StatelessWidget {
                               ),
                               const Gap(8),
                               Text(
-                                '-${currencyFormatter.format(item.amountDeducted)} ${'common.currency'.tr()}',
+                                '-${AppFormatters.integerNumber.format(item.amountDeducted)} ${'common.currency'.tr()}',
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -150,7 +150,7 @@ class BeneficiaryRedemptionsTab extends StatelessWidget {
                               ),
                               const Gap(8),
                               Text(
-                                dateFormatter.format(item.timestamp),
+                                AppFormatters.fullDate.format(item.timestamp),
                                 style: const TextStyle(
                                   fontSize: 12,
                                   color: AppColors.textSecondaryLight,

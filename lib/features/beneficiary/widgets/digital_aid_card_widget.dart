@@ -439,15 +439,14 @@ class DigitalAidCardWidget extends StatelessWidget {
                 ],
               ),
 
-              // 2. Badges (Social Status + Nationality + Field Research)
-              if (card.socialStatus != null || card.nationality != null) ...[
-                const Gap(6),
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: AlignmentDirectional.centerStart,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
+              // 2. Badges (Social Status + Nationality + Family Count + Residence)
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: AlignmentDirectional.centerStart,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (card.socialStatus != null || card.nationality != null)
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 9,
@@ -467,48 +466,71 @@ class DigitalAidCardWidget extends StatelessWidget {
                           ),
                         ),
                       ),
-                      if (card.fieldResearchStatus?.isNotEmpty == true) ...[
-                        const Gap(6),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 9,
-                            vertical: 4,
+                    const Gap(6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 9,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.18),
+                        borderRadius: BorderRadius.circular(7),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.people_alt_rounded,
+                            size: 13,
+                            color: AppColors.accentLight,
                           ),
-                          decoration: BoxDecoration(
-                            color: AppColors.success.withValues(alpha: 0.28),
-                            borderRadius: BorderRadius.circular(7),
-                            border: Border.all(
-                              color: AppColors.accentLight.withValues(
-                                alpha: 0.5,
-                              ),
+                          const Gap(4),
+                          Text(
+                            '${card.familyCount} أفراد',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
                             ),
                           ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(
-                                Icons.check_circle_rounded,
-                                size: 13,
-                                color: AppColors.accentLight,
-                              ),
-                              const Gap(4),
-                              Text(
-                                card.fieldResearchStatus!,
-                                maxLines: 1,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
-                          ),
+                        ],
+                      ),
+                    ),
+                    if (card.residence != null && card.residence!.isNotEmpty) ...[
+                      const Gap(6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 9,
+                          vertical: 4,
                         ),
-                      ],
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.18),
+                          borderRadius: BorderRadius.circular(7),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.location_on_rounded,
+                              size: 13,
+                              color: AppColors.accentLight,
+                            ),
+                            const Gap(4),
+                            Text(
+                              card.residence!,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
-                  ),
+                  ],
                 ),
-              ],
+              ),
 
               const Gap(10),
 

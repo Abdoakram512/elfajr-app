@@ -66,6 +66,11 @@ class _LoginViewBodyState extends State<_LoginViewBody> {
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state is Authenticated) {
+          if (!state.user.isActive || !state.user.isApproved) {
+            context.go(RouteNames.accountSuspended, extra: state.user);
+            return;
+          }
+
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('auth.login_success'.tr(args: [state.user.name])),
@@ -89,6 +94,7 @@ class _LoginViewBodyState extends State<_LoginViewBody> {
               break;
           }
         } else if (state is AuthError) {
+
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message.tr()),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import '../../constants/app_colors.dart';
 import '../../services/card_printer_service.dart';
+import '../../utils/app_formatters.dart';
 import '../../../features/beneficiary/models/aid_card_model.dart';
 
 class TransactionListItem extends StatelessWidget {
@@ -31,8 +32,6 @@ class TransactionListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currencyFormatter = NumberFormat('#,###');
-    final dateFormatter = DateFormat('yyyy/MM/dd - HH:mm');
 
     return InkWell(
       onTap: onTap,
@@ -100,7 +99,7 @@ class TransactionListItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      '-${currencyFormatter.format(amount)} ${'common.currency'.tr()}',
+                      '-${AppFormatters.integerNumber.format(amount)} ${'common.currency'.tr()}',
                       style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
@@ -175,7 +174,7 @@ class TransactionListItem extends StatelessWidget {
                 ),
                 const Gap(8),
                 Text(
-                  dateFormatter.format(timestamp),
+                  AppFormatters.fullDate.format(timestamp),
                   style: const TextStyle(
                     fontSize: 11,
                     color: AppColors.textMutedLight,

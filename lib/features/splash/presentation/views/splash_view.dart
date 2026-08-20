@@ -36,6 +36,9 @@ class _SplashViewBody extends StatelessWidget {
           context.go(RouteNames.login);
         } else if (state is SplashNavigateToDashboard) {
           switch (state.role) {
+            case 'suspended':
+              context.go(RouteNames.accountSuspended);
+              break;
             case 'admin':
               context.go(RouteNames.adminDashboard);
               break;
@@ -48,6 +51,7 @@ class _SplashViewBody extends StatelessWidget {
               break;
           }
         }
+
       },
       child: Scaffold(
         body: Container(
@@ -63,10 +67,11 @@ class _SplashViewBody extends StatelessWidget {
           child: SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Column(
-                children: [
-                  // Optical Center Top Spacer (Places brand at the ideal 40-42% vertical eye-line)
-                  const Spacer(flex: 5),
+              child: RepaintBoundary(
+                child: Column(
+                  children: [
+                    // Optical Center Top Spacer (Places brand at the ideal 40-42% vertical eye-line)
+                    const Spacer(flex: 5),
 
                   // 1. Central Brand Emblem
                   Container(
@@ -173,8 +178,9 @@ class _SplashViewBody extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildLoadingDot({required int delayMs}) {
     return Container(

@@ -11,6 +11,8 @@ import '../../features/info_content/views/about_us_view.dart';
 import '../../features/info_content/views/contact_support_view.dart';
 import '../../features/info_content/views/faq_view.dart';
 import '../../features/info_content/views/terms_privacy_view.dart';
+import '../../features/auth/views/account_suspended_view.dart';
+import '../../features/auth/models/user_model.dart';
 import '../../features/merchant/views/merchant_main_view.dart';
 import '../../features/onboarding/presentation/views/onboarding_view.dart';
 import '../../features/splash/presentation/views/splash_view.dart';
@@ -49,6 +51,13 @@ class AppRouter {
         path: RouteNames.forgotPassword,
         builder: (context, state) => const ForgotPasswordView(),
       ),
+      GoRoute(
+        path: RouteNames.accountSuspended,
+        builder: (context, state) {
+          final user = state.extra is UserModel ? state.extra as UserModel : null;
+          return AccountSuspendedView(user: user);
+        },
+      ),
 
       // 3 Core Role-Based Dashboards
       GoRoute(
@@ -84,3 +93,4 @@ class AppRouter {
     ],
   );
 }
+

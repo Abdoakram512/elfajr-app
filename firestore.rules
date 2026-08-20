@@ -3,29 +3,109 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Allow full read and write access for development & test credentials verification
+    // ──────────────────────────────────────────────
+    // 🔧 Helper Functions
+    // ──────────────────────────────────────────────
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && getUserData().role == 'admin';
+    }
+
+    function isActiveMerchant() {
+      return isAuthenticated()
+        && getUserData().role == 'merchant'
+        && getUserData().isActive == true;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // ──────────────────────────────────────────────
+    // 👥 users Collection
+    // ──────────────────────────────────────────────
     match /users/{userId} {
-      allow read, write: if true;
+      // Allow read so users can perform email/role lookup during sign-in
+      allow read: if true;
+
+      allow create: if isAdmin();
+      allow update: if isAdmin()
+                    || (isOwner(userId)
+                        && !request.resource.data.diff(resource.data).affectedKeys()
+                            .hasAny(['role', 'isActive', 'isApproved']));
+      allow delete: if isAdmin();
     }
 
-    // Digital Aid Cards (QR Code verification & balance updates)
+    // ──────────────────────────────────────────────
+    // 💳 aid_cards Collection
+    // ──────────────────────────────────────────────
     match /aid_cards/{cardId} {
-      allow read, write: if true;
+      allow read: if isAdmin()
+                  || isActiveMerchant()
+                  || (isAuthenticated()
+                      && resource.data.beneficiaryId == request.auth.uid);
+
+      allow create: if isAdmin();
+      allow update: if isAdmin()
+                    || (isActiveMerchant()
+                        && request.resource.data.diff(resource.data).affectedKeys()
+                            .hasOnly(['totalBalance', 'foodBasketsQuota', 'status']));
+      allow delete: if isAdmin();
     }
 
-    // Redemptions & Transactions
+    // ──────────────────────────────────────────────
+    // 🧾 redemptions Collection
+    // ──────────────────────────────────────────────
     match /redemptions/{transactionId} {
-      allow read, write: if true;
+      allow read: if isAdmin()
+                  || (isActiveMerchant()
+                      && resource.data.merchantId == request.auth.uid)
+                  || (isAuthenticated()
+                      && resource.data.beneficiaryId == request.auth.uid);
+
+      allow create: if isActiveMerchant()
+                    && request.resource.data.merchantId == request.auth.uid;
+      allow update, delete: if isAdmin();
     }
 
-    // Aid Requests
-    match /aid_requests/{requestId} {
-      allow read, write: if true;
+    // ──────────────────────────────────────────────
+    // 📊 stats Collection
+    // ──────────────────────────────────────────────
+    match /stats/{docId} {
+      allow read: if true;
+      allow write: if isAdmin() || isActiveMerchant();
     }
 
-    // Global Collections
+    // ──────────────────────────────────────────────
+    // 📄 content Collection
+    // ──────────────────────────────────────────────
+    match /content/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ──────────────────────────────────────────────
+    // 📋 audit_log Collection
+    // ──────────────────────────────────────────────
+    match /audit_log/{logId} {
+      allow read: if isAdmin();
+      allow create: if isAdmin();
+      allow update, delete: if false;
+    }
+
+    // ──────────────────────────────────────────────
+    // 🚫 Deny All Other Collections
+    // ──────────────────────────────────────────────
     match /{document=**} {
-      allow read, write: if true;
+      allow read, write: if false;
     }
   }
 }

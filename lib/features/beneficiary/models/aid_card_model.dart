@@ -45,6 +45,7 @@ class AidCardModel extends Equatable {
   final String beneficiaryName;
   final String nationalId;
   final int familyCount;
+  final String? residence;
   final double totalBalance;
   final int foodBasketsQuota;
   final AidCardStatus status;
@@ -62,6 +63,7 @@ class AidCardModel extends Equatable {
     required this.beneficiaryName,
     required this.nationalId,
     this.familyCount = 4,
+    this.residence,
     required this.totalBalance,
     required this.foodBasketsQuota,
     this.status = AidCardStatus.active,
@@ -83,6 +85,7 @@ class AidCardModel extends Equatable {
     String? beneficiaryName,
     String? nationalId,
     int? familyCount,
+    String? residence,
     double? totalBalance,
     int? foodBasketsQuota,
     AidCardStatus? status,
@@ -100,6 +103,7 @@ class AidCardModel extends Equatable {
       beneficiaryName: beneficiaryName ?? this.beneficiaryName,
       nationalId: nationalId ?? this.nationalId,
       familyCount: familyCount ?? this.familyCount,
+      residence: residence ?? this.residence,
       totalBalance: totalBalance ?? this.totalBalance,
       foodBasketsQuota: foodBasketsQuota ?? this.foodBasketsQuota,
       status: status ?? this.status,
@@ -120,6 +124,7 @@ class AidCardModel extends Equatable {
       'beneficiaryName': beneficiaryName,
       'nationalId': nationalId,
       'familyCount': familyCount,
+      'residence': residence,
       'totalBalance': totalBalance,
       'foodBasketsQuota': foodBasketsQuota,
       'status': status.nameString,
@@ -151,6 +156,7 @@ class AidCardModel extends Equatable {
       beneficiaryName: map['beneficiaryName'] as String? ?? 'مستفيد',
       nationalId: map['nationalId'] as String? ?? '',
       familyCount: map['familyCount'] as int? ?? 4,
+      residence: map['residence'] as String?,
       totalBalance: (map['totalBalance'] as num?)?.toDouble() ?? 600.0,
       foodBasketsQuota: map['foodBasketsQuota'] as int? ?? 2,
       status: AidCardStatus.fromString(map['status'] as String?),
@@ -171,6 +177,7 @@ class AidCardModel extends Equatable {
         beneficiaryName,
         nationalId,
         familyCount,
+        residence,
         totalBalance,
         foodBasketsQuota,
         status,
