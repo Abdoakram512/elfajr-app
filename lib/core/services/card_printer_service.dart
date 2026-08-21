@@ -50,7 +50,7 @@ class CardPrinterService {
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
                           pw.Text(
-                            'منظومة قُوت (QOUT)',
+                            'مؤسسة الفجر الخيرية (ALFAJR)',
                             style: pw.TextStyle(
                               font: font,
                               fontSize: 18,

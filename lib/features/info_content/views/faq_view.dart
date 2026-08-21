@@ -82,7 +82,7 @@ class _FaqViewBody extends StatelessWidget {
                             Gap(12),
                             Expanded(
                               child: Text(
-                                'إليك إجابات لأبرز الاستفسارات المتعلقة ببطاقات الدعم، ومنافذ الصرف، والحوكمة في منظومة قوت.',
+                                'إليك إجابات لأبرز الاستفسارات المتعلقة ببطاقات الدعم، ومنافذ الصرف، والحوكمة في منظومة الفجر.',
                                 style: TextStyle(
                                   fontSize: 13,
                                   color: AppColors.primaryDark,

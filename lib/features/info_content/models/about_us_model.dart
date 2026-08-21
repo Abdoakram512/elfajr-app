@@ -34,16 +34,18 @@ class AboutUsModel extends Equatable {
     }
 
     return AboutUsModel(
-      title: map['title'] as String? ?? 'منصة قُوت (QOUT)',
+      title: map['title'] as String? ?? 'مؤسسة الفجر الخيرية (Al-Fajr)',
       tagline: map['tagline'] as String? ??
-          'المنظومة الوطنية الموحدة لإدارة وتوزيع الدعم الغذائي والإغاثي الذكي',
-      description: map['description'] as String? ?? '',
-      vision: map['vision'] as String? ?? '',
-      mission: map['mission'] as String? ?? '',
-      values: parseValues(map['values']),
-      email: map['email'] as String? ?? 'info@qout.org',
-      phone: map['phone'] as String? ?? '8001234567',
-      headquarters: map['headquarters'] as String? ?? 'الرياض، المملكة العربية السعودية',
+          'المنظومة الموحدة لإدارة وتوزيع الدعم الغذائي والإغاثي الذكي المعتمد',
+      description: map['description'] as String? ?? 'منظومة إغاثية رقمية متكاملة لرقمنة توزيع الإعانات والمساعدات الغذائية للمستحقين.',
+      vision: map['vision'] as String? ?? 'الريادة والشفافية التامة في العمل الإنساني والوصول الموثق لكافة الأسر المتعففة.',
+      mission: map['mission'] as String? ?? 'توفير منظومة ذكية تعتمد البطاقات المشفرة لضمان كرامة المستفيد وسرعة الصرف.',
+      values: parseValues(map['values']).isNotEmpty
+          ? parseValues(map['values'])
+          : ['الشفافية المطلقة', 'حفظ كرامة المستفيد', 'الأمانة المحاسبية', 'السرعة والتوثيق الميداني'],
+      email: map['email'] as String? ?? 'info@alfajr.org',
+      phone: map['phone'] as String? ?? '19000',
+      headquarters: map['headquarters'] as String? ?? 'جمهورية مصر العربية - المقر الإداري المركزي',
       version: map['version'] as String? ?? '2.4.0',
     );
   }

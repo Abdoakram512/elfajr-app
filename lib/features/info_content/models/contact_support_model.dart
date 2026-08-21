@@ -23,14 +23,14 @@ class ContactSupportModel extends Equatable {
 
   factory ContactSupportModel.fromMap(Map<String, dynamic> map) {
     return ContactSupportModel(
-      hotline: map['hotline'] as String? ?? '8001234567',
-      emergencyPhone: map['emergencyPhone'] as String? ?? '+966 11 234 5678',
-      supportEmail: map['supportEmail'] as String? ?? 'support@qout.org',
-      partnersEmail: map['partnersEmail'] as String? ?? 'merchants@qout.org',
-      workingHours: map['workingHours'] as String? ?? '24/7',
-      address: map['address'] as String? ?? 'الرياض، المملكة العربية السعودية',
-      socialTwitter: map['socialTwitter'] as String? ?? '@QoutApp',
-      socialLinkedin: map['socialLinkedin'] as String? ?? 'company/qout-platform',
+      hotline: map['hotline'] as String? ?? '19000',
+      emergencyPhone: map['emergencyPhone'] as String? ?? '+201000000000',
+      supportEmail: map['supportEmail'] as String? ?? 'support@alfajr.org',
+      partnersEmail: map['partnersEmail'] as String? ?? 'merchants@alfajr.org',
+      workingHours: map['workingHours'] as String? ?? 'السبت - الخميس: 9:00 ص - 9:00 م',
+      address: map['address'] as String? ?? 'جمهورية مصر العربية - المقر الإداري المركزي',
+      socialTwitter: map['socialTwitter'] as String? ?? '@AlFajrCharity',
+      socialLinkedin: map['socialLinkedin'] as String? ?? 'company/alfajr-foundation',
     );
   }
 

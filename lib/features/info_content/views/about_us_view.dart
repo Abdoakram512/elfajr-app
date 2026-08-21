@@ -32,7 +32,7 @@ class _AboutUsViewBody extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
-        title: const Text('عن منصة قُوت'),
+        title: const Text('عن منصة مؤسسة الفجر الخيرية'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
           onPressed: () => context.pop(),

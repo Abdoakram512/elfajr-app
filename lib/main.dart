@@ -33,13 +33,13 @@ void main() async {
       path: AppConstants.translationsPath,
       fallbackLocale: AppConstants.arabicLocale,
       startLocale: AppConstants.arabicLocale,
-      child: const QoutApp(),
+      child: const AlFajrApp(),
     ),
   );
 }
 
-class QoutApp extends StatelessWidget {
-  const QoutApp({super.key});
+class AlFajrApp extends StatelessWidget {
+  const AlFajrApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +49,7 @@ class QoutApp extends StatelessWidget {
       splitScreenMode: true,
       builder: (context, child) {
         return MaterialApp.router(
-          title: 'Qout',
+          title: 'مؤسسة الفجر الخيرية',
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
