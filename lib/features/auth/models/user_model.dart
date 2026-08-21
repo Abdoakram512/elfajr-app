@@ -10,6 +10,13 @@ DateTime _parseDateTime(dynamic value) {
   return DateTime.now();
 }
 
+double? _parseDouble(dynamic value) {
+  if (value == null) return null;
+  if (value is num) return value.toDouble();
+  if (value is String) return double.tryParse(value);
+  return null;
+}
+
 class UserModel extends Equatable {
   final String uid;
   final String email;
@@ -28,6 +35,13 @@ class UserModel extends Equatable {
   final String? inKindNeeds; // For beneficiary: household / in-kind items
   final String? storeName; // For merchant: store / pharmacy / center name
   final String? commercialReg; // For merchant: CR number
+  
+  // New Liquidity & Budget Fields
+  final double? allocatedBudget;
+  final double? currentRemainingBudget;
+  final String? instapayAddress;
+  final String? vodafoneCashNumber;
+  final String? liquidityAlertLevel;
   final DateTime createdAt;
 
   const UserModel({
@@ -48,6 +62,11 @@ class UserModel extends Equatable {
     this.inKindNeeds,
     this.storeName,
     this.commercialReg,
+    this.allocatedBudget,
+    this.currentRemainingBudget,
+    this.instapayAddress,
+    this.vodafoneCashNumber,
+    this.liquidityAlertLevel,
     required this.createdAt,
   });
 
@@ -69,6 +88,11 @@ class UserModel extends Equatable {
     String? inKindNeeds,
     String? storeName,
     String? commercialReg,
+    double? allocatedBudget,
+    double? currentRemainingBudget,
+    String? instapayAddress,
+    String? vodafoneCashNumber,
+    String? liquidityAlertLevel,
     DateTime? createdAt,
   }) {
     return UserModel(
@@ -89,6 +113,11 @@ class UserModel extends Equatable {
       inKindNeeds: inKindNeeds ?? this.inKindNeeds,
       storeName: storeName ?? this.storeName,
       commercialReg: commercialReg ?? this.commercialReg,
+      allocatedBudget: allocatedBudget ?? this.allocatedBudget,
+      currentRemainingBudget: currentRemainingBudget ?? this.currentRemainingBudget,
+      instapayAddress: instapayAddress ?? this.instapayAddress,
+      vodafoneCashNumber: vodafoneCashNumber ?? this.vodafoneCashNumber,
+      liquidityAlertLevel: liquidityAlertLevel ?? this.liquidityAlertLevel,
       createdAt: createdAt ?? this.createdAt,
     );
   }
@@ -112,6 +141,11 @@ class UserModel extends Equatable {
       'inKindNeeds': inKindNeeds,
       'storeName': storeName,
       'commercialReg': commercialReg,
+      'allocatedBudget': allocatedBudget,
+      'currentRemainingBudget': currentRemainingBudget,
+      'instapayAddress': instapayAddress,
+      'vodafoneCashNumber': vodafoneCashNumber,
+      'liquidityAlertLevel': liquidityAlertLevel,
       'createdAt': createdAt.toIso8601String(),
     };
   }
@@ -135,6 +169,11 @@ class UserModel extends Equatable {
       inKindNeeds: map['inKindNeeds'] as String?,
       storeName: map['storeName'] as String?,
       commercialReg: map['commercialReg'] as String?,
+      allocatedBudget: _parseDouble(map['allocatedBudget']),
+      currentRemainingBudget: _parseDouble(map['currentRemainingBudget']),
+      instapayAddress: map['instapayAddress'] as String?,
+      vodafoneCashNumber: map['vodafoneCashNumber'] as String?,
+      liquidityAlertLevel: map['liquidityAlertLevel'] as String?,
       createdAt: _parseDateTime(map['createdAt']),
     );
   }
@@ -158,6 +197,11 @@ class UserModel extends Equatable {
     inKindNeeds,
     storeName,
     commercialReg,
+    allocatedBudget,
+    currentRemainingBudget,
+    instapayAddress,
+    vodafoneCashNumber,
+    liquidityAlertLevel,
     createdAt,
   ];
 }

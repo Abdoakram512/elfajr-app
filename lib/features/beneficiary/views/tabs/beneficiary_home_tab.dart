@@ -2,131 +2,107 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/constants/app_constants.dart';
-import '../../../../core/widgets/feedback/qout_refresh_indicator.dart';
-import '../../view_models/beneficiary_cubit.dart';
-import '../../view_models/beneficiary_state.dart';
-import '../../widgets/digital_aid_card_widget.dart';
+import 'package:qout/core/formatters/app_formatters.dart';
+import 'package:qout/core/theme/app_colors.dart';
+import 'package:qout/core/widgets/qout_refresh_indicator.dart';
+import 'package:qout/features/beneficiary/view_models/beneficiary_cubit.dart';
+import 'package:qout/features/beneficiary/view_models/beneficiary_state.dart';
+import 'package:qout/features/beneficiary/widgets/digital_aid_card_widget.dart';
 
 class BeneficiaryHomeTab extends StatelessWidget {
-  final VoidCallback? onSwitchToHistory;
+  final VoidCallback onShowQr;
+  final VoidCallback onSwitchToRedemptions;
 
-  const BeneficiaryHomeTab({super.key, this.onSwitchToHistory});
+  const BeneficiaryHomeTab({
+    super.key,
+    required this.onShowQr,
+    required this.onSwitchToRedemptions,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final currencyFormatter = NumberFormat('#,###');
-    final dateFormatter = DateFormat('yyyy/MM/dd - HH:mm');
-    final isArabic = context.locale.languageCode == 'ar';
-
     return BlocBuilder<BeneficiaryCubit, BeneficiaryState>(
       builder: (context, state) {
+        final card = state.activeCard;
+        final redemptions = state.redemptions;
+        
+        // Calculate monthly metrics
+        final now = DateTime.now();
+        final thisMonthRedemptions = redemptions.where((r) {
+          return r.timestamp.year == now.year && r.timestamp.month == now.month;
+        }).toList();
+        
+        final thisMonthSpent = thisMonthRedemptions.fold<double>(
+          0.0,
+          (sum, r) => sum + r.amountDeducted,
+        );
+
+        final currentBalance = card?.totalBalance ?? 0.0;
+        final initialMonthEstimate = currentBalance + thisMonthSpent;
+
         return Scaffold(
           backgroundColor: AppColors.backgroundLight,
-          body: SafeArea(
-            child: QoutRefreshIndicator(
-              onRefresh: () => context.read<BeneficiaryCubit>().refreshData(),
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          appBar: AppBar(
+            title: Text('app_name'.tr()),
+            automaticallyImplyLeading: false,
+          ),
+          body: QoutRefreshIndicator(
+            onRefresh: () => context.read<BeneficiaryCubit>().refreshData(),
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Top Bar
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: AppColors.primarySubtle,
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.handshake_rounded,
-                              color: AppColors.primary,
-                              size: 20,
-                            ),
-                          ),
-                          const Gap(10),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'app_name'.tr(),
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.primary,
-                                ),
-                              ),
-                              Text(
-                                'dashboard.beneficiary.greeting'.tr(),
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: AppColors.textSecondaryLight,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+                  // Digital Aid Card Widget
+                  if (card != null)
+                    DigitalAidCardWidget(
+                      card: card,
+                      beneficiaryUser: state.user,
+                      onTapShowQr: onShowQr,
+                    )
+                  else
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(color: AppColors.borderLight),
                       ),
-                      // Language Switcher Pill
-                      InkWell(
-                        onTap: () {
-                          final newLocale = isArabic
-                              ? AppConstants.englishLocale
-                              : AppConstants.arabicLocale;
-                          context.setLocale(newLocale);
-                        },
-                        borderRadius: BorderRadius.circular(20),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: AppColors.borderLight),
-                          ),
-                          child: Text(
-                            isArabic ? 'English' : 'العربية',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primary,
-                            ),
+                      child: Center(
+                        child: Text(
+                          'لا توجد بطاقة إغاثية نشطة حالياً',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textSecondaryLight,
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
 
-                  const Gap(22),
+                  const Gap(20),
 
-                  // Digital QR Aid Card
-                  if (state.activeCard != null) ...[
-                    DigitalAidCardWidget(card: state.activeCard!),
-                    const Gap(22),
-                  ],
-
-                  // How to use QR Card Instructions Banner
+                  // ── NEW: Monthly Balance & Aid Statement ("كان كام وبقى كام") ──
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      gradient: LinearGradient(
+                        colors: [
+                          AppColors.primarySubtle,
+                          Colors.white,
+                        ],
+                        begin: Alignment.topRight,
+                        end: Alignment.bottomLeft,
+                      ),
                       borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: AppColors.borderLight),
+                      border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.03),
-                          blurRadius: 14,
+                          color: AppColors.primary.withValues(alpha: 0.04),
+                          blurRadius: 12,
                           offset: const Offset(0, 4),
                         ),
                       ],
@@ -135,70 +111,180 @@ class BeneficiaryHomeTab extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primary,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: const Icon(
+                                    Icons.account_balance_wallet_outlined,
+                                    color: Colors.white,
+                                    size: 18,
+                                  ),
+                                ),
+                                const Gap(10),
+                                Text(
+                                  'dashboard.beneficiary.monthly_statement'.tr(),
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w900,
+                                    color: AppColors.textPrimaryLight,
+                                  ),
+                                ),
+                              ],
+                            ),
                             Container(
-                              padding: const EdgeInsets.all(8),
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                               decoration: BoxDecoration(
                                 color: AppColors.primarySubtle,
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
                               ),
-                              child: const Icon(
-                                Icons.info_outline_rounded,
-                                color: AppColors.primary,
-                                size: 20,
-                              ),
-                            ),
-                            const Gap(10),
-                            Text(
-                              'dashboard.beneficiary.how_to_use_title'.tr(),
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimaryLight,
+                              child: Text(
+                                DateFormat('MMMM yyyy', 'ar').format(now),
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primary,
+                                ),
                               ),
                             ),
                           ],
                         ),
                         const Gap(16),
-                        _buildInstructionStep(
-                          stepNumber: '1',
-                          title: 'dashboard.beneficiary.how_to_use_step_1_title'.tr(),
-                          desc: 'dashboard.beneficiary.how_to_use_step_1_desc'.tr(),
+
+                        // Financial Breakdown Row
+                        Row(
+                          children: [
+                            // Initial Balance
+                            Expanded(
+                              child: Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(color: AppColors.borderLight),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'dashboard.beneficiary.monthly_initial'.tr(),
+                                      style: const TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.textSecondaryLight,
+                                      ),
+                                    ),
+                                    const Gap(4),
+                                    Text(
+                                      '${AppFormatters.integerNumber.format(initialMonthEstimate)} ${'common.currency'.tr()}',
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w900,
+                                        color: AppColors.textPrimaryLight,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const Gap(10),
+
+                            // Spent this month
+                            Expanded(
+                              child: Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(color: AppColors.borderLight),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'dashboard.beneficiary.monthly_spent'.tr(),
+                                      style: const TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.textSecondaryLight,
+                                      ),
+                                    ),
+                                    const Gap(4),
+                                    Text(
+                                      '-${AppFormatters.integerNumber.format(thisMonthSpent)} ${'common.currency'.tr()}',
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w900,
+                                        color: AppColors.error,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                         const Gap(12),
-                        _buildInstructionStep(
-                          stepNumber: '2',
-                          title: 'dashboard.beneficiary.how_to_use_step_2_title'.tr(),
-                          desc: 'dashboard.beneficiary.how_to_use_step_2_desc'.tr(),
-                        ),
-                        const Gap(12),
-                        _buildInstructionStep(
-                          stepNumber: '3',
-                          title: 'dashboard.beneficiary.how_to_use_step_3_title'.tr(),
-                          desc: 'dashboard.beneficiary.how_to_use_step_3_desc'.tr(),
+
+                        // Current Remaining Badge
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: AppColors.primarySubtle,
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'dashboard.beneficiary.monthly_remaining'.tr(),
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                              Text(
+                                '${AppFormatters.integerNumber.format(currentBalance)} ${'common.currency'.tr()}',
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w900,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
                   ),
 
-                  const Gap(26),
+                  const Gap(24),
 
-                  // Recent Redemptions Header
+                  // Recent Redemptions Section Title
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'dashboard.beneficiary.recent_redemptions_title'.tr(),
+                        'dashboard.beneficiary.redemptions_history'.tr(),
                         style: const TextStyle(
-                          fontSize: 17,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: AppColors.textPrimaryLight,
                         ),
                       ),
                       TextButton(
-                        onPressed: onSwitchToHistory,
+                        onPressed: onSwitchToRedemptions,
                         child: Text(
-                          'common.view_all'.tr(),
+                          'عرض الكل',
                           style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
@@ -208,18 +294,24 @@ class BeneficiaryHomeTab extends StatelessWidget {
                       ),
                     ],
                   ),
+                  const Gap(10),
 
-                  const Gap(12),
-
-                  if (state.redemptions.isEmpty)
-                    Center(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 24),
+                  // Recent redemptions list
+                  if (redemptions.isEmpty)
+                    Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: AppColors.borderLight),
+                      ),
+                      child: Center(
                         child: Text(
                           'dashboard.beneficiary.no_redemptions_title'.tr(),
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: AppColors.textMutedLight,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textSecondaryLight,
                           ),
                         ),
                       ),
@@ -228,10 +320,10 @@ class BeneficiaryHomeTab extends StatelessWidget {
                     ListView.separated(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      itemCount: state.redemptions.length,
-                      separatorBuilder: (context, index) => const Gap(12),
+                      itemCount: redemptions.take(3).length,
+                      separatorBuilder: (_, __) => const Gap(10),
                       itemBuilder: (context, index) {
-                        final item = state.redemptions[index];
+                        final r = redemptions[index];
                         return Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
@@ -239,66 +331,54 @@ class BeneficiaryHomeTab extends StatelessWidget {
                             borderRadius: BorderRadius.circular(18),
                             border: Border.all(color: AppColors.borderLight),
                           ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Expanded(
-                                    child: Text(
-                                      item.merchantStoreName,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.textPrimaryLight,
-                                      ),
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.primarySubtle,
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: const Icon(
+                                      Icons.storefront_rounded,
+                                      color: AppColors.primary,
+                                      size: 20,
                                     ),
                                   ),
-                                  const Gap(8),
-                                  Text(
-                                    '-${currencyFormatter.format(item.amountDeducted)} ${'common.currency'.tr()}',
-                                    style: const TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.error,
-                                    ),
+                                  const Gap(12),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        r.merchantStoreName,
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.textPrimaryLight,
+                                        ),
+                                      ),
+                                      const Gap(2),
+                                      Text(
+                                        DateFormat('dd MMM yyyy, hh:mm a', 'ar').format(r.timestamp),
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          color: AppColors.textSecondaryLight,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
-                              const Gap(6),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    dateFormatter.format(item.timestamp),
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      color: AppColors.textSecondaryLight,
-                                    ),
-                                  ),
-                                  if (item.foodBasketsDeducted > 0)
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 2,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.accentLight.withValues(alpha: 0.5),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: Text(
-                                        'تم صرف ${item.foodBasketsDeducted} سلة',
-                                        style: const TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.bold,
-                                          color: AppColors.accentDark,
-                                        ),
-                                      ),
-                                    ),
-                                ],
+                              Text(
+                                '-${AppFormatters.integerNumber.format(r.amountDeducted)} ${'common.currency'.tr()}',
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w900,
+                                  color: AppColors.error,
+                                ),
                               ),
                             ],
                           ),
@@ -309,65 +389,8 @@ class BeneficiaryHomeTab extends StatelessWidget {
               ),
             ),
           ),
-          ),
         );
       },
-    );
-  }
-
-  Widget _buildInstructionStep({
-    required String stepNumber,
-    required String title,
-    required String desc,
-  }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 24,
-          height: 24,
-          decoration: BoxDecoration(
-            color: AppColors.primarySubtle,
-            shape: BoxShape.circle,
-            border: Border.all(color: AppColors.primary, width: 1.2),
-          ),
-          child: Center(
-            child: Text(
-              stepNumber,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: AppColors.primary,
-              ),
-            ),
-          ),
-        ),
-        const Gap(12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimaryLight,
-                ),
-              ),
-              const Gap(2),
-              Text(
-                desc,
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: AppColors.textSecondaryLight,
-                  height: 1.3,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }
