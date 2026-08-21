@@ -2,35 +2,37 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:intl/intl.dart';
-import 'package:qout/core/theme/app_colors.dart';
-import 'package:qout/core/widgets/app_empty_state_widget.dart';
-import 'package:qout/core/widgets/qout_refresh_indicator.dart';
-import 'package:qout/core/widgets/transaction_list_item.dart';
+import 'package:qout/core/constants/app_colors.dart';
+import 'package:qout/core/widgets/feedback/app_empty_state_widget.dart';
+import 'package:qout/core/widgets/feedback/qout_refresh_indicator.dart';
+import 'package:qout/core/widgets/transactions/transaction_list_item.dart';
+import 'package:qout/features/auth/view_models/auth_cubit.dart';
+import 'package:qout/features/auth/view_models/auth_state.dart';
 import 'package:qout/features/merchant/view_models/merchant_dashboard_cubit.dart';
 import 'package:qout/features/merchant/view_models/merchant_dashboard_state.dart';
+import 'package:qout/features/merchant/view_models/redemption_cubit.dart';
+import 'package:qout/features/merchant/views/merchant_scanner_view.dart';
 import 'package:qout/features/merchant/widgets/extra_disbursement_request_sheet.dart';
 import 'package:qout/features/merchant/widgets/manual_search_sheet.dart';
 
 class MerchantHomeTab extends StatelessWidget {
-  final VoidCallback onOpenScanner;
   final VoidCallback onSwitchToHistory;
 
   const MerchantHomeTab({
     super.key,
-    required this.onOpenScanner,
     required this.onSwitchToHistory,
   });
 
   @override
   Widget build(BuildContext context) {
     final currencyFormatter = NumberFormat('#,##0', 'ar');
+    final authState = context.watch<AuthCubit>().state;
+    final merchant = authState is Authenticated ? authState.user : null;
 
     return BlocBuilder<MerchantDashboardCubit, MerchantDashboardState>(
       builder: (context, state) {
-        final merchant = state.merchant;
         final allocatedBudget = merchant?.allocatedBudget ?? 0.0;
-        final disbursedAmount = merchant?.totalDisbursed ?? 0.0;
+        final disbursedAmount = state.todayDispensedAmount;
         final remainingLiquidity = (allocatedBudget - disbursedAmount) > 0 ? (allocatedBudget - disbursedAmount) : 0.0;
         final spentPct = allocatedBudget > 0 ? (disbursedAmount / allocatedBudget).clamp(0.0, 1.0) : 0.0;
         final isLowLiquidity = allocatedBudget > 0 && ((remainingLiquidity / allocatedBudget) <= 0.15);
@@ -38,7 +40,7 @@ class MerchantHomeTab extends StatelessWidget {
         return Scaffold(
           backgroundColor: AppColors.backgroundLight,
           body: QoutRefreshIndicator(
-            onRefresh: () => context.read<MerchantDashboardCubit>().refreshDashboard(),
+            onRefresh: () => context.read<MerchantDashboardCubit>().refreshData(),
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               child: Padding(
@@ -238,7 +240,12 @@ class MerchantHomeTab extends StatelessWidget {
                         Expanded(
                           flex: 3,
                           child: ElevatedButton.icon(
-                            onPressed: onOpenScanner,
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => const MerchantScannerView()),
+                              );
+                            },
                             icon: const Icon(Icons.qr_code_scanner_rounded, color: Colors.white),
                             label: Text(
                               'dashboard.merchant.scan_to_redeem'.tr(),
@@ -283,12 +290,10 @@ class MerchantHomeTab extends StatelessWidget {
                     // Manual Search Button
                     OutlinedButton.icon(
                       onPressed: () {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
-                          builder: (_) => const ManualSearchSheet(),
-                        );
+                        try {
+                          final cubit = context.read<RedemptionCubit>();
+                          ManualSearchSheet.show(context, cubit);
+                        } catch (_) {}
                       },
                       icon: const Icon(Icons.search_rounded, size: 20),
                       label: Text('dashboard.merchant.manual_search'.tr()),
@@ -388,7 +393,7 @@ class MerchantHomeTab extends StatelessWidget {
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         itemCount: state.recentTransactions.length,
-                        separatorBuilder: (_, __) => const Gap(10),
+                        separatorBuilder: (context, index) => const Gap(10),
                         itemBuilder: (context, index) {
                           final item = state.recentTransactions[index];
                           return TransactionListItem(

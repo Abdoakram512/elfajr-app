@@ -2,25 +2,24 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:qout/core/formatters/app_formatters.dart';
-import 'package:qout/core/theme/app_colors.dart';
-import 'package:qout/core/widgets/qout_refresh_indicator.dart';
+import 'package:qout/core/constants/app_colors.dart';
+import 'package:qout/core/widgets/feedback/qout_refresh_indicator.dart';
 import 'package:qout/features/beneficiary/view_models/beneficiary_cubit.dart';
 import 'package:qout/features/beneficiary/view_models/beneficiary_state.dart';
 import 'package:qout/features/beneficiary/widgets/digital_aid_card_widget.dart';
 
 class BeneficiaryHomeTab extends StatelessWidget {
-  final VoidCallback onShowQr;
-  final VoidCallback onSwitchToRedemptions;
+  final VoidCallback? onSwitchToHistory;
 
   const BeneficiaryHomeTab({
     super.key,
-    required this.onShowQr,
-    required this.onSwitchToRedemptions,
+    this.onSwitchToHistory,
   });
 
   @override
   Widget build(BuildContext context) {
+    final currencyFormatter = NumberFormat('#,##0', 'ar');
+
     return BlocBuilder<BeneficiaryCubit, BeneficiaryState>(
       builder: (context, state) {
         final card = state.activeCard;
@@ -56,11 +55,7 @@ class BeneficiaryHomeTab extends StatelessWidget {
                 children: [
                   // Digital Aid Card Widget
                   if (card != null)
-                    DigitalAidCardWidget(
-                      card: card,
-                      beneficiaryUser: state.user,
-                      onTapShowQr: onShowQr,
-                    )
+                    DigitalAidCardWidget(card: card)
                   else
                     Container(
                       width: double.infinity,
@@ -70,7 +65,7 @@ class BeneficiaryHomeTab extends StatelessWidget {
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(color: AppColors.borderLight),
                       ),
-                      child: Center(
+                      child: const Center(
                         child: Text(
                           'لا توجد بطاقة إغاثية نشطة حالياً',
                           style: TextStyle(
@@ -89,7 +84,7 @@ class BeneficiaryHomeTab extends StatelessWidget {
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
+                      gradient: const LinearGradient(
                         colors: [
                           AppColors.primarySubtle,
                           Colors.white,
@@ -183,7 +178,7 @@ class BeneficiaryHomeTab extends StatelessWidget {
                                     ),
                                     const Gap(4),
                                     Text(
-                                      '${AppFormatters.integerNumber.format(initialMonthEstimate)} ${'common.currency'.tr()}',
+                                      '${currencyFormatter.format(initialMonthEstimate)} ${'common.currency'.tr()}',
                                       style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w900,
@@ -218,7 +213,7 @@ class BeneficiaryHomeTab extends StatelessWidget {
                                     ),
                                     const Gap(4),
                                     Text(
-                                      '-${AppFormatters.integerNumber.format(thisMonthSpent)} ${'common.currency'.tr()}',
+                                      '-${currencyFormatter.format(thisMonthSpent)} ${'common.currency'.tr()}',
                                       style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w900,
@@ -253,7 +248,7 @@ class BeneficiaryHomeTab extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                '${AppFormatters.integerNumber.format(currentBalance)} ${'common.currency'.tr()}',
+                                '${currencyFormatter.format(currentBalance)} ${'common.currency'.tr()}',
                                 style: const TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w900,
@@ -281,17 +276,18 @@ class BeneficiaryHomeTab extends StatelessWidget {
                           color: AppColors.textPrimaryLight,
                         ),
                       ),
-                      TextButton(
-                        onPressed: onSwitchToRedemptions,
-                        child: Text(
-                          'عرض الكل',
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primary,
+                      if (onSwitchToHistory != null)
+                        TextButton(
+                          onPressed: onSwitchToHistory,
+                          child: const Text(
+                            'عرض الكل',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primary,
+                            ),
                           ),
                         ),
-                      ),
                     ],
                   ),
                   const Gap(10),
@@ -308,7 +304,7 @@ class BeneficiaryHomeTab extends StatelessWidget {
                       child: Center(
                         child: Text(
                           'dashboard.beneficiary.no_redemptions_title'.tr(),
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
                             color: AppColors.textSecondaryLight,
@@ -321,7 +317,7 @@ class BeneficiaryHomeTab extends StatelessWidget {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: redemptions.take(3).length,
-                      separatorBuilder: (_, __) => const Gap(10),
+                      separatorBuilder: (context, index) => const Gap(10),
                       itemBuilder: (context, index) {
                         final r = redemptions[index];
                         return Container(
@@ -373,7 +369,7 @@ class BeneficiaryHomeTab extends StatelessWidget {
                                 ],
                               ),
                               Text(
-                                '-${AppFormatters.integerNumber.format(r.amountDeducted)} ${'common.currency'.tr()}',
+                                '-${currencyFormatter.format(r.amountDeducted)} ${'common.currency'.tr()}',
                                 style: const TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w900,

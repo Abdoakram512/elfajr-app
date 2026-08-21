@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:qout/core/theme/app_colors.dart';
+import 'package:qout/core/constants/app_colors.dart';
 import 'package:qout/features/auth/models/user_model.dart';
 
 class ExtraDisbursementRequestSheet extends StatefulWidget {
