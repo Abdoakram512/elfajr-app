@@ -15,6 +15,7 @@ import 'package:qout/features/merchant/view_models/redemption_cubit.dart';
 import 'package:qout/features/merchant/views/merchant_scanner_view.dart';
 import 'package:qout/features/merchant/widgets/extra_disbursement_request_sheet.dart';
 import 'package:qout/features/merchant/widgets/manual_search_sheet.dart';
+import 'package:qout/features/merchant/widgets/merchant_payment_receipts_sheet.dart';
 
 class MerchantHomeTab extends StatelessWidget {
   final VoidCallback onSwitchToHistory;
@@ -425,6 +426,61 @@ class MerchantHomeTab extends StatelessWidget {
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
                                     color: Color(0xFFB45309),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const Gap(12),
+
+                      // 4. View Payment Receipts & Transfers Button (With Image Previews)
+                      SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: OutlinedButton(
+                          onPressed: () {
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              builder: (_) => MerchantPaymentReceiptsSheet(
+                                merchant: merchant,
+                              ),
+                            );
+                          },
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: const Color(0xFFF0FDF4),
+                            padding: EdgeInsets.zero,
+                            side: const BorderSide(
+                              color: Color(0xFFBBF7D0),
+                              width: 1.5,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                          ),
+                          child: const Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.receipt_long_rounded,
+                                  color: Color(0xFF15803D),
+                                  size: 20,
+                                ),
+                                Gap(8),
+                                Text(
+                                  'سجل وصولات الدفع والحوالات (معاينة الصور)',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF15803D),
                                   ),
                                 ),
                               ],
