@@ -46,28 +46,25 @@ class BeneficiaryCardSummary extends StatelessWidget {
                   children: [
                     Text(
                       card.beneficiaryName,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
+                        height: 1.3,
                       ),
                     ),
                     if (card.socialStatus != null || card.nationality != null) ...[
-                      const Gap(2),
+                      const Gap(4),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
                           color: Colors.white.withValues(alpha: 0.18),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          '${card.socialStatus ?? ''}${card.socialStatus != null && card.nationality != null ? ' • ' : ''}${card.nationality ?? ''}',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                          '${card.socialStatus ?? ''}${card.socialStatus != null && card.nationality != null ? ' • ' : ''}${card.nationality == 'مصرية' ? 'مصري' : (card.nationality == 'سورية' ? 'سوري' : (card.nationality == 'سودانية' ? 'سوداني' : (card.nationality == 'يمنية' ? 'يمني' : (card.nationality == 'فلسطينية' ? 'فلسطيني' : (card.nationality == 'أردنية' ? 'أردني' : (card.nationality == 'عراقية' ? 'عراقي' : (card.nationality == 'لبنانية' ? 'لبناني' : (card.nationality ?? ''))))))))}',
                           style: const TextStyle(
-                            fontSize: 10,
+                            fontSize: 11,
                             fontWeight: FontWeight.bold,
                             color: AppColors.accentLight,
                           ),
@@ -77,8 +74,6 @@ class BeneficiaryCardSummary extends StatelessWidget {
                     const Gap(4),
                     Text(
                       '${'merchant.national_id'.tr()}: ${_getMaskedNationalId(card.nationalId)}',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.white.withValues(alpha: 0.85),

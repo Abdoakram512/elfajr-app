@@ -26,7 +26,10 @@ class BeneficiaryProfileTab extends StatelessWidget {
 
     final displayName =
         user?.name.isNotEmpty == true ? user!.name : 'مستفيد معتمد';
-    final displayEmail = user?.email.isNotEmpty == true ? user!.email : '-';
+    final rawEmail = user?.email.isNotEmpty == true ? user!.email : '-';
+    final displayEmail = rawEmail.endsWith('@alfajr.app')
+        ? (user?.phone?.isNotEmpty == true ? user!.phone! : rawEmail)
+        : rawEmail;
     final displayPhone = user?.phone?.isNotEmpty == true ? user!.phone! : '-';
     final displayCity =
         user?.city?.isNotEmpty == true ? user!.city! : 'المدينة';
@@ -34,6 +37,24 @@ class BeneficiaryProfileTab extends StatelessWidget {
     return BlocBuilder<BeneficiaryCubit, BeneficiaryState>(
       builder: (context, state) {
         final card = state.activeCard;
+        final rawNat = user?.nationality ?? card?.nationality;
+        final displayNat = rawNat == 'مصرية'
+            ? 'مصري'
+            : (rawNat == 'سورية'
+                ? 'سوري'
+                : (rawNat == 'سودانية'
+                    ? 'سوداني'
+                    : (rawNat == 'يمنية'
+                        ? 'يمني'
+                        : (rawNat == 'فلسطينية'
+                            ? 'فلسطيني'
+                            : (rawNat == 'أردنية'
+                                ? 'أردني'
+                                : (rawNat == 'عراقية'
+                                    ? 'عراقي'
+                                    : (rawNat == 'لبنانية'
+                                        ? 'لبناني'
+                                        : (rawNat ?? '-'))))))));
 
         return Scaffold(
           backgroundColor: AppColors.backgroundLight,
@@ -159,7 +180,7 @@ class BeneficiaryProfileTab extends StatelessWidget {
                     ),
                     ProfileInfoRow(
                       label: 'profile.nationality_label'.tr(),
-                      value: user?.nationality ?? card?.nationality ?? '-',
+                      value: displayNat,
                     ),
                     ProfileInfoRow(
                       label: 'profile.field_research_label'.tr(),

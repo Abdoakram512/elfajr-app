@@ -55,9 +55,9 @@ class RedemptionReceiptCard extends StatelessWidget {
                 ),
               ),
               const Gap(12),
-              const Text(
-                'تمت عملية الصرف بنجاح!',
-                style: TextStyle(
+              Text(
+                'merchant.redemption_receipt.success_title'.tr(),
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: AppColors.textPrimaryLight,
@@ -65,7 +65,7 @@ class RedemptionReceiptCard extends StatelessWidget {
               ),
               const Gap(4),
               Text(
-                'رقم المعاملة: ${transaction.transactionId}',
+                'merchant.redemption_receipt.txn_number'.tr(namedArgs: {'txn': transaction.transactionId}),
                 style: const TextStyle(
                   fontSize: 12,
                   color: AppColors.textSecondaryLight,
@@ -76,12 +76,12 @@ class RedemptionReceiptCard extends StatelessWidget {
               const Divider(height: 1, color: Colors.black12),
               const Gap(16),
 
-              _buildRow('المستفيد:', transaction.beneficiaryName),
+              _buildRow('merchant.redemption_receipt.beneficiary_label'.tr(), transaction.beneficiaryName),
               const Gap(8),
-              _buildRow('المنفذ:', transaction.merchantStoreName),
+              _buildRow('merchant.redemption_receipt.outlet_label'.tr(), transaction.merchantStoreName),
               const Gap(8),
               _buildRow(
-                'المبلغ المخصوم:',
+                'merchant.redemption_receipt.deducted_amount'.tr(),
                 '${currencyFormatter.format(transaction.amountDeducted)} ${'common.currency'.tr()}',
                 isBold: true,
                 color: AppColors.error,
@@ -89,22 +89,22 @@ class RedemptionReceiptCard extends StatelessWidget {
               if (transaction.foodBasketsDeducted > 0) ...[
                 const Gap(8),
                 _buildRow(
-                  'السلال المصروفة:',
-                  '${transaction.foodBasketsDeducted} سلة',
+                  'merchant.redemption_receipt.deducted_baskets'.tr(),
+                  '${transaction.foodBasketsDeducted} ${'common.baskets_unit'.tr()}',
                   isBold: true,
                 ),
               ],
               const Gap(8),
               _buildRow(
-                'الرصيد المتبقي:',
+                'merchant.redemption_receipt.remaining_balance'.tr(),
                 '${currencyFormatter.format(transaction.remainingBalance)} ${'common.currency'.tr()}',
                 isBold: true,
                 color: AppColors.primary,
               ),
               const Gap(8),
               _buildRow(
-                'السلال المتبقية:',
-                '${transaction.remainingBaskets} سلة',
+                'merchant.redemption_receipt.remaining_baskets'.tr(),
+                '${transaction.remainingBaskets} ${'common.baskets_unit'.tr()}',
               ),
             ],
           ),
@@ -114,7 +114,7 @@ class RedemptionReceiptCard extends StatelessWidget {
 
         // Action 1: Print Receipt / Card
         PrimaryButton(
-          text: 'طباعة إيصال المعاملة والكارت',
+          text: 'merchant.redemption_receipt.print_receipt_btn'.tr(),
           leadingIcon: Icons.print_rounded,
           onPressed: () {
             if (card != null) {
@@ -128,9 +128,9 @@ class RedemptionReceiptCard extends StatelessWidget {
           OutlinedButton.icon(
             onPressed: onNewRedemption,
             icon: const Icon(Icons.add_circle_outline_rounded, size: 18, color: AppColors.primary),
-            label: const Text(
-              'عملية صرف جديدة',
-              style: TextStyle(
+            label: Text(
+              'merchant.redemption_receipt.new_redemption_btn'.tr(),
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 13,
                 color: AppColors.primary,
@@ -151,9 +151,9 @@ class RedemptionReceiptCard extends StatelessWidget {
           Center(
             child: TextButton(
               onPressed: onDone,
-              child: const Text(
-                'إتمام والعودة للماسح',
-                style: TextStyle(
+              child: Text(
+                'merchant.redemption_receipt.done_and_return'.tr(),
+                style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textSecondaryLight,

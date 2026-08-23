@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import '../../../../core/constants/app_colors.dart';
@@ -48,15 +49,15 @@ class ReceiptImageViewerDialog extends StatelessWidget {
   }
 
   Widget _buildFallback() {
-    return const Center(
+    return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.broken_image_rounded, size: 48, color: Colors.white54),
-          Gap(8),
+          const Icon(Icons.broken_image_rounded, size: 48, color: Colors.white54),
+          const Gap(8),
           Text(
-            'تعذر تحميل صورة الوصل',
-            style: TextStyle(color: Colors.white70, fontSize: 13),
+            'merchant.receipt_viewer.error_loading'.tr(),
+            style: const TextStyle(color: Colors.white70, fontSize: 13),
           ),
         ],
       ),
@@ -118,7 +119,7 @@ class ReceiptImageViewerDialog extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            'مرجع: $referenceNumber',
+                            'merchant.receipt_viewer.ref_label'.tr(namedArgs: {'ref': referenceNumber}),
                             style: TextStyle(
                               fontSize: 11,
                               fontFamily: 'monospace',
@@ -173,12 +174,12 @@ class ReceiptImageViewerDialog extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'مبلغ الحوالة المحول:',
-                        style: TextStyle(fontSize: 11, color: Colors.white60),
+                      Text(
+                        'merchant.receipt_viewer.amount_label'.tr(),
+                        style: const TextStyle(fontSize: 11, color: Colors.white60),
                       ),
                       Text(
-                        '${amount.toStringAsFixed(0)} ج.م',
+                        '${amount.toStringAsFixed(0)} ${'common.currency'.tr()}',
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w900,
@@ -190,7 +191,7 @@ class ReceiptImageViewerDialog extends StatelessWidget {
                   ElevatedButton.icon(
                     onPressed: () => Navigator.of(context).pop(),
                     icon: const Icon(Icons.check_rounded, size: 18),
-                    label: const Text('إغلاق'),
+                    label: Text('merchant.receipt_viewer.close'.tr()),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.accent,
                       foregroundColor: AppColors.primaryDark,

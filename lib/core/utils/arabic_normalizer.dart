@@ -3,27 +3,43 @@ class ArabicNormalizer {
 
   /// Normalizes Arabic text for smart, accent-insensitive and spelling-variation-insensitive searching.
   ///
-  /// - Removes diacritics / tashkeel (Fatha, Damma, Kasra, Tanween, Shadda, Sukun)
-  /// - Unifies Alef variants: [أ, إ, آ, ٱ] -> ا
-  /// - Unifies Taa Marbuta / Haa: ة -> ه
-  /// - Unifies Yaa / Alef Maqsura: ى -> ي
-  /// - Removes Tatweel / Kashida: ـ -> ""
+  /// - Unifies all Alef variants: [أ, إ, آ, ٱ] -> ا
+  /// - Unifies Taa Marbuta and Haa: [ة, ه] -> ه
+  /// - Unifies Yaa, Alef Maqsura and Nabrah: [ى, ي, ئ] -> ي
+  /// - Unifies Waw and Waw with Hamza: [ؤ, و] -> و
+  /// - Unifies standalone Hamza: ء -> ء
+  /// - Removes all diacritics / tashkeel (Fatha, Damma, Kasra, Tanween, Shadda, Sukun, etc.)
+  /// - Removes Tatweel / Kashida: ـ
+  /// - Converts Arabic-Indic numerals (٠١٢٣٤٥٦٧٨٩) to standard digits (0123456789)
   static String normalize(String? text) {
     if (text == null || text.trim().isEmpty) return '';
 
     var normalized = text.trim().toLowerCase();
 
-    // 1. Remove diacritics / tashkeel (064B - 0652) and dagger alef (0670) and tatweel (0640)
-    normalized = normalized.replaceAll(RegExp(r'[\u064B-\u0652\u0670\u0640]'), '');
+    // 1. Convert Arabic-Indic numerals to ASCII digits
+    const arabicIndicDigits = '٠١٢٣٤٥٦٧٨٩';
+    const asciiDigits = '0123456789';
+    for (int i = 0; i < arabicIndicDigits.length; i++) {
+      normalized = normalized.replaceAll(arabicIndicDigits[i], asciiDigits[i]);
+    }
 
-    // 2. Normalize Alef variants to bare Alef (ا)
+    // 2. Remove all Arabic diacritics / tashkeel and tatweel
+    normalized = normalized.replaceAll(RegExp(r'[\u064B-\u065F\u0670\u0640]'), '');
+
+    // 3. Normalize all Alef variants to bare Alef (ا)
     normalized = normalized.replaceAll(RegExp(r'[أإآٱ]'), 'ا');
 
-    // 3. Normalize Taa Marbuta (ة) to Haa (ه)
+    // 4. Normalize Taa Marbuta (ة) to Haa (ه)
     normalized = normalized.replaceAll('ة', 'ه');
 
-    // 4. Normalize Alef Maqsura (ى) to Yaa (ي)
-    normalized = normalized.replaceAll('ى', 'ي');
+    // 5. Normalize Alef Maqsura (ى) and Hamza on Yaa (ئ) to Yaa (ي)
+    normalized = normalized.replaceAll(RegExp(r'[ىئ]'), 'ي');
+
+    // 6. Normalize Waw with Hamza (ؤ) to Waw (و)
+    normalized = normalized.replaceAll('ؤ', 'و');
+
+    // 7. Remove any extra multiple spaces
+    normalized = normalized.replaceAll(RegExp(r'\s+'), ' ');
 
     return normalized;
   }

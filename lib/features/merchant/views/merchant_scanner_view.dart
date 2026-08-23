@@ -102,8 +102,8 @@ class _MerchantScannerBodyState extends State<_MerchantScannerBody> {
                     child: Text(
                       'merchant.redemption_success'.tr(args: [
                         state.transaction.amountDeducted > 0
-                            ? state.transaction.amountDeducted.toStringAsFixed(0)
-                            : '${state.transaction.foodBasketsDeducted} سلة'
+                            ? '${state.transaction.amountDeducted.toStringAsFixed(0)} ${'common.currency'.tr()}'
+                            : '${state.transaction.foodBasketsDeducted} ${'common.baskets_unit'.tr()}'
                       ]),
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,

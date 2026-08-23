@@ -99,7 +99,7 @@ class DigitalAidCardWidget extends StatelessWidget {
                 if (cleanedNationalId.isNotEmpty) ...[
                   const Gap(4),
                   Text(
-                    'رقم البطاقة: $cleanedNationalId',
+                    '${'digital_card.national_id_label'.tr()}: $cleanedNationalId',
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w900,
@@ -145,9 +145,9 @@ class DigitalAidCardWidget extends StatelessWidget {
                           CardPrinterService.shareAidCard(card: card);
                         },
                         icon: const Icon(Icons.share_rounded, size: 18),
-                        label: const Text(
-                          'مشاركة / حفظ',
-                          style: TextStyle(
+                        label: Text(
+                          'digital_card.share_save_button'.tr(),
+                          style: const TextStyle(
                             fontSize: 13.5,
                             fontWeight: FontWeight.bold,
                           ),
@@ -521,7 +521,7 @@ class DigitalAidCardWidget extends StatelessWidget {
                           ),
                           const Gap(4),
                           Text(
-                            '${card.familyCount} أفراد',
+                            'digital_card.family_members_count'.tr(namedArgs: {'count': '${card.familyCount}'}),
                             style: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
@@ -594,9 +594,9 @@ class DigitalAidCardWidget extends StatelessWidget {
                       ),
                     ),
                     if (cleanedNationalId.isNotEmpty) ...[
-                      const Text(
-                        '   •   رقم البطاقة: ',
-                        style: TextStyle(
+                      Text(
+                        '   •   ${'digital_card.national_id_label'.tr()}: ',
+                        style: const TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,

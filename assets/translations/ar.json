@@ -104,7 +104,10 @@
     "identifier_hint": "أدخل رقم البطاقة القومية أو البريد",
     "national_id": "رقم البطاقة القومية / جواز السفر",
     "national_id_hint": "أدخل الـ 14 رقماً للبطاقة أو رقم الجواز",
-    "validation_national_id_required": "يرجى إدخال رقم البطاقة القومية أو جواز السفر"
+    "validation_national_id_required": "يرجى إدخال رقم البطاقة القومية أو جواز السفر",
+    "nationality": "الجنسية",
+    "select_nationality": "اختر الجنسية",
+    "search_nationalities": "بحث في الجنسيات..."
   },
   "auth_errors": {
     "user_not_found": "بيانات الدخول غير صحيحة، يرجى التأكد من رقم البطاقة أو الإيميل وكلمة المرور",
@@ -118,17 +121,20 @@
   },
   "digital_card": {
     "title": "بطاقة الدعم الرقمية",
-    "card_number": "رقم البطاقة",
-    "passport_or_id": "رقم الهوية / الجواز",
+    "card_number": "كود كارت المنظومة (الفجر)",
+    "passport_or_id": "رقم الهوية الوطنية / جواز السفر",
     "food_baskets": "حصص السلال الغذائية",
     "available_balance": "رصيد المشتريات المتاح",
     "baskets_unit": "سلة",
-    "expires_at": "تاريخ الانتهاء",
+    "expires_at": "صلاحية البطاقة",
     "status_active": "البطاقة نشطة وجاهزة للصرف",
     "status_pending": "بانتظار التفعيل الميداني",
     "tap_to_enlarge": "اضغط لتكبير رمز الـ QR للصراف",
     "print_card_button": "طباعة البطاقة / تصدير PDF",
-    "print_guidance": "يمكنك إبراز هذه البطاقة الرقمية أو المطبوعة لدى أي منفذ صرف معتمد"
+    "print_guidance": "يمكنك إبراز هذه البطاقة الرقمية أو المطبوعة لدى أي منفذ صرف معتمد",
+    "national_id_label": "رقم البطاقة / الهوية",
+    "share_save_button": "مشاركة / حفظ",
+    "family_members_count": "{count} أفراد"
   },
   "merchant": {
     "scan_title": "مسح كود المستفيد",
@@ -146,11 +152,92 @@
     "security_verification_desc": "يرجى إدخال رمز الأمان (آخر 4 أرقام من هوية المستفيد) لتأكيد المعاملة",
     "security_pin_label": "رمز الأمان (PIN)",
     "security_pin_hint": "••••",
+    "security_pin_error_empty": "يرجى إدخال رمز الأمان (آخر 4 أرقام من الهوية)",
+    "security_pin_error_mismatch": "رمز الأمان غير مطابق لآخر 4 أرقام من هوية المستفيد",
+    "card_not_registered": "هذا الكارت غير مسجل في منظومة مؤسسة الفجر",
+    "card_not_found": "لم يتم العثور على كارت مطابق لبيانات البحث",
+    "invalid_card": "بيانات الكارت غير صالحة أو منتهية الصلاحية",
+    "search_query_empty": "يرجى إدخال رقم الكارت أو الهوية للبحث",
+    "insufficient_balance": "رصيد الكارت المتاح غير كافٍ لإتمام عملية الخصم",
+    "fixed_amount_badge": "مبلغ الصرف المعتمد تلقائياً (30 ج.م)",
     "notes_label": "ملاحظات العملية (اختياري)",
     "notes_hint": "مثال: صرف مشتريات مواد تموينية أساسية...",
     "confirm_redemption": "تأكيد خصم وصرف المساعدة",
     "recent_transactions": "آخر العمليات المنفذة بالمنفذ",
-    "redemption_success": "تمت عملية الصرف وتحديث الرصيد بنجاح!"
+    "redemption_success": "تمت عملية الصرف وتحديث الرصيد بنجاح!",
+    "filter_today": "اليوم",
+    "filter_week": "هذا الأسبوع",
+    "filter_month": "هذا الشهر",
+    "filter_all": "الكل",
+    "filter_custom": "تاريخ مخصص",
+    "stats_total_amount": "إجمالي المصروف",
+    "stats_total_baskets": "السلال المسلمة",
+    "stats_operations": "عدد العمليات",
+    "stats_beneficiaries": "المستفيدين",
+    "receipts": {
+      "sheet_title": "سجل وصولات الدفع والحوالات",
+      "sheet_subtitle": "الحوالات والمبالغ المحولة من المؤسسة لحسابك",
+      "empty_title": "لا توجد وصولات دفع مرسلة حتى الآن",
+      "empty_desc": "ستظهر هنا كافة إيصالات التحويل البنكي وفودافون كاش وإنستاباي المرسلة لك من الإدارة مع صور الإيصالات",
+      "confirm_success": "تم تأكيد استلام الحوالة بمبلغ {amount} ج.م بنجاح ✅",
+      "confirm_error": "تعذر تحديث حالة الاستلام، يرجى المحاولة لاحقاً",
+      "method_instapay": "⚡ إنستا باي (InstaPay)",
+      "method_vodafone_cash": "📱 فودافون كاش",
+      "method_bank_transfer": "🏛️ تحويل بنكي",
+      "method_cash": "💵 نقدي باليد",
+      "status_confirmed": "تم التأكيد ✅",
+      "status_pending": "بانتظار تأكيدك ⏳",
+      "ref_label": "مرجع: {ref}",
+      "admin_notes_label": "ملاحظة الإدارة: {notes}",
+      "receipt_image_title": "صورة إيصال تحويل {amount} ج.م",
+      "tap_to_preview": "اضغط هنا لمعاينة وتكبير صورة وصل التحويل 📸",
+      "confirm_button": "تأكيد استلام المبلغ في حسابي ✅"
+    },
+    "redemption_receipt": {
+      "success_title": "تمت عملية الصرف بنجاح!",
+      "txn_number": "رقم المعاملة: {txn}",
+      "beneficiary_label": "المستفيد:",
+      "outlet_label": "المنفذ:",
+      "deducted_amount": "المبلغ المخصوم:",
+      "deducted_baskets": "السلال المصروفة:",
+      "remaining_balance": "الرصيد المتبقي:",
+      "remaining_baskets": "السلال المتبقية:",
+      "print_receipt_btn": "طباعة إيصال المعاملة والكارت",
+      "new_redemption_btn": "عملية صرف جديدة",
+      "done_and_return": "إتمام والعودة للماسح"
+    },
+    "receipt_viewer": {
+      "error_loading": "تعذر تحميل صورة الوصل",
+      "ref_label": "مرجع: {ref}",
+      "amount_label": "مبلغ الحوالة المحول:",
+      "close": "إغلاق"
+    },
+    "manual_search_ext": {
+      "verified_receipt": "إيصال الصرف الموثق",
+      "another_search": "بحث آخر",
+      "search_guidance": "إذا كان المستفيد لا يحمل هاتفاً ذكياً، أدخل رقم الهوية الوطنية أو رقم الكارت:",
+      "available_baskets": "المتاح: {count} سلة"
+    },
+    "extra_disbursement_ext": {
+      "error_sending": "حدث خطأ أثناء إرسال الطلب: {error}",
+      "sent_to_admin": "تم إرسال الطلب إلى لوحة تحكم الأدمن للمراجعة الفورية",
+      "confirm_handover": "تأكيد تسليم المبلغ للمستفيد",
+      "card_id_required": "يرجى إدخال رقم الكارت",
+      "amount_required": "يرجى إدخال المبلغ",
+      "reason_required": "يرجى ذكر سبب الصرف الاستثنائي"
+    },
+    "critical_liquidity": "⚠️ سيولة حرجة",
+    "payment_receipts_action": "سجل وصولات الدفع والحوالات (معاينة الصور)",
+    "recent_redemptions_title": "آخر عمليات الصرف",
+    "full_history_btn": "عرض السجل الكامل",
+    "empty_today_title": "لا توجد عمليات صرف مسجلة اليوم",
+    "empty_today_desc": "ستظهر هنا كافة عمليات الخصم وسحب الإعانات فور تنفيذها",
+    "history_page_title": "إحصائيات وسجل عمليات الصراف",
+    "search_placeholder": "بحث باسم المستفيد أو رقم الكارت...",
+    "no_matching_txns_title": "لا توجد معاملات مطابقة",
+    "no_matching_txns_desc": "لا توجد عمليات صرف مسجلة تطابق الفلترة الزمنية أو كلمة البحث المحددة",
+    "txns_unit_label": "عملية",
+    "beneficiaries_cases_label": "حالة"
   },
   "extra_disbursement": {
     "title": "طلب صرف استثنائي / طارئ",
@@ -185,7 +272,8 @@
       "no_redemptions_title": "لا توجد معاملات مسجلة",
       "no_redemptions_desc": "ستظهر هنا كافة عمليات الشراء وصرف السلال الغذائية",
       "txn_number": "رقم العملية",
-      "notes": "ملاحظات"
+      "notes": "ملاحظات",
+      "no_active_card": "لا توجد بطاقة دعم نشطة حالياً"
     },
     "merchant": {
       "scan_to_redeem": "مسح كود المستفيد (QR)",
@@ -262,14 +350,56 @@
     "families_unit": "أسرة مستفيدة",
     "stores_unit": "منفذ معتمد",
     "txns_unit": "عملية",
-    "baskets_unit": "سلة"
+    "baskets_unit": "سلة",
+    "settings_and_support": "إعدادات الحساب والدعم"
   },
   "info_content": {
     "about_us": "عن مؤسسة الفجر الخيرية",
     "terms_privacy": "الشروط والأحكام وسياسة الخصوصية",
-    "faq": "الأسئلة الشائعة والإرشادات",
+    "faq": {
+      "title": "الأسئلة الشائعة",
+      "intro": "إليك إجابات لأبرز الاستفسارات المتعلقة ببطاقات الدعم، ومنافذ الصرف، والحوكمة في المنظومة.",
+      "all": "الكل",
+      "empty": "لا توجد أسئلة شائعة في هذا التصنيف"
+    },
     "contact_support": "تواصل مع الدعم الفني والإدارة",
-    "headquarters": "المقر الرئيسي للمؤسسة"
+    "headquarters": "المقر الرئيسي للمؤسسة",
+    "about": {
+      "title": "عن المنظومة",
+      "version_label": "الإصدار: v{version}",
+      "about_system": "نبذة عن المنظومة",
+      "our_vision": "رؤيتنا",
+      "our_mission": "رسالتنا",
+      "core_values": "قيمنا الجوهرية",
+      "hq_and_contact": "المقر والتواصل",
+      "headquarters": "المقر الرئيسي",
+      "official_email": "البريد الرسمي",
+      "hotline": "الرقم الموحد",
+      "failed_to_load": "تعذر تحميل بيانات من نحن"
+    },
+    "contact": {
+      "title": "مركز الدعم والتواصل",
+      "hero_title": "فريق الدعم الفني جاهز لمساعدتكم",
+      "working_hours_label": "ساعات العمل: {hours}",
+      "hotline_title": "الرقم الموحد المجاني",
+      "hotline_subtitle": "متاح لكافة المستفيدين ومنافذ الصرف",
+      "emergency_title": "خط المساعدة والدعم الطارئ",
+      "emergency_subtitle": "للتعامل مع حالات البلاغات العاجلة",
+      "email_title": "بريد الدعم العام",
+      "email_subtitle": "لاستقبال الاستفسارات والشكاوى",
+      "partners_title": "بريد شركاء ومنافذ الصرف",
+      "partners_subtitle": "للتسويات والاعتماد والمسائل التقنية",
+      "address_title": "المقر الرسمي",
+      "failed_to_load": "تعذر تحميل بيانات الدعم والمساعدة"
+    },
+    "terms": {
+      "title": "الشروط وسياسة الخصوصية",
+      "tab_terms": "شروط الاستخدام",
+      "tab_privacy": "سياسة الخصوصية",
+      "last_updated_label": "آخر تحديث: {date}",
+      "empty": "لا يوجد محتوى متوفر حالياً",
+      "failed_to_load": "تعذر تحميل الشروط وسياسة الخصوصية"
+    }
   },
   "account_status": {
     "pending_title": "الحساب قيد المراجعة",
@@ -285,7 +415,8 @@
     "contact_support_btn": "التواصل مع الدعم الفني",
     "logout_btn": "تسجيل الخروج والعودة",
     "role_merchant": "صراف / منفذ معتمد",
-    "role_beneficiary": "مستفيد"
+    "role_beneficiary": "مستفيد",
+    "refresh_status": "تحديث حالة الحساب الآن"
   },
   "admin_mgmt": {
     "title": "إدارة الحسابات والاعتمادات",

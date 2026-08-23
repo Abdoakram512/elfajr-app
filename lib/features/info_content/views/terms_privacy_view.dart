@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -29,24 +30,26 @@ class _TermsPrivacyViewBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final lang = context.locale.languageCode;
+
     return DefaultTabController(
       length: 2,
       child: Scaffold(
         backgroundColor: AppColors.backgroundLight,
         appBar: AppBar(
-          title: const Text('الشروط وسياسة الخصوصية'),
+          title: Text('info_content.terms.title'.tr()),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
             onPressed: () => context.pop(),
           ),
-          bottom: const TabBar(
+          bottom: TabBar(
             indicatorColor: AppColors.primary,
             labelColor: AppColors.primary,
             unselectedLabelColor: AppColors.textSecondaryLight,
-            labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+            labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
             tabs: [
-              Tab(text: 'شروط الاستخدام'),
-              Tab(text: 'سياسة الخصوصية'),
+              Tab(text: 'info_content.terms.tab_terms'.tr()),
+              Tab(text: 'info_content.terms.tab_privacy'.tr()),
             ],
           ),
         ),
@@ -59,8 +62,7 @@ class _TermsPrivacyViewBody extends StatelessWidget {
             final data = state.termsPrivacy;
             if (data == null) {
               return AppErrorStateWidget(
-                errorMessage:
-                    state.errorMessage ?? 'تعذر تحميل الشروط وسياسة الخصوصية',
+                errorMessage: state.errorMessage ?? 'info_content.terms.failed_to_load'.tr(),
                 onRetry: () => context.read<InfoCubit>().loadAllInfo(),
               );
             }
@@ -71,18 +73,18 @@ class _TermsPrivacyViewBody extends StatelessWidget {
                 _buildListTab(
                   context: context,
                   icon: Icons.gavel_rounded,
-                  title: data.termsTitle,
-                  items: data.termsList,
-                  lastUpdated: data.lastUpdated,
+                  title: data.termsTitle(lang),
+                  items: data.termsList(lang),
+                  lastUpdated: data.lastUpdated(lang),
                 ),
 
                 // 2. Privacy Tab
                 _buildListTab(
                   context: context,
                   icon: Icons.security_rounded,
-                  title: data.privacyTitle,
-                  items: data.privacyList,
-                  lastUpdated: data.lastUpdated,
+                  title: data.privacyTitle(lang),
+                  items: data.privacyList(lang),
+                  lastUpdated: data.lastUpdated(lang),
                 ),
               ],
             );
@@ -104,113 +106,126 @@ class _TermsPrivacyViewBody extends StatelessWidget {
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header Card
-          Container(
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              color: AppColors.primarySubtle,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: AppColors.primary.withValues(alpha: 0.15),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header Card
+            Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                color: AppColors.primarySubtle,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: AppColors.primary.withValues(alpha: 0.15),
+                ),
               ),
-            ),
-            child: Row(
-              children: [
-                Icon(icon, size: 28, color: AppColors.primary),
-                const Gap(12),
-                Expanded(
-                  child: Column(
+              child: Row(
+                children: [
+                  Icon(icon, size: 28, color: AppColors.primary),
+                  const Gap(12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primaryDark,
+                          ),
+                        ),
+                        if (lastUpdated.isNotEmpty) ...[
+                          const Gap(2),
+                          Text(
+                            'info_content.terms.last_updated_label'.tr(namedArgs: {'date': lastUpdated}),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: AppColors.textSecondaryLight,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ).animate().fadeIn(duration: 300.ms),
+
+            const Gap(20),
+
+            // Policy items
+            if (items.isEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 40),
+                child: Center(
+                  child: Text(
+                    'info_content.terms.empty'.tr(),
+                    style: const TextStyle(color: AppColors.textSecondaryLight),
+                  ),
+                ),
+              )
+            else
+              ...items.asMap().entries.map((entry) {
+                final idx = entry.key + 1;
+                final text = entry.value;
+
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(color: AppColors.borderLight),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.02),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        title,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primaryDark,
+                      Container(
+                        width: 28,
+                        height: 28,
+                        decoration: const BoxDecoration(
+                          color: AppColors.primary,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Center(
+                          child: Text(
+                            '$idx',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                            ),
+                          ),
                         ),
                       ),
-                      const Gap(2),
-                      Text(
-                        'آخر تحديث: $lastUpdated',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: AppColors.textSecondaryLight,
+                      const Gap(14),
+                      Expanded(
+                        child: Text(
+                          text,
+                          style: const TextStyle(
+                            fontSize: 13.5,
+                            color: AppColors.textPrimaryLight,
+                            height: 1.5,
+                          ),
                         ),
                       ),
                     ],
                   ),
-                ),
-              ],
-            ),
-          ).animate().fadeIn(duration: 300.ms),
+                );
+              }),
 
-          const Gap(20),
-
-          // Policy items
-          ...items.asMap().entries.map((entry) {
-            final idx = entry.key + 1;
-            final text = entry.value;
-
-            return Container(
-              margin: const EdgeInsets.only(bottom: 12),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: AppColors.borderLight),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.02),
-                    blurRadius: 8,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: Text(
-                        '$idx',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const Gap(14),
-                  Expanded(
-                    child: Text(
-                      text,
-                      style: const TextStyle(
-                        fontSize: 13.5,
-                        color: AppColors.textPrimaryLight,
-                        height: 1.5,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ).animate().fadeIn(delay: (entry.key * 80).ms, duration: 300.ms);
-          }),
-
-          const Gap(24),
-        ],
+            const Gap(24),
+          ],
+        ),
       ),
-    ),
     );
   }
 }

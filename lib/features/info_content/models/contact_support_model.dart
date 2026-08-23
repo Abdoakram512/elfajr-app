@@ -5,8 +5,10 @@ class ContactSupportModel extends Equatable {
   final String emergencyPhone;
   final String supportEmail;
   final String partnersEmail;
-  final String workingHours;
-  final String address;
+  final String workingHoursAr;
+  final String workingHoursEn;
+  final String addressAr;
+  final String addressEn;
   final String socialTwitter;
   final String socialLinkedin;
 
@@ -15,22 +17,34 @@ class ContactSupportModel extends Equatable {
     required this.emergencyPhone,
     required this.supportEmail,
     required this.partnersEmail,
-    required this.workingHours,
-    required this.address,
+    required this.workingHoursAr,
+    required this.workingHoursEn,
+    required this.addressAr,
+    required this.addressEn,
     required this.socialTwitter,
     required this.socialLinkedin,
   });
 
+  String workingHours(String lang) => lang == 'en'
+      ? (workingHoursEn.isNotEmpty ? workingHoursEn : workingHoursAr)
+      : (workingHoursAr.isNotEmpty ? workingHoursAr : workingHoursEn);
+
+  String address(String lang) => lang == 'en'
+      ? (addressEn.isNotEmpty ? addressEn : addressAr)
+      : (addressAr.isNotEmpty ? addressAr : addressEn);
+
   factory ContactSupportModel.fromMap(Map<String, dynamic> map) {
     return ContactSupportModel(
-      hotline: map['hotline'] as String? ?? '19000',
-      emergencyPhone: map['emergencyPhone'] as String? ?? '+201000000000',
-      supportEmail: map['supportEmail'] as String? ?? 'support@alfajr.org',
-      partnersEmail: map['partnersEmail'] as String? ?? 'merchants@alfajr.org',
-      workingHours: map['workingHours'] as String? ?? 'السبت - الخميس: 9:00 ص - 9:00 م',
-      address: map['address'] as String? ?? 'جمهورية مصر العربية - المقر الإداري المركزي',
-      socialTwitter: map['socialTwitter'] as String? ?? '@AlFajrCharity',
-      socialLinkedin: map['socialLinkedin'] as String? ?? 'company/alfajr-foundation',
+      hotline: map['hotline'] as String? ?? '',
+      emergencyPhone: map['emergencyPhone'] as String? ?? '',
+      supportEmail: map['supportEmail'] as String? ?? '',
+      partnersEmail: map['partnersEmail'] as String? ?? '',
+      workingHoursAr: map['workingHoursAr'] as String? ?? map['workingHours'] as String? ?? '',
+      workingHoursEn: map['workingHoursEn'] as String? ?? '',
+      addressAr: map['addressAr'] as String? ?? map['address'] as String? ?? '',
+      addressEn: map['addressEn'] as String? ?? '',
+      socialTwitter: map['socialTwitter'] as String? ?? '',
+      socialLinkedin: map['socialLinkedin'] as String? ?? '',
     );
   }
 
@@ -40,8 +54,10 @@ class ContactSupportModel extends Equatable {
         emergencyPhone,
         supportEmail,
         partnersEmail,
-        workingHours,
-        address,
+        workingHoursAr,
+        workingHoursEn,
+        addressAr,
+        addressEn,
         socialTwitter,
         socialLinkedin,
       ];

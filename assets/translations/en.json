@@ -104,7 +104,10 @@
     "identifier_hint": "Enter National ID or Email",
     "national_id": "National ID / Passport",
     "national_id_hint": "Enter 14-digit ID or passport number",
-    "validation_national_id_required": "National ID or passport number is required"
+    "validation_national_id_required": "National ID or passport number is required",
+    "nationality": "Nationality",
+    "select_nationality": "Select Nationality",
+    "search_nationalities": "Search nationalities..."
   },
   "auth_errors": {
     "user_not_found": "Invalid login credentials. Please check your National ID / email and password",
@@ -118,7 +121,7 @@
   },
   "digital_card": {
     "title": "Digital Aid Card",
-    "card_number": "Card Number",
+    "card_number": "System Card Code (Al-Fajr)",
     "passport_or_id": "National ID / Passport",
     "food_baskets": "Food Basket Quota",
     "available_balance": "Available Balance",
@@ -128,7 +131,10 @@
     "status_pending": "Pending Field Activation",
     "tap_to_enlarge": "Tap to enlarge QR Code",
     "print_card_button": "Print Card / Export PDF",
-    "print_guidance": "Present this digital or printed card at any authorized merchant"
+    "print_guidance": "Present this digital or printed card at any authorized merchant",
+    "national_id_label": "National ID / Card",
+    "share_save_button": "Share / Save",
+    "family_members_count": "{count} members"
   },
   "merchant": {
     "scan_title": "Scan Beneficiary QR",
@@ -146,11 +152,92 @@
     "security_verification_desc": "Enter security PIN (last 4 digits of beneficiary ID) to confirm",
     "security_pin_label": "Security PIN",
     "security_pin_hint": "••••",
+    "security_pin_error_empty": "Please enter the security PIN (last 4 digits of ID)",
+    "security_pin_error_mismatch": "Security PIN does not match the last 4 digits of National ID",
+    "card_not_registered": "This card is not registered in the system",
+    "card_not_found": "No matching card found for query",
+    "invalid_card": "Invalid or expired aid card data",
+    "search_query_empty": "Please enter card or ID number to search",
+    "insufficient_balance": "Available card balance is insufficient for this deduction",
+    "fixed_amount_badge": "Auto Approved Disbursement Amount (30 EGP)",
     "notes_label": "Transaction Notes (Optional)",
     "notes_hint": "e.g. Grocery items distribution...",
     "confirm_redemption": "Confirm Aid Disbursement",
     "recent_transactions": "Recent Store Transactions",
-    "redemption_success": "Disbursement completed and balance updated successfully!"
+    "redemption_success": "Disbursement completed and balance updated successfully!",
+    "filter_today": "Today",
+    "filter_week": "This Week",
+    "filter_month": "This Month",
+    "filter_all": "All",
+    "filter_custom": "Custom Date",
+    "stats_total_amount": "Total Disbursed",
+    "stats_total_baskets": "Delivered Baskets",
+    "stats_operations": "Operations",
+    "stats_beneficiaries": "Beneficiaries",
+    "receipts": {
+      "sheet_title": "Payment & Transfer Receipts",
+      "sheet_subtitle": "Transfers and funds sent from foundation to your account",
+      "empty_title": "No payment receipts sent yet",
+      "empty_desc": "All bank, Vodafone Cash and InstaPay transfer receipts will appear here",
+      "confirm_success": "Transfer of {amount} EGP confirmed successfully ✅",
+      "confirm_error": "Failed to update receipt confirmation, please try again",
+      "method_instapay": "⚡ InstaPay",
+      "method_vodafone_cash": "📱 Vodafone Cash",
+      "method_bank_transfer": "🏛️ Bank Transfer",
+      "method_cash": "💵 Cash Handover",
+      "status_confirmed": "Confirmed ✅",
+      "status_pending": "Pending Confirmation ⏳",
+      "ref_label": "Ref: {ref}",
+      "admin_notes_label": "Admin Note: {notes}",
+      "receipt_image_title": "Transfer Receipt ({amount} EGP)",
+      "tap_to_preview": "Tap here to preview and enlarge receipt image 📸",
+      "confirm_button": "Confirm Fund Receipt in My Account ✅"
+    },
+    "redemption_receipt": {
+      "success_title": "Redemption Completed Successfully!",
+      "txn_number": "Transaction ID: {txn}",
+      "beneficiary_label": "Beneficiary:",
+      "outlet_label": "Merchant Outlet:",
+      "deducted_amount": "Deducted Amount:",
+      "deducted_baskets": "Deducted Baskets:",
+      "remaining_balance": "Remaining Balance:",
+      "remaining_baskets": "Remaining Baskets:",
+      "print_receipt_btn": "Print Transaction Receipt & Card",
+      "new_redemption_btn": "New Redemption",
+      "done_and_return": "Done & Return to Scanner"
+    },
+    "receipt_viewer": {
+      "error_loading": "Failed to load receipt image",
+      "ref_label": "Ref: {ref}",
+      "amount_label": "Transferred Amount:",
+      "close": "Close"
+    },
+    "manual_search_ext": {
+      "verified_receipt": "Verified Redemption Receipt",
+      "another_search": "Another Search",
+      "search_guidance": "If the beneficiary has no smartphone, enter National ID or Card Number:",
+      "available_baskets": "Available: {count} baskets"
+    },
+    "extra_disbursement_ext": {
+      "error_sending": "Error sending request: {error}",
+      "sent_to_admin": "Request submitted to admin dashboard for instant review",
+      "confirm_handover": "Confirm Cash Handover to Beneficiary",
+      "card_id_required": "Please enter card number",
+      "amount_required": "Please enter amount",
+      "reason_required": "Please enter reason for extra disbursement"
+    },
+    "critical_liquidity": "⚠️ Critical Liquidity",
+    "payment_receipts_action": "Payment Receipts Ledger (Preview Images)",
+    "recent_redemptions_title": "Recent Redemptions",
+    "full_history_btn": "View Full History",
+    "empty_today_title": "No redemptions recorded today",
+    "empty_today_desc": "All aid deductions and redemptions will appear here once processed",
+    "history_page_title": "Store Redemptions & Stats",
+    "search_placeholder": "Search by beneficiary name or card ID...",
+    "no_matching_txns_title": "No transactions found",
+    "no_matching_txns_desc": "No transactions match the selected timeframe or search keyword",
+    "txns_unit_label": "txns",
+    "beneficiaries_cases_label": "cases"
   },
   "extra_disbursement": {
     "title": "Emergency Aid Request",
@@ -185,7 +272,8 @@
       "no_redemptions_title": "No Transactions Yet",
       "no_redemptions_desc": "Your purchases and basket distributions will appear here",
       "txn_number": "Txn #",
-      "notes": "Notes"
+      "notes": "Notes",
+      "no_active_card": "No active aid card found currently"
     },
     "merchant": {
       "scan_to_redeem": "Scan Beneficiary QR",
@@ -262,14 +350,56 @@
     "families_unit": "Families",
     "stores_unit": "Outlets",
     "txns_unit": "Transactions",
-    "baskets_unit": "Baskets"
+    "baskets_unit": "Baskets",
+    "settings_and_support": "Account Settings & Support"
   },
   "info_content": {
     "about_us": "About Al-Fajr Foundation",
     "terms_privacy": "Terms & Privacy Policy",
-    "faq": "Frequently Asked Questions",
+    "faq": {
+      "title": "Frequently Asked Questions (FAQ)",
+      "intro": "Find answers to common questions about digital cards, merchant redemption, and governance.",
+      "all": "All",
+      "empty": "No FAQs found in this category"
+    },
     "contact_support": "Contact Support & Administration",
-    "headquarters": "Foundation Headquarters"
+    "headquarters": "Central Headquarters",
+    "about": {
+      "title": "About Us",
+      "version_label": "Version: v{version}",
+      "about_system": "About the System",
+      "our_vision": "Our Vision",
+      "our_mission": "Our Mission",
+      "core_values": "Core Values",
+      "hq_and_contact": "Headquarters & Contact",
+      "headquarters": "Headquarters",
+      "official_email": "Official Email",
+      "hotline": "Hotline",
+      "failed_to_load": "Failed to load About Us content"
+    },
+    "contact": {
+      "title": "Support & Contact",
+      "hero_title": "Support Team is Here to Help You",
+      "working_hours_label": "Hours: {hours}",
+      "hotline_title": "Unified Hotline",
+      "hotline_subtitle": "Available for all beneficiaries & outlets",
+      "emergency_title": "Emergency Help Line",
+      "emergency_subtitle": "For urgent field inquiries",
+      "email_title": "Support Email",
+      "email_subtitle": "For inquiries and tickets",
+      "partners_title": "Merchants & Outlets Email",
+      "partners_subtitle": "For settlements and technical support",
+      "address_title": "Official Address",
+      "failed_to_load": "Failed to load Support info"
+    },
+    "terms": {
+      "title": "Terms & Privacy Policy",
+      "tab_terms": "Terms of Use",
+      "tab_privacy": "Privacy Policy",
+      "last_updated_label": "Last updated: {date}",
+      "empty": "No content available",
+      "failed_to_load": "Failed to load Terms & Privacy content"
+    }
   },
   "account_status": {
     "pending_title": "Account Under Review",
@@ -285,7 +415,8 @@
     "contact_support_btn": "Contact Technical Support",
     "logout_btn": "Logout & Return",
     "role_merchant": "Authorized Merchant / Cashier",
-    "role_beneficiary": "Beneficiary"
+    "role_beneficiary": "Beneficiary",
+    "refresh_status": "Refresh Account Status Now"
   },
   "admin_mgmt": {
     "title": "Accounts & Approvals Management",

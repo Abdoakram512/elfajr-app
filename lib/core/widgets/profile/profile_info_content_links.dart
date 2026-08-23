@@ -48,7 +48,7 @@ class ProfileInfoContentLinks extends StatelessWidget {
     }
 
     return ProfileSectionCard(
-      title: customSectionTitle ?? 'إعدادات الحساب والدعم',
+      title: customSectionTitle ?? 'profile.settings_and_support'.tr(),
       icon: customSectionIcon ?? Icons.help_outline_rounded,
       children: tiles,
     );

@@ -175,9 +175,9 @@ class MerchantHomeTab extends StatelessWidget {
                                       color: Colors.red.shade300,
                                     ),
                                   ),
-                                  child: const Text(
-                                    '⚠️ سيولة حرجة',
-                                    style: TextStyle(
+                                  child: Text(
+                                    'merchant.critical_liquidity'.tr(),
+                                    style: const TextStyle(
                                       fontSize: 10,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.red,
@@ -475,7 +475,7 @@ class MerchantHomeTab extends StatelessWidget {
                               borderRadius: BorderRadius.circular(14),
                             ),
                           ),
-                          child: const Center(
+                          child:  Center(
                             child: FittedBox(
                               fit: BoxFit.scaleDown,
                               child: Row(
@@ -488,11 +488,11 @@ class MerchantHomeTab extends StatelessWidget {
                                     color: Color(0xFF15803D),
                                     size: 20,
                                   ),
-                                  Gap(8),
+                                  const Gap(8),
                                   Text(
-                                    'سجل وصولات الدفع والحوالات (معاينة الصور)',
+                                    'merchant.payment_receipts_action'.tr(),
                                     textAlign: TextAlign.center,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
                                       color: Color(0xFF15803D),
@@ -583,9 +583,9 @@ class MerchantHomeTab extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          'آخر عمليات الصرف',
-                          style: TextStyle(
+                        Text(
+                          'merchant.recent_redemptions_title'.tr(),
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: AppColors.textPrimaryLight,
@@ -593,9 +593,9 @@ class MerchantHomeTab extends StatelessWidget {
                         ),
                         TextButton(
                           onPressed: onSwitchToHistory,
-                          child: const Text(
-                            'عرض السجل الكامل',
-                            style: TextStyle(
+                          child: Text(
+                            'merchant.full_history_btn'.tr(),
+                            style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
                               color: AppColors.primary,
@@ -607,10 +607,9 @@ class MerchantHomeTab extends StatelessWidget {
                     const Gap(10),
 
                     if (state.recentTransactions.isEmpty)
-                      const AppEmptyStateWidget(
-                        title: 'لا توجد عمليات صرف مسجلة اليوم',
-                        description:
-                            'ستظهر هنا كافة عمليات الخصم وسحب الإعانات فور تنفيذها',
+                      AppEmptyStateWidget(
+                        title: 'merchant.empty_today_title'.tr(),
+                        description: 'merchant.empty_today_desc'.tr(),
                         icon: Icons.receipt_long_outlined,
                       )
                     else

@@ -16,28 +16,29 @@ class InfoState extends Equatable {
   const InfoState({
     this.aboutUs,
     this.faqs = const [],
-    this.selectedFaqCategory = 'الكل',
+    this.selectedFaqCategory = 'all',
     this.termsPrivacy,
     this.contactSupport,
     this.isLoading = false,
     this.errorMessage,
   });
 
-  List<String> get availableFaqCategories {
-    final set = <String>{'الكل'};
+  List<String> availableFaqCategories(String lang) {
+    final set = <String>{'all'};
     for (final f in faqs) {
-      if (f.category.isNotEmpty) {
-        set.add(f.category);
+      final cat = f.category(lang);
+      if (cat.isNotEmpty) {
+        set.add(cat);
       }
     }
     return set.toList();
   }
 
-  List<FaqItemModel> get filteredFaqs {
-    if (selectedFaqCategory == 'الكل') {
+  List<FaqItemModel> filteredFaqs(String lang) {
+    if (selectedFaqCategory == 'all' || selectedFaqCategory == 'الكل') {
       return faqs;
     }
-    return faqs.where((f) => f.category == selectedFaqCategory).toList();
+    return faqs.where((f) => f.category(lang) == selectedFaqCategory || f.categoryAr == selectedFaqCategory || f.categoryEn == selectedFaqCategory).toList();
   }
 
   InfoState copyWith({

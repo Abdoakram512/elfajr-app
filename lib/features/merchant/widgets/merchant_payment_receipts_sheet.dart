@@ -41,7 +41,7 @@ class _MerchantPaymentReceiptsSheetState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'تم تأكيد استلام الحوالة بمبلغ ${receipt.amount.toStringAsFixed(0)} ج.م بنجاح ✅',
+              'merchant.receipts.confirm_success'.tr(namedArgs: {'amount': receipt.amount.toStringAsFixed(0)}),
             ),
             backgroundColor: AppColors.success,
           ),
@@ -50,8 +50,8 @@ class _MerchantPaymentReceiptsSheetState
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('تعذر تحديث حالة الاستلام، يرجى المحاولة لاحقاً'),
+          SnackBar(
+            content: Text('merchant.receipts.confirm_error'.tr()),
             backgroundColor: AppColors.error,
           ),
         );
@@ -66,13 +66,13 @@ class _MerchantPaymentReceiptsSheetState
   String _getMethodLabel(String method) {
     switch (method) {
       case 'instapay':
-        return '⚡ إنستا باي (InstaPay)';
+        return 'merchant.receipts.method_instapay'.tr();
       case 'vodafone_cash':
-        return '📱 فودافون كاش';
+        return 'merchant.receipts.method_vodafone_cash'.tr();
       case 'bank_transfer':
-        return '🏛️ تحويل بنكي';
+        return 'merchant.receipts.method_bank_transfer'.tr();
       case 'cash':
-        return '💵 نقدي باليد';
+        return 'merchant.receipts.method_cash'.tr();
       default:
         return method;
     }
@@ -80,7 +80,7 @@ class _MerchantPaymentReceiptsSheetState
 
   @override
   Widget build(BuildContext context) {
-    final currencyFormatter = NumberFormat('#,##0', 'ar');
+    final currencyFormatter = NumberFormat('#,##0');
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.85,
@@ -123,20 +123,20 @@ class _MerchantPaymentReceiptsSheetState
                       ),
                     ),
                     const Gap(12),
-                    const Column(
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'سجل وصولات الدفع والحوالات',
-                          style: TextStyle(
+                          'merchant.receipts.sheet_title'.tr(),
+                          style: const TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.w900,
                             color: AppColors.textPrimaryLight,
                           ),
                         ),
                         Text(
-                          'الحوالات والمبالغ المحولة من المؤسسة لحسابك',
-                          style: TextStyle(
+                          'merchant.receipts.sheet_subtitle'.tr(),
+                          style: const TextStyle(
                             fontSize: 11,
                             color: AppColors.textSecondaryLight,
                           ),
@@ -174,12 +174,11 @@ class _MerchantPaymentReceiptsSheetState
                 }
 
                 if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                  return const SingleChildScrollView(
-                    padding: EdgeInsets.symmetric(vertical: 40),
+                  return SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(vertical: 40),
                     child: AppEmptyStateWidget(
-                      title: 'لا توجد وصولات دفع مرسلة حتى الآن',
-                      description:
-                          'ستظهر هنا كافة إيصالات التحويل البنكي وفودافون كاش وإنستاباي المرسلة لك من الإدارة مع صور الإيصالات',
+                      title: 'merchant.receipts.empty_title'.tr(),
+                      description: 'merchant.receipts.empty_desc'.tr(),
                       icon: Icons.receipt_long_outlined,
                     ),
                   );
@@ -200,10 +199,7 @@ class _MerchantPaymentReceiptsSheetState
                 });
 
                 return ListView.separated(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 16,
-                  ),
+                  padding: const EdgeInsets.all(20),
                   itemCount: receipts.length,
                   separatorBuilder: (context, index) => const Gap(14),
                   itemBuilder: (context, index) {
@@ -217,13 +213,13 @@ class _MerchantPaymentReceiptsSheetState
                         borderRadius: BorderRadius.circular(22),
                         border: Border.all(
                           color: r.isConfirmed
-                              ? const Color(0xFF10B981).withValues(alpha: 0.3)
-                              : const Color(0xFFF59E0B).withValues(alpha: 0.4),
+                              ? AppColors.success.withValues(alpha: 0.3)
+                              : const Color(0xFFFDE68A),
                           width: 1.5,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.04),
+                            color: Colors.black.withValues(alpha: 0.03),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           ),
@@ -232,31 +228,57 @@ class _MerchantPaymentReceiptsSheetState
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Top row: Amount + Status
+                          // Row 1: Method Badge + Amount + Status
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade100,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  _getMethodLabel(r.paymentMethod),
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
                               Row(
                                 children: [
                                   Text(
-                                    '+${currencyFormatter.format(r.amount)}',
+                                    currencyFormatter.format(r.amount),
                                     style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w900,
-                                      color: Color(0xFF0F766E),
+                                      color: AppColors.primaryDark,
                                     ),
                                   ),
                                   const Gap(4),
-                                  const Text(
-                                    'ج.م',
-                                    style: TextStyle(
-                                      fontSize: 12,
+                                  Text(
+                                    'common.currency'.tr(),
+                                    style: const TextStyle(
+                                      fontSize: 11,
                                       fontWeight: FontWeight.bold,
                                       color: AppColors.textSecondaryLight,
                                     ),
                                   ),
                                 ],
                               ),
+                            ],
+                          ),
+
+                          const Gap(10),
+
+                          // Row 2: Status Pill & Date
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
                               Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 10,
@@ -264,146 +286,141 @@ class _MerchantPaymentReceiptsSheetState
                                 ),
                                 decoration: BoxDecoration(
                                   color: r.isConfirmed
-                                      ? const Color(0xFFECFDF5)
-                                      : const Color(0xFFFFFBEB),
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(
-                                    color: r.isConfirmed
-                                        ? const Color(0xFFA7F3D0)
-                                        : const Color(0xFFFDE68A),
-                                  ),
+                                      ? AppColors.success.withValues(alpha: 0.1)
+                                      : const Color(0xFFFEF3C7),
+                                  borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: Text(
-                                  r.isConfirmed ? 'تم التأكيد ✅' : 'بانتظار تأكيدك ⏳',
+                                  r.isConfirmed
+                                      ? 'merchant.receipts.status_confirmed'.tr()
+                                      : 'merchant.receipts.status_pending'.tr(),
                                   style: TextStyle(
                                     fontSize: 11,
                                     fontWeight: FontWeight.bold,
                                     color: r.isConfirmed
-                                        ? const Color(0xFF047857)
-                                        : const Color(0xFFB45309),
+                                        ? AppColors.success
+                                        : const Color(0xFFD97706),
                                   ),
                                 ),
                               ),
+                              if (r.timestamp != null)
+                                Text(
+                                  DateFormat('yyyy/MM/dd - hh:mm a')
+                                      .format(r.timestamp!),
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.grey.shade500,
+                                  ),
+                                ),
                             ],
                           ),
 
+                          const Gap(12),
+                          const Divider(height: 1),
                           const Gap(10),
 
-                          // Method & Ref
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 3,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFF1F5F9),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text(
-                                  _getMethodLabel(r.paymentMethod),
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.textPrimaryLight,
+                          // Row 3: Reference Number
+                          if (r.referenceNumber.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 6),
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.tag_rounded,
+                                    size: 14,
+                                    color: AppColors.textSecondaryLight,
                                   ),
-                                ),
-                              ),
-                              const Gap(8),
-                              Text(
-                                'مرجع: ${r.referenceNumber}',
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  fontFamily: 'monospace',
-                                  color: AppColors.textSecondaryLight,
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          if (r.timestamp != null) ...[
-                            const Gap(6),
-                            Text(
-                              DateFormat('yyyy/MM/dd - hh:mm a', 'ar')
-                                  .format(r.timestamp!),
-                              style: const TextStyle(
-                                fontSize: 10.5,
-                                color: AppColors.textSecondaryLight,
+                                  const Gap(6),
+                                  Text(
+                                    'merchant.receipts.ref_label'.tr(namedArgs: {'ref': r.referenceNumber}),
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontFamily: 'monospace',
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.textPrimaryLight,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
 
-                          if (r.notes != null && r.notes!.isNotEmpty) ...[
-                            const Gap(8),
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF8FAFC),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Text(
-                                'ملاحظة الإدارة: ${r.notes}',
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  color: AppColors.textSecondaryLight,
-                                ),
+                          // Row 4: Notes
+                          if (r.notes != null && r.notes!.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Icon(
+                                    Icons.notes_rounded,
+                                    size: 14,
+                                    color: AppColors.textSecondaryLight,
+                                  ),
+                                  const Gap(6),
+                                  Expanded(
+                                    child: Text(
+                                      'merchant.receipts.admin_notes_label'.tr(namedArgs: {'notes': r.notes!}),
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: AppColors.textSecondaryLight,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
 
-                          // ── RECEIPT IMAGE CARD (CLICK TO VIEW FULL) ──
+                          // Row 5: Receipt Image Attachment (Click to View)
                           if (r.receiptImageUrl != null &&
                               r.receiptImageUrl!.isNotEmpty) ...[
-                            const Gap(12),
+                            const Gap(4),
                             InkWell(
                               onTap: () {
                                 showDialog(
                                   context: context,
-                                  builder: (_) => ReceiptImageViewerDialog(
+                                  builder: (ctx) => ReceiptImageViewerDialog(
                                     imageUrl: r.receiptImageUrl!,
-                                    title: 'صورة إيصال تحويل ${r.amount.toStringAsFixed(0)} ج.م',
+                                    title: 'merchant.receipts.receipt_image_title'.tr(namedArgs: {'amount': r.amount.toStringAsFixed(0)}),
                                     amount: r.amount,
                                     referenceNumber: r.referenceNumber,
                                   ),
                                 );
                               },
-                              borderRadius: BorderRadius.circular(14),
+                              borderRadius: BorderRadius.circular(12),
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 12,
                                   vertical: 8,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFFEF3C7),
-                                  borderRadius: BorderRadius.circular(14),
+                                  color: const Color(0xFFF0FDF4),
+                                  borderRadius: BorderRadius.circular(12),
                                   border: Border.all(
-                                    color: const Color(0xFFFCD34D),
+                                    color: const Color(0xFFBBF7D0),
                                   ),
                                 ),
-                                child: const Row(
+                                child: Row(
                                   children: [
-                                    Icon(
+                                    const Icon(
                                       Icons.image_search_rounded,
-                                      color: Color(0xFFD97706),
-                                      size: 20,
+                                      size: 18,
+                                      color: Color(0xFF16A34A),
                                     ),
-                                    Gap(8),
+                                    const Gap(8),
                                     Expanded(
                                       child: Text(
-                                        'اضغط هنا لمعاينة وتكبير صورة وصل التحويل 📸',
-                                        style: TextStyle(
+                                        'merchant.receipts.tap_to_preview'.tr(),
+                                        style: const TextStyle(
                                           fontSize: 11.5,
                                           fontWeight: FontWeight.bold,
-                                          color: Color(0xFF92400E),
+                                          color: Color(0xFF16A34A),
                                         ),
                                       ),
                                     ),
-                                    Icon(
+                                    const Icon(
                                       Icons.arrow_forward_ios_rounded,
                                       size: 12,
-                                      color: Color(0xFF92400E),
+                                      color: Color(0xFF16A34A),
                                     ),
                                   ],
                                 ),
@@ -411,7 +428,7 @@ class _MerchantPaymentReceiptsSheetState
                             ),
                           ],
 
-                          // Confirm Button (if not yet confirmed)
+                          // Action Button (Confirm Receipt if pending)
                           if (!r.isConfirmed) ...[
                             const Gap(14),
                             SizedBox(
@@ -422,53 +439,29 @@ class _MerchantPaymentReceiptsSheetState
                                     ? null
                                     : () => _confirmReceipt(r),
                                 style: ElevatedButton.styleFrom(
-                                  alignment: Alignment.center,
-                                  backgroundColor: const Color(0xFF0A734D),
+                                  backgroundColor: const Color(0xFF059669),
                                   foregroundColor: Colors.white,
-                                  padding: EdgeInsets.zero,
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
+                                    borderRadius: BorderRadius.circular(14),
                                   ),
+                                  elevation: 0,
                                 ),
-                                child: Center(
-                                  child: isConfirming
-                                      ? const SizedBox(
-                                          width: 18,
-                                          height: 18,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                            color: Colors.white,
-                                          ),
-                                        )
-                                      : const FittedBox(
-                                          fit: BoxFit.scaleDown,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Icon(
-                                                Icons
-                                                    .check_circle_outline_rounded,
-                                                size: 18,
-                                                color: Colors.white,
-                                              ),
-                                              Gap(8),
-                                              Text(
-                                                'تأكيد استلام المبلغ في حسابي ✅',
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(
-                                                  fontSize: 13,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
+                                child: isConfirming
+                                    ? const SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 2,
                                         ),
-                                ),
+                                      )
+                                    : Text(
+                                        'merchant.receipts.confirm_button'.tr(),
+                                        style: const TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                               ),
                             ),
                           ],

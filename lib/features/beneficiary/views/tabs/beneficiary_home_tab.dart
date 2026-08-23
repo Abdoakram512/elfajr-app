@@ -65,10 +65,10 @@ class BeneficiaryHomeTab extends StatelessWidget {
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(color: AppColors.borderLight),
                       ),
-                      child: const Center(
+                      child: Center(
                         child: Text(
-                          'لا توجد بطاقة دعم نشطة حالياً',
-                          style: TextStyle(
+                          'dashboard.beneficiary.no_active_card'.tr(),
+                          style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                             color: AppColors.textSecondaryLight,
@@ -302,9 +302,9 @@ class BeneficiaryHomeTab extends StatelessWidget {
                       if (onSwitchToHistory != null)
                         TextButton(
                           onPressed: onSwitchToHistory,
-                          child: const Text(
-                            'عرض الكل',
-                            style: TextStyle(
+                          child: Text(
+                            'admin_mgmt.show_all'.tr(),
+                            style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
                               color: AppColors.primary,

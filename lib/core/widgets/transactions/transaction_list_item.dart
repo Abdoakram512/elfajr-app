@@ -70,19 +70,16 @@ class TransactionListItem extends StatelessWidget {
                           children: [
                             Text(
                               merchantStoreName ?? beneficiaryName,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.textPrimaryLight,
+                                height: 1.25,
                               ),
                             ),
                             if (merchantStoreName != null)
                               Text(
                                 '${'merchant.beneficiary_label'.tr()}: $beneficiaryName',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
                                   fontSize: 12,
                                   color: AppColors.textSecondaryLight,
@@ -131,8 +128,6 @@ class TransactionListItem extends StatelessWidget {
                       Flexible(
                         child: Text(
                           '${'digital_card.card_number'.tr()}: $cardId${city != null ? ' • $city' : ''}',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                             fontSize: 11,
                             color: AppColors.textMutedLight,

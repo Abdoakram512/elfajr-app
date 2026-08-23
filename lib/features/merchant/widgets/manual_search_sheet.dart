@@ -133,7 +133,7 @@ class _ManualSearchSheetState extends State<ManualSearchSheet> {
                         const Gap(8),
                         Text(
                           isSuccess
-                              ? 'إيصال الصرف الموثق'
+                              ? 'merchant.manual_search_ext.verified_receipt'.tr()
                               : (loadedCard == null
                                   ? 'merchant.search_manual_title'.tr()
                                   : 'merchant.beneficiary_details'.tr()),
@@ -149,7 +149,7 @@ class _ManualSearchSheetState extends State<ManualSearchSheet> {
                       TextButton.icon(
                         onPressed: _onReset,
                         icon: const Icon(Icons.refresh_rounded, size: 16),
-                        label: const Text('بحث آخر'),
+                        label: Text('merchant.manual_search_ext.another_search'.tr()),
                       ),
                   ],
                 ),
@@ -167,7 +167,7 @@ class _ManualSearchSheetState extends State<ManualSearchSheet> {
                 ] else if (loadedCard == null) ...[
                   // CASE 2: Search Form
                   Text(
-                    'إذا كان المستفيد لا يحمل هاتفاً ذكياً، أدخل رقم الهوية الوطنية (10 أرقام) أو رقم الكارت:',
+                    'merchant.manual_search_ext.search_guidance'.tr(),
                     style: const TextStyle(
                       fontSize: 13,
                       height: 1.4,
@@ -245,7 +245,7 @@ class _ManualSearchSheetState extends State<ManualSearchSheet> {
                                   ),
                                 ),
                                 Text(
-                                  'المتاح: ${loadedCard.foodBasketsQuota} سلة',
+                                  'merchant.manual_search_ext.available_baskets'.tr(namedArgs: {'count': '${loadedCard.foodBasketsQuota}'}),
                                   style: const TextStyle(
                                     fontSize: 11,
                                     color: AppColors.textSecondaryLight,

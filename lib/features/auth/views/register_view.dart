@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/service_locator.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/routes/route_names.dart';
+import '../../../../core/utils/arabic_normalizer.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../models/user_role.dart';
@@ -51,16 +52,16 @@ class _RegisterViewBodyState extends State<_RegisterViewBody> {
   final _cityController = TextEditingController();
   final _extraDetailsController = TextEditingController();
 
-  String _selectedNationality = 'مصرية';
+  String _selectedNationality = 'مصري';
   List<String> _nationalities = [
-    'مصرية',
-    'سورية',
-    'سودانية',
-    'يمنية',
-    'فلسطينية',
-    'أردنية',
-    'عراقية',
-    'لبنانية',
+    'مصري',
+    'سوري',
+    'سوداني',
+    'يمني',
+    'فلسطيني',
+    'أردني',
+    'عراقي',
+    'لبناني',
     'أخرى',
   ];
 
@@ -76,8 +77,21 @@ class _RegisterViewBodyState extends State<_RegisterViewBody> {
       if (snap.docs.isNotEmpty && mounted) {
         setState(() {
           final list = snap.docs
-              .map((d) => (d.data()['name'] ?? d.id).toString().trim())
+              .map((d) {
+                var name = (d.data()['name'] ?? d.id).toString().trim();
+                // Normalize feminine to masculine
+                if (name == 'مصرية') name = 'مصري';
+                if (name == 'سورية') name = 'سوري';
+                if (name == 'سودانية') name = 'سوداني';
+                if (name == 'يمنية') name = 'يمني';
+                if (name == 'فلسطينية') name = 'فلسطيني';
+                if (name == 'أردنية') name = 'أردني';
+                if (name == 'عراقية') name = 'عراقي';
+                if (name == 'لبنانية') name = 'لبناني';
+                return name;
+              })
               .where((name) => name.isNotEmpty)
+              .toSet()
               .toList();
           if (list.isNotEmpty) {
             _nationalities = list;
@@ -348,13 +362,13 @@ class _RegisterViewBodyState extends State<_RegisterViewBody> {
                       ),
                       const Gap(18),
 
-                      // Nationality Dropdown for Beneficiary
+                      // Nationality Selector for Beneficiary
                       if (_selectedRole == UserRole.beneficiary) ...[
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'الجنسية',
+                              'auth.nationality'.tr(),
                               style: const TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
@@ -362,49 +376,46 @@ class _RegisterViewBodyState extends State<_RegisterViewBody> {
                               ),
                             ),
                             const Gap(6),
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(color: AppColors.borderLight),
-                              ),
-                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
-                              child: DropdownButtonHideUnderline(
-                                child: DropdownButton<String>(
-                                  value: _selectedNationality,
-                                  isExpanded: true,
-                                  icon: const Icon(
-                                    Icons.keyboard_arrow_down_rounded,
-                                    color: AppColors.primary,
-                                  ),
-                                  items: _nationalities.map((nat) {
-                                    return DropdownMenuItem<String>(
-                                      value: nat,
-                                      child: Row(
-                                        children: [
-                                          const Icon(
-                                            Icons.public_rounded,
-                                            size: 18,
-                                            color: AppColors.textSecondaryLight,
-                                          ),
-                                          const Gap(10),
-                                          Text(
-                                            nat,
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                              color: AppColors.textPrimaryLight,
-                                            ),
-                                          ),
-                                        ],
+                            InkWell(
+                              onTap: () => _openNationalityBottomSheet(context),
+                              borderRadius: BorderRadius.circular(16),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(color: AppColors.borderLight),
+                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(6),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.primarySubtle,
+                                        borderRadius: BorderRadius.circular(10),
                                       ),
-                                    );
-                                  }).toList(),
-                                  onChanged: (val) {
-                                    if (val != null) {
-                                      setState(() => _selectedNationality = val);
-                                    }
-                                  },
+                                      child: const Icon(
+                                        Icons.public_rounded,
+                                        size: 18,
+                                        color: AppColors.primary,
+                                      ),
+                                    ),
+                                    const Gap(12),
+                                    Expanded(
+                                      child: Text(
+                                        _selectedNationality,
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.textPrimaryLight,
+                                        ),
+                                      ),
+                                    ),
+                                    const Icon(
+                                      Icons.keyboard_arrow_down_rounded,
+                                      color: AppColors.textSecondaryLight,
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
@@ -515,6 +526,188 @@ class _RegisterViewBodyState extends State<_RegisterViewBody> {
               ),
             ),
           ),
+        );
+      },
+    );
+  }
+
+  void _openNationalityBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (ctx) {
+        String searchQuery = '';
+        return StatefulBuilder(
+          builder: (modalCtx, setModalState) {
+            final filtered = _nationalities.where((n) {
+              if (searchQuery.trim().isEmpty) return true;
+              return ArabicNormalizer.matches(n, searchQuery);
+            }).toList();
+
+            return Container(
+              padding: EdgeInsets.only(
+                left: 20,
+                right: 20,
+                top: 16,
+                bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+              ),
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(ctx).size.height * 0.75,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Drag Handle
+                  Container(
+                    width: 44,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  const Gap(16),
+
+                  // Header
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: AppColors.primarySubtle,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Icon(
+                              Icons.public_rounded,
+                              color: AppColors.primary,
+                              size: 20,
+                            ),
+                          ),
+                          const Gap(10),
+                          Text(
+                            'auth.select_nationality'.tr(),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textPrimaryLight,
+                            ),
+                          ),
+                        ],
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        icon: const Icon(Icons.close_rounded, size: 20),
+                        style: IconButton.styleFrom(
+                          backgroundColor: Colors.grey.shade100,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Gap(14),
+
+                  // Search Field
+                  TextField(
+                    onChanged: (val) => setModalState(() => searchQuery = val),
+                    decoration: InputDecoration(
+                      hintText: 'auth.search_nationalities'.tr(),
+                      prefixIcon: const Icon(Icons.search_rounded, size: 20),
+                      filled: true,
+                      fillColor: AppColors.backgroundLight,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: BorderSide(color: Colors.grey.shade200),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: BorderSide(color: Colors.grey.shade200),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                      ),
+                    ),
+                  ),
+                  const Gap(14),
+
+                  // Nationalities List
+                  Expanded(
+                    child: ListView.separated(
+                      shrinkWrap: true,
+                      itemCount: filtered.length,
+                      separatorBuilder: (ctx, i) => const Gap(8),
+                      itemBuilder: (context, idx) {
+                        final nat = filtered[idx];
+                        final isSelected = nat == _selectedNationality;
+
+                        return InkWell(
+                          onTap: () {
+                            setState(() => _selectedNationality = nat);
+                            Navigator.pop(ctx);
+                          },
+                          borderRadius: BorderRadius.circular(14),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? AppColors.primary.withValues(alpha: 0.08)
+                                  : AppColors.backgroundLight,
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color: isSelected
+                                    ? AppColors.primary
+                                    : Colors.transparent,
+                                width: isSelected ? 1.5 : 1,
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.flag_rounded,
+                                  size: 18,
+                                  color: isSelected
+                                      ? AppColors.primary
+                                      : AppColors.textSecondaryLight,
+                                ),
+                                const Gap(12),
+                                Expanded(
+                                  child: Text(
+                                    nat,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: isSelected
+                                          ? FontWeight.bold
+                                          : FontWeight.w600,
+                                      color: isSelected
+                                          ? AppColors.primaryDark
+                                          : AppColors.textPrimaryLight,
+                                    ),
+                                  ),
+                                ),
+                                if (isSelected)
+                                  const Icon(
+                                    Icons.check_circle_rounded,
+                                    color: AppColors.primary,
+                                    size: 20,
+                                  ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
         );
       },
     );

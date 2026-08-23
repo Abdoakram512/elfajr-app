@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -29,10 +30,12 @@ class _FaqViewBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final lang = context.locale.languageCode;
+
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
-        title: const Text('الأسئلة الشائعة'),
+        title: Text('info_content.faq.title'.tr()),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
           onPressed: () => context.pop(),
@@ -45,140 +48,143 @@ class _FaqViewBody extends StatelessWidget {
           }
 
           final cubit = context.read<InfoCubit>();
-          final categories = state.availableFaqCategories;
-          final faqs = state.filteredFaqs;
+          final categories = state.availableFaqCategories(lang);
+          final faqs = state.filteredFaqs(lang);
 
           return AlfajrRefreshIndicator(
             onRefresh: () => context.read<InfoCubit>().loadAllInfo(),
             child: CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               slivers: [
-              // 1. Header description
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 14,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(18),
-                        decoration: BoxDecoration(
-                          color: AppColors.primarySubtle,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: AppColors.primary.withValues(alpha: 0.15),
-                          ),
-                        ),
-                        child: const Row(
-                          children: [
-                            Icon(
-                              Icons.help_outline_rounded,
-                              color: AppColors.primary,
-                              size: 28,
+                // 1. Header description
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 14,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(18),
+                          decoration: BoxDecoration(
+                            color: AppColors.primarySubtle,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: AppColors.primary.withValues(alpha: 0.15),
                             ),
-                            Gap(12),
-                            Expanded(
-                              child: Text(
-                                'إليك إجابات لأبرز الاستفسارات المتعلقة ببطاقات الدعم، ومنافذ الصرف، والحوكمة في منظومة الفجر.',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: AppColors.primaryDark,
-                                  height: 1.4,
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.help_outline_rounded,
+                                color: AppColors.primary,
+                                size: 28,
+                              ),
+                              const Gap(12),
+                              Expanded(
+                                child: Text(
+                                  'info_content.faq.intro'.tr(),
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    color: AppColors.primaryDark,
+                                    height: 1.4,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const Gap(16),
-
-                      // 2. Category Filter Chips
-                      if (categories.length > 1)
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: categories.map((cat) {
-                              final isSelected =
-                                  state.selectedFaqCategory == cat;
-                              return Padding(
-                                padding: const EdgeInsets.only(left: 8),
-                                child: ChoiceChip(
-                                  label: Text(cat),
-                                  selected: isSelected,
-                                  onSelected: (selected) {
-                                    if (selected) {
-                                      cubit.selectFaqCategory(cat);
-                                    }
-                                  },
-                                  selectedColor: AppColors.primary,
-                                  backgroundColor: Colors.white,
-                                  labelStyle: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: isSelected
-                                        ? FontWeight.bold
-                                        : FontWeight.normal,
-                                    color: isSelected
-                                        ? Colors.white
-                                        : AppColors.textSecondaryLight,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                    side: BorderSide(
-                                      color: isSelected
-                                          ? AppColors.primary
-                                          : AppColors.borderLight,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }).toList(),
+                            ],
                           ),
                         ),
-                    ],
-                  ),
-                ),
-              ),
+                        const Gap(16),
 
-              // 3. FAQ Items List
-              if (faqs.isEmpty)
-                const SliverFillRemaining(
-                  child: Center(
-                    child: Text(
-                      'لا توجد أسئلة شائعة في هذا التصنيف',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.textSecondaryLight,
-                      ),
+                        // 2. Category Filter Chips
+                        if (categories.length > 1)
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: categories.map((cat) {
+                                final isSelected =
+                                    state.selectedFaqCategory == cat ||
+                                    (cat == 'all' && (state.selectedFaqCategory == 'all' || state.selectedFaqCategory == 'الكل'));
+                                final labelText = cat == 'all' ? 'info_content.faq.all'.tr() : cat;
+
+                                return Padding(
+                                  padding: const EdgeInsets.only(left: 8),
+                                  child: ChoiceChip(
+                                    label: Text(labelText),
+                                    selected: isSelected,
+                                    onSelected: (selected) {
+                                      if (selected) {
+                                        cubit.selectFaqCategory(cat);
+                                      }
+                                    },
+                                    selectedColor: AppColors.primary,
+                                    backgroundColor: Colors.white,
+                                    labelStyle: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: isSelected
+                                          ? FontWeight.bold
+                                          : FontWeight.normal,
+                                      color: isSelected
+                                          ? Colors.white
+                                          : AppColors.textSecondaryLight,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                      side: BorderSide(
+                                        color: isSelected
+                                            ? AppColors.primary
+                                            : AppColors.borderLight,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                      ],
                     ),
                   ),
-                )
-              else
-                SliverPadding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 8,
-                  ),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate((context, index) {
-                      final item = faqs[index];
-                      return _buildFaqTile(item, index);
-                    }, childCount: faqs.length),
-                  ),
                 ),
 
-              const SliverToBoxAdapter(child: Gap(30)),
-            ],
-          ),
+                // 3. FAQ Items List
+                if (faqs.isEmpty)
+                  SliverFillRemaining(
+                    child: Center(
+                      child: Text(
+                        'info_content.faq.empty'.tr(),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: AppColors.textSecondaryLight,
+                        ),
+                      ),
+                    ),
+                  )
+                else
+                  SliverPadding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 8,
+                    ),
+                    sliver: SliverList(
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        final item = faqs[index];
+                        return _buildFaqTile(item, index, lang);
+                      }, childCount: faqs.length),
+                    ),
+                  ),
+
+                const SliverToBoxAdapter(child: Gap(30)),
+              ],
+            ),
           );
         },
       ),
     );
   }
 
-  Widget _buildFaqTile(FaqItemModel item, int index) {
+  Widget _buildFaqTile(FaqItemModel item, int index, String lang) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Container(
@@ -219,7 +225,7 @@ class _FaqViewBody extends StatelessWidget {
               ),
             ),
             title: Text(
-              item.question,
+              item.question(lang),
               style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
@@ -227,11 +233,11 @@ class _FaqViewBody extends StatelessWidget {
                 height: 1.4,
               ),
             ),
-            subtitle: item.category.isNotEmpty
+            subtitle: item.category(lang).isNotEmpty
                 ? Padding(
                     padding: const EdgeInsets.only(top: 4),
                     child: Text(
-                      item.category,
+                      item.category(lang),
                       style: const TextStyle(
                         fontSize: 11,
                         color: AppColors.accentDark,
@@ -244,7 +250,7 @@ class _FaqViewBody extends StatelessWidget {
               const Divider(height: 1, color: AppColors.borderLight),
               const Gap(12),
               Text(
-                item.answer,
+                item.answer(lang),
                 style: const TextStyle(
                   fontSize: 13,
                   color: AppColors.textSecondaryLight,

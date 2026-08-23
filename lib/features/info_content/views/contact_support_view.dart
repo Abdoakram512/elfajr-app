@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -29,10 +30,12 @@ class _ContactSupportViewBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final lang = context.locale.languageCode;
+
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
-        title: const Text('مركز الدعم والتواصل'),
+        title: Text('info_content.contact.title'.tr()),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
           onPressed: () => context.pop(),
@@ -47,8 +50,7 @@ class _ContactSupportViewBody extends StatelessWidget {
           final contact = state.contactSupport;
           if (contact == null) {
             return AppErrorStateWidget(
-              errorMessage:
-                  state.errorMessage ?? 'تعذر تحميل بيانات الدعم والمساعدة',
+              errorMessage: state.errorMessage ?? 'info_content.contact.failed_to_load'.tr(),
               onRetry: () => context.read<InfoCubit>().loadAllInfo(),
             );
           }
@@ -58,160 +60,167 @@ class _ContactSupportViewBody extends StatelessWidget {
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // 1. Hero Card
-                Container(
-                  padding: const EdgeInsets.all(22),
-                  decoration: BoxDecoration(
-                    gradient: AppColors.primaryGradient,
-                    borderRadius: BorderRadius.circular(26),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.3),
-                        blurRadius: 20,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      Container(
-                        width: 72,
-                        height: 72,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
-                          shape: BoxShape.circle,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // 1. Hero Card
+                  Container(
+                    padding: const EdgeInsets.all(22),
+                    decoration: BoxDecoration(
+                      gradient: AppColors.primaryGradient,
+                      borderRadius: BorderRadius.circular(26),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withValues(alpha: 0.3),
+                          blurRadius: 20,
+                          offset: const Offset(0, 8),
                         ),
-                        child: const Icon(
-                          Icons.headset_mic_rounded,
-                          size: 38,
-                          color: Colors.white,
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        Container(
+                          width: 72,
+                          height: 72,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.2),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.headset_mic_rounded,
+                            size: 38,
+                            color: Colors.white,
+                          ),
                         ),
-                      ),
-                      const Gap(14),
-                      const Text(
-                        'فريق الدعم الفني جاهز لمساعدتكم',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                        const Gap(14),
+                        Text(
+                          'info_content.contact.hero_title'.tr(),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
-                      ),
-                      const Gap(6),
-                      Text(
-                        'ساعات العمل: ${contact.workingHours}',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.white.withValues(alpha: 0.9),
-                        ),
-                      ),
-                    ],
-                  ),
-                ).animate().fadeIn(duration: 300.ms),
-
-                const Gap(20),
-
-                // 2. Direct Channels
-                _buildChannelCard(
-                  icon: Icons.phone_in_talk_rounded,
-                  title: 'الرقم الموحد المجاني',
-                  subtitle: 'متاح لكافة المستفيدين ومنافذ الصرف',
-                  value: contact.hotline,
-                  color: AppColors.primary,
-                ).animate().fadeIn(delay: 100.ms, duration: 300.ms),
-
-                const Gap(12),
-
-                _buildChannelCard(
-                  icon: Icons.support_agent_rounded,
-                  title: 'خط المساعدة والدعم الطارئ',
-                  subtitle: 'للتعامل مع حالات البلاغات العاجلة',
-                  value: contact.emergencyPhone,
-                  color: AppColors.accentDark,
-                ).animate().fadeIn(delay: 200.ms, duration: 300.ms),
-
-                const Gap(12),
-
-                _buildChannelCard(
-                  icon: Icons.email_rounded,
-                  title: 'بريد الدعم العام',
-                  subtitle: 'لاستقبال الاستفسارات والشكاوى',
-                  value: contact.supportEmail,
-                  color: AppColors.primaryDark,
-                ).animate().fadeIn(delay: 300.ms, duration: 300.ms),
-
-                const Gap(12),
-
-                _buildChannelCard(
-                  icon: Icons.store_mall_directory_rounded,
-                  title: 'بريد شركاء ومنافذ الصرف',
-                  subtitle: 'للتسويات والاعتماد والمسائل التقنية',
-                  value: contact.partnersEmail,
-                  color: AppColors.primary,
-                ).animate().fadeIn(delay: 400.ms, duration: 300.ms),
-
-                const Gap(16),
-
-                // 3. Location Address Card
-                Container(
-                  padding: const EdgeInsets.all(18),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: AppColors.borderLight),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: AppColors.primarySubtle,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(
-                          Icons.location_on_rounded,
-                          color: AppColors.primary,
-                          size: 22,
-                        ),
-                      ),
-                      const Gap(14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'المقر الرسمي',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimaryLight,
-                              ),
+                        if (contact.workingHours(lang).isNotEmpty) ...[
+                          const Gap(6),
+                          Text(
+                            'info_content.contact.working_hours_label'.tr(namedArgs: {'hours': contact.workingHours(lang)}),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.white.withValues(alpha: 0.9),
                             ),
-                            const Gap(4),
-                            Text(
-                              contact.address,
-                              style: const TextStyle(
-                                fontSize: 13,
-                                color: AppColors.textSecondaryLight,
-                                height: 1.4,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ).animate().fadeIn(delay: 500.ms, duration: 300.ms),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ).animate().fadeIn(duration: 300.ms),
 
-                const Gap(24),
-              ],
+                  const Gap(20),
+
+                  // 2. Direct Channels
+                  if (contact.hotline.isNotEmpty) ...[
+                    _buildChannelCard(
+                      icon: Icons.phone_in_talk_rounded,
+                      title: 'info_content.contact.hotline_title'.tr(),
+                      subtitle: 'info_content.contact.hotline_subtitle'.tr(),
+                      value: contact.hotline,
+                      color: AppColors.primary,
+                    ).animate().fadeIn(delay: 100.ms, duration: 300.ms),
+                    const Gap(12),
+                  ],
+
+                  if (contact.emergencyPhone.isNotEmpty) ...[
+                    _buildChannelCard(
+                      icon: Icons.support_agent_rounded,
+                      title: 'info_content.contact.emergency_title'.tr(),
+                      subtitle: 'info_content.contact.emergency_subtitle'.tr(),
+                      value: contact.emergencyPhone,
+                      color: AppColors.accentDark,
+                    ).animate().fadeIn(delay: 200.ms, duration: 300.ms),
+                    const Gap(12),
+                  ],
+
+                  if (contact.supportEmail.isNotEmpty) ...[
+                    _buildChannelCard(
+                      icon: Icons.email_rounded,
+                      title: 'info_content.contact.email_title'.tr(),
+                      subtitle: 'info_content.contact.email_subtitle'.tr(),
+                      value: contact.supportEmail,
+                      color: AppColors.primaryDark,
+                    ).animate().fadeIn(delay: 300.ms, duration: 300.ms),
+                    const Gap(12),
+                  ],
+
+                  if (contact.partnersEmail.isNotEmpty) ...[
+                    _buildChannelCard(
+                      icon: Icons.store_mall_directory_rounded,
+                      title: 'info_content.contact.partners_title'.tr(),
+                      subtitle: 'info_content.contact.partners_subtitle'.tr(),
+                      value: contact.partnersEmail,
+                      color: AppColors.primary,
+                    ).animate().fadeIn(delay: 400.ms, duration: 300.ms),
+                    const Gap(16),
+                  ],
+
+                  // 3. Location Address Card
+                  if (contact.address(lang).isNotEmpty)
+                    Container(
+                      padding: const EdgeInsets.all(18),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: AppColors.borderLight),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: AppColors.primarySubtle,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Icon(
+                              Icons.location_on_rounded,
+                              color: AppColors.primary,
+                              size: 22,
+                            ),
+                          ),
+                          const Gap(14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'info_content.contact.address_title'.tr(),
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.textPrimaryLight,
+                                  ),
+                                ),
+                                const Gap(4),
+                                Text(
+                                  contact.address(lang),
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    color: AppColors.textSecondaryLight,
+                                    height: 1.4,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ).animate().fadeIn(delay: 500.ms, duration: 300.ms),
+
+                  const Gap(24),
+                ],
+              ),
             ),
-          ),
           );
         },
       ),

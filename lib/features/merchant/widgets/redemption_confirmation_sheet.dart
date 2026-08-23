@@ -26,9 +26,16 @@ class RedemptionConfirmationSheet extends StatefulWidget {
 
 class _RedemptionConfirmationSheetState
     extends State<RedemptionConfirmationSheet> {
-  final _amountController = TextEditingController();
+  final _amountController = TextEditingController(text: '30');
   final _pinController = TextEditingController();
   final _notesController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Default to 30 EGP automatically as per organization policy
+    _amountController.text = '30';
+  }
 
   @override
   void dispose() {
@@ -39,7 +46,7 @@ class _RedemptionConfirmationSheetState
   }
 
   void _onConfirmRedemption() {
-    final amount = double.tryParse(_amountController.text.trim()) ?? 0.0;
+    final amount = double.tryParse(_amountController.text.trim()) ?? 30.0;
 
     context.read<RedemptionCubit>().confirmRedemption(
       amount: amount,
@@ -150,12 +157,41 @@ class _RedemptionConfirmationSheetState
                   // CASE 2: Beneficiary Card Summary
                   BeneficiaryCardSummary(card: widget.card),
 
-                  const Gap(16),
+                  // Automatic Fixed Amount Policy Banner
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFECFDF5),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: const Color(0xFFA7F3D0)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.verified_rounded,
+                          color: Color(0xFF059669),
+                          size: 18,
+                        ),
+                        const Gap(8),
+                        Expanded(
+                          child: Text(
+                            'merchant.fixed_amount_badge'.tr(),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF065F46),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Gap(10),
 
                   CustomTextField(
                     controller: _amountController,
                     label: 'merchant.enter_deduction_amount'.tr(),
-                    hint: '0.0',
+                    hint: '30.0',
                     prefixIcon: Icons.payments_outlined,
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   ),

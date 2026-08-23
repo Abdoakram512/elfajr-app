@@ -190,18 +190,18 @@ class AccountSuspendedView extends StatelessWidget {
                               borderRadius: BorderRadius.circular(14),
                             ),
                           ),
-                          child: const Center(
+                          child: Center(
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.refresh_rounded, size: 20),
-                                Gap(8),
+                                const Icon(Icons.refresh_rounded, size: 20),
+                                const Gap(8),
                                 Text(
-                                  'تحديث حالة الحساب الآن',
+                                  'account_status.refresh_status'.tr(),
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.bold,
                                     height: 1.1,

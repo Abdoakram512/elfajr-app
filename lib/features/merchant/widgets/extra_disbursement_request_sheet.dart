@@ -87,7 +87,7 @@ class _ExtraDisbursementRequestSheetState extends State<ExtraDisbursementRequest
       if (mounted) {
         setState(() => _isSubmitting = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('حدث خطأ أثناء إرسال الطلب: $e')),
+          SnackBar(content: Text('merchant.extra_disbursement_ext.error_sending'.tr(namedArgs: {'error': '$e'}))),
         );
       }
     }
@@ -205,10 +205,10 @@ class _ExtraDisbursementRequestSheetState extends State<ExtraDisbursementRequest
                         ),
                       ),
                       const Gap(4),
-                      const Text(
-                        'تم إرسال الطلب إلى لوحة تحكم الأدمن للمراجعة الفورية',
+                      Text(
+                        'merchant.extra_disbursement_ext.sent_to_admin'.tr(),
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 12, color: AppColors.textSecondaryLight),
+                        style: const TextStyle(fontSize: 12, color: AppColors.textSecondaryLight),
                       ),
                     ] else if (_currentStatus == 'approved') ...[
                       const Icon(Icons.check_circle_rounded, color: AppColors.primary, size: 36),
@@ -232,11 +232,11 @@ class _ExtraDisbursementRequestSheetState extends State<ExtraDisbursementRequest
                           minimumSize: const Size(double.infinity, 48),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         ),
-                        child: const Center(
+                        child: Center(
                           child: Text(
-                            'تأكيد تسليم المبلغ للمستفيد',
+                            'merchant.extra_disbursement_ext.confirm_handover'.tr(),
                             textAlign: TextAlign.center,
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
@@ -270,7 +270,7 @@ class _ExtraDisbursementRequestSheetState extends State<ExtraDisbursementRequest
                         prefixIcon: const Icon(Icons.credit_card),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
                       ),
-                      validator: (v) => (v == null || v.isEmpty) ? 'يرجى إدخال رقم الكارت' : null,
+                      validator: (v) => (v == null || v.isEmpty) ? 'merchant.extra_disbursement_ext.card_id_required'.tr() : null,
                     ),
                     const Gap(14),
 
@@ -282,7 +282,7 @@ class _ExtraDisbursementRequestSheetState extends State<ExtraDisbursementRequest
                         prefixIcon: const Icon(Icons.attach_money),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
                       ),
-                      validator: (v) => (v == null || v.isEmpty) ? 'يرجى إدخال المبلغ' : null,
+                      validator: (v) => (v == null || v.isEmpty) ? 'merchant.extra_disbursement_ext.amount_required'.tr() : null,
                     ),
                     const Gap(14),
 
@@ -295,7 +295,7 @@ class _ExtraDisbursementRequestSheetState extends State<ExtraDisbursementRequest
                         prefixIcon: const Icon(Icons.note_alt_outlined),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
                       ),
-                      validator: (v) => (v == null || v.isEmpty) ? 'يرجى ذكر سبب الصرف الاستثنائي' : null,
+                      validator: (v) => (v == null || v.isEmpty) ? 'merchant.extra_disbursement_ext.reason_required'.tr() : null,
                     ),
                     const Gap(20),
 
