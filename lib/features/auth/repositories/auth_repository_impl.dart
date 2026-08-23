@@ -21,26 +21,35 @@ class AuthRepositoryImpl implements AuthRepository {
 
     // 1. Try to fetch fresh live state from Firestore first
     try {
-      UserModel? remoteUser;
       if (cachedUser != null) {
-        remoteUser = await _remoteDataSource.getUserDataById(cachedUser.uid) ??
+        final remoteUser = await _remoteDataSource.getUserDataById(cachedUser.uid) ??
             await _remoteDataSource.getUserDataByEmail(cachedUser.email);
-      } else {
-        remoteUser = await _remoteDataSource.getCurrentUserData();
-      }
 
-      if (remoteUser != null) {
-        if (rememberMe) {
-          await _localDataSource.saveUserSession(remoteUser);
+        if (remoteUser != null) {
+          if (rememberMe) {
+            await _localDataSource.saveUserSession(remoteUser);
+          }
+          return remoteUser;
+        } else {
+          // User document was deleted from Firestore! Wipe local cache & session
+          await _localDataSource.clearUserSession();
+          await _remoteDataSource.signOut();
+          return null;
         }
-        return remoteUser;
+      } else {
+        final remoteUser = await _remoteDataSource.getCurrentUserData();
+        if (remoteUser != null) {
+          if (rememberMe) {
+            await _localDataSource.saveUserSession(remoteUser);
+          }
+          return remoteUser;
+        }
       }
     } catch (_) {
-      // If offline or fetch failed, fallback to local cache
-    }
-
-    if (rememberMe && cachedUser != null) {
-      return cachedUser;
+      // If network error / completely offline, allow cached session as fallback
+      if (rememberMe && cachedUser != null) {
+        return cachedUser;
+      }
     }
 
     return null;
@@ -50,17 +59,25 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<UserModel?> refreshCurrentUser() async {
     final cachedUser = _localDataSource.getCachedUserSession();
     try {
-      UserModel? remoteUser;
       if (cachedUser != null) {
-        remoteUser = await _remoteDataSource.getUserDataById(cachedUser.uid) ??
+        final remoteUser = await _remoteDataSource.getUserDataById(cachedUser.uid) ??
             await _remoteDataSource.getUserDataByEmail(cachedUser.email);
-      } else {
-        remoteUser = await _remoteDataSource.getCurrentUserData();
-      }
 
-      if (remoteUser != null) {
-        await _localDataSource.saveUserSession(remoteUser);
-        return remoteUser;
+        if (remoteUser != null) {
+          await _localDataSource.saveUserSession(remoteUser);
+          return remoteUser;
+        } else {
+          // User was deleted from Firestore!
+          await _localDataSource.clearUserSession();
+          await _remoteDataSource.signOut();
+          return null;
+        }
+      } else {
+        final remoteUser = await _remoteDataSource.getCurrentUserData();
+        if (remoteUser != null) {
+          await _localDataSource.saveUserSession(remoteUser);
+          return remoteUser;
+        }
       }
     } catch (_) {}
     return cachedUser;

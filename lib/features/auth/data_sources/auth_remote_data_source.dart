@@ -48,8 +48,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       }
 
       if (currentUser.email != null) {
-        return await getUserDataByEmail(currentUser.email!);
+        final emailUser = await getUserDataByEmail(currentUser.email!);
+        if (emailUser != null) {
+          return emailUser;
+        }
       }
+
+      // User document was deleted from Firestore -> sign out from Firebase Auth
+      await _firebaseAuth.signOut();
       return null;
     } catch (e) {
       throw AppException('Failed to fetch user data: $e');
@@ -137,13 +143,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           return UserModel.fromMap(doc.data()!, documentId: doc.id);
         }
 
-        return UserModel(
-          uid: user.uid,
-          email: user.email ?? normalizedEmail,
-          name: user.displayName ?? normalizedEmail.split('@').first,
-          role: UserRole.beneficiary,
-          createdAt: DateTime.now(),
-        );
+        // The user document was deleted by Admin from Firestore -> Reject and Sign Out!
+        await _firebaseAuth.signOut();
+        throw const AppException('auth_errors.user_not_found');
       }
 
       throw const AppException('auth_errors.user_not_found');
