@@ -24,6 +24,15 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
+  Future<void> refreshUser() async {
+    try {
+      final user = await _authRepository.refreshCurrentUser();
+      if (user != null) {
+        emit(Authenticated(user));
+      }
+    } catch (_) {}
+  }
+
   Future<void> login({
     required String email,
     required String password,

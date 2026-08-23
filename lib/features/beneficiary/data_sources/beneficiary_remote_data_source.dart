@@ -33,9 +33,21 @@ class BeneficiaryRemoteDataSourceImpl implements BeneficiaryRemoteDataSource {
     String? cardId,
   }) {
     if (cardId != null && cardId.isNotEmpty) {
-      return _firestore.collection('aid_cards').doc(cardId).snapshots().map((doc) {
+      return _firestore.collection('aid_cards').doc(cardId).snapshots().asyncMap((doc) async {
         if (doc.exists && doc.data() != null) {
           return AidCardModel.fromMap(doc.data()!, documentId: doc.id);
+        }
+        if (beneficiaryId.isNotEmpty) {
+          try {
+            final query = await _firestore
+                .collection('aid_cards')
+                .where('beneficiaryId', isEqualTo: beneficiaryId)
+                .limit(1)
+                .get();
+            if (query.docs.isNotEmpty) {
+              return AidCardModel.fromMap(query.docs.first.data(), documentId: query.docs.first.id);
+            }
+          } catch (_) {}
         }
         return null;
       });

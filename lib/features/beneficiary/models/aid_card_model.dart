@@ -151,7 +151,7 @@ class AidCardModel extends Equatable {
 
   factory AidCardModel.fromMap(Map<String, dynamic> map, {String? documentId}) {
     return AidCardModel(
-      cardId: documentId ?? (map['cardId'] as String? ?? 'QOUT-CARD-002'),
+      cardId: documentId ?? (map['cardId'] as String? ?? 'FAJR-CARD-002'),
       beneficiaryId: map['beneficiaryId'] as String? ?? '',
       beneficiaryName: map['beneficiaryName'] as String? ?? 'مستفيد',
       nationalId: map['nationalId'] as String? ?? '',

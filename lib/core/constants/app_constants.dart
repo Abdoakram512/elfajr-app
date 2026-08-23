@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 abstract class AppConstants {
   static const String appName = 'مؤسسة الفجر الخيرية';
   static const String appNameEn = 'Al-Fajr Foundation';
-  static const String appTagline = 'منظومة الإغاثة والمساعدات الرقمية المعتمدة';
+  static const String appTagline = 'منظومة المساعدات الرقمية المعتمدة';
   static const String appVersion = '1.0.0';
 
   static const String prefsKeyOnboardingCompleted = 'alfajr_onboarding_completed';

@@ -3,6 +3,7 @@ import '../models/user_role.dart';
 
 abstract class AuthRepository {
   Future<UserModel?> getCurrentUser();
+  Future<UserModel?> refreshCurrentUser();
   Future<UserModel> signIn({
     required String email,
     required String password,

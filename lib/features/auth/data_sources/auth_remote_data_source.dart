@@ -6,6 +6,8 @@ import '../models/user_role.dart';
 
 abstract class AuthRemoteDataSource {
   Future<UserModel?> getCurrentUserData();
+  Future<UserModel?> getUserDataById(String uid);
+  Future<UserModel?> getUserDataByEmail(String email);
   Future<UserModel> signInWithEmailAndPassword({
     required String email,
     required String password,
@@ -44,9 +46,46 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       if (doc.exists && doc.data() != null) {
         return UserModel.fromMap(doc.data()!, documentId: doc.id);
       }
+
+      if (currentUser.email != null) {
+        return await getUserDataByEmail(currentUser.email!);
+      }
       return null;
     } catch (e) {
       throw AppException('Failed to fetch user data: $e');
+    }
+  }
+
+  @override
+  Future<UserModel?> getUserDataById(String uid) async {
+    try {
+      final doc = await _firestore.collection('users').doc(uid).get();
+      if (doc.exists && doc.data() != null) {
+        return UserModel.fromMap(doc.data()!, documentId: doc.id);
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  @override
+  Future<UserModel?> getUserDataByEmail(String email) async {
+    try {
+      final normalized = email.trim().toLowerCase();
+      final query = await _firestore
+          .collection('users')
+          .where('email', isEqualTo: normalized)
+          .limit(1)
+          .get();
+
+      if (query.docs.isNotEmpty) {
+        final doc = query.docs.first;
+        return UserModel.fromMap(doc.data(), documentId: doc.id);
+      }
+      return null;
+    } catch (_) {
+      return null;
     }
   }
 
@@ -156,14 +195,69 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         }
       } catch (_) {}
 
+      String? activeCardId;
+      String? nationalId;
+
+      final bool isAutoApproved = role == UserRole.admin;
+
+      // Automatically provision an Aid Card if registering as a beneficiary (pending approval)
+      if (role == UserRole.beneficiary) {
+        final uniqueSuffix = '${DateTime.now().millisecondsSinceEpoch}'.substring(4);
+        activeCardId = 'FAJR-CARD-$uniqueSuffix';
+        nationalId = (phone != null && phone.trim().isNotEmpty) ? phone.trim() : 'N-$uniqueSuffix';
+
+        final aidCardData = {
+          'cardId': activeCardId,
+          'beneficiaryId': uid,
+          'beneficiaryName': name,
+          'nationalId': nationalId,
+          'familyCount': 4,
+          'totalBalance': 600.0,
+          'foodBasketsQuota': 2,
+          'status': isAutoApproved ? 'active' : 'pending',
+          'nationality': 'مصرية',
+          'residence': city ?? 'القاهرة',
+          'securityHash': uniqueSuffix,
+          'activatedAt': DateTime.now().toIso8601String(),
+          'expiresAt': DateTime.now().add(const Duration(days: 365)).toIso8601String(),
+          'fieldResearchStatus':
+              isAutoApproved ? 'معتمد ومسجل حديثاً' : 'قيد مراجعة الإدارة',
+          'totalBasketsDelivered': 0,
+          'extraNotes': 'حساب مستفيد رسمي مسجل من التطبيق',
+        };
+
+        try {
+          await _firestore
+              .collection('aid_cards')
+              .doc(activeCardId)
+              .set(aidCardData);
+        } catch (e) {
+          // If set fails with string date, try basic map
+          await _firestore.collection('aid_cards').doc(activeCardId).set({
+            'cardId': activeCardId,
+            'beneficiaryId': uid,
+            'beneficiaryName': name,
+            'nationalId': nationalId,
+            'familyCount': 4,
+            'totalBalance': 600.0,
+            'foodBasketsQuota': 2,
+            'status': isAutoApproved ? 'active' : 'pending',
+            'securityHash': uniqueSuffix,
+          });
+        }
+      }
+
       final userModel = UserModel(
         uid: uid,
         email: normalizedEmail,
         name: name,
         phone: phone,
         role: role,
-        city: city ?? 'الرياض',
-        isApproved: true,
+        city: city ?? 'القاهرة',
+        isApproved: isAutoApproved,
+        isActive: isAutoApproved,
+        activeCardId: activeCardId,
+        nationalId: nationalId,
         storeName: storeName,
         commercialReg: commercialReg,
         createdAt: DateTime.now(),

@@ -5,7 +5,7 @@ import 'package:gap/gap.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/utils/app_formatters.dart';
-import '../../../../core/widgets/feedback/qout_refresh_indicator.dart';
+import '../../../../core/widgets/feedback/alfajr_refresh_indicator.dart';
 import '../../view_models/beneficiary_cubit.dart';
 import '../../view_models/beneficiary_state.dart';
 
@@ -22,7 +22,7 @@ class BeneficiaryRedemptionsTab extends StatelessWidget {
             title: Text('dashboard.beneficiary.redemptions_history'.tr()),
             automaticallyImplyLeading: false,
           ),
-          body: QoutRefreshIndicator(
+          body: AlfajrRefreshIndicator(
             onRefresh: () => context.read<BeneficiaryCubit>().refreshData(),
             child: state.redemptions.isEmpty
                 ? ListView(

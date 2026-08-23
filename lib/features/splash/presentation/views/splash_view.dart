@@ -6,6 +6,7 @@ import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/service_locator.dart';
+import '../../../../core/constants/app_assets.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/routes/route_names.dart';
 import '../cubit/splash_cubit.dart';
@@ -75,46 +76,41 @@ class _SplashViewBody extends StatelessWidget {
 
                   // 1. Central Brand Emblem
                   Container(
-                        width: 96,
-                        height: 96,
+                        width: 104,
+                        height: 104,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF10875C), Color(0xFF074830)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
                           border: Border.all(
-                            color: AppColors.accentLight.withValues(alpha: 0.7),
-                            width: 1.8,
+                            color: AppColors.accentLight.withValues(alpha: 0.85),
+                            width: 2.2,
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.25),
-                              blurRadius: 24,
-                              offset: const Offset(0, 8),
+                              color: Colors.black.withValues(alpha: 0.35),
+                              blurRadius: 28,
+                              offset: const Offset(0, 10),
                             ),
                             BoxShadow(
-                              color: AppColors.primaryLight.withValues(
-                                alpha: 0.2,
+                              color: AppColors.goldGlow.withValues(
+                                alpha: 0.35,
                               ),
                               blurRadius: 36,
-                              spreadRadius: 2,
+                              spreadRadius: 3,
                             ),
                           ],
                         ),
-                        child: Center(
-                          child: Container(
-                            width: 58,
-                            height: 58,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white.withValues(alpha: 0.12),
-                            ),
-                            child: const Icon(
-                              Icons.volunteer_activism_rounded,
-                              size: 34,
-                              color: Colors.white,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(52),
+                          child: Image.asset(
+                            AppAssets.appIcon,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) => Container(
+                              color: AppColors.primary,
+                              child: const Icon(
+                                Icons.volunteer_activism_rounded,
+                                size: 48,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),

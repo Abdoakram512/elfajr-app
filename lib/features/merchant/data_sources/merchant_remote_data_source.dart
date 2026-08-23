@@ -59,7 +59,7 @@ class MerchantRemoteDataSourceImpl implements MerchantRemoteDataSource {
 
       return null;
     } catch (e) {
-      throw AppException('فشل في جلب بيانات كارت الإغاثة: $e');
+      throw AppException('فشل في جلب بيانات كارت المستفيد: $e');
     }
   }
 

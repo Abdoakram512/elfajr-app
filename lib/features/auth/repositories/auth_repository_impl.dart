@@ -17,18 +17,53 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<UserModel?> getCurrentUser() async {
     final rememberMe = _localDataSource.getRememberMe();
-    if (rememberMe) {
-      final cachedUser = _localDataSource.getCachedUserSession();
+    final cachedUser = _localDataSource.getCachedUserSession();
+
+    // 1. Try to fetch fresh live state from Firestore first
+    try {
+      UserModel? remoteUser;
       if (cachedUser != null) {
-        return cachedUser;
+        remoteUser = await _remoteDataSource.getUserDataById(cachedUser.uid) ??
+            await _remoteDataSource.getUserDataByEmail(cachedUser.email);
+      } else {
+        remoteUser = await _remoteDataSource.getCurrentUserData();
       }
+
+      if (remoteUser != null) {
+        if (rememberMe) {
+          await _localDataSource.saveUserSession(remoteUser);
+        }
+        return remoteUser;
+      }
+    } catch (_) {
+      // If offline or fetch failed, fallback to local cache
     }
 
-    final remoteUser = await _remoteDataSource.getCurrentUserData();
-    if (remoteUser != null && rememberMe) {
-      await _localDataSource.saveUserSession(remoteUser);
+    if (rememberMe && cachedUser != null) {
+      return cachedUser;
     }
-    return remoteUser;
+
+    return null;
+  }
+
+  @override
+  Future<UserModel?> refreshCurrentUser() async {
+    final cachedUser = _localDataSource.getCachedUserSession();
+    try {
+      UserModel? remoteUser;
+      if (cachedUser != null) {
+        remoteUser = await _remoteDataSource.getUserDataById(cachedUser.uid) ??
+            await _remoteDataSource.getUserDataByEmail(cachedUser.email);
+      } else {
+        remoteUser = await _remoteDataSource.getCurrentUserData();
+      }
+
+      if (remoteUser != null) {
+        await _localDataSource.saveUserSession(remoteUser);
+        return remoteUser;
+      }
+    } catch (_) {}
+    return cachedUser;
   }
 
   @override

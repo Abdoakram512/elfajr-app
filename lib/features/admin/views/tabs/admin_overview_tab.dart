@@ -7,7 +7,7 @@ import '../../../../app/service_locator.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/widgets/cards/stat_kpi_card.dart';
 import '../../../../core/widgets/feedback/app_empty_state_widget.dart';
-import '../../../../core/widgets/feedback/qout_refresh_indicator.dart';
+import '../../../../core/widgets/feedback/alfajr_refresh_indicator.dart';
 import '../../../../core/widgets/transactions/transaction_list_item.dart';
 import '../../view_models/admin_overview_cubit.dart';
 import '../../view_models/admin_overview_state.dart';
@@ -36,7 +36,7 @@ class _AdminOverviewTabBody extends StatelessWidget {
         return Scaffold(
           backgroundColor: AppColors.backgroundLight,
           body: SafeArea(
-            child: QoutRefreshIndicator(
+            child: AlfajrRefreshIndicator(
               onRefresh: () =>
                   context.read<AdminOverviewCubit>().refreshData(),
               child: SingleChildScrollView(

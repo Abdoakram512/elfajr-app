@@ -19,8 +19,8 @@ class LoginView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => getIt<AuthCubit>(),
+    return BlocProvider.value(
+      value: getIt<AuthCubit>(),
       child: const _LoginViewBody(),
     );
   }
@@ -94,7 +94,6 @@ class _LoginViewBodyState extends State<_LoginViewBody> {
               break;
           }
         } else if (state is AuthError) {
-
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message.tr()),
@@ -389,7 +388,7 @@ class _LoginViewBodyState extends State<_LoginViewBody> {
                           ),
                           const Gap(4),
                           GestureDetector(
-                            onTap: () => context.push(RouteNames.register),
+                            onTap: () => context.push(RouteNames.roleSelection),
                             child: Text(
                               'auth.register'.tr(),
                               style: const TextStyle(

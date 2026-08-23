@@ -8,7 +8,7 @@ import 'package:qout/core/constants/app_colors.dart';
 import '../../../../app/service_locator.dart';
 import '../../../../core/widgets/feedback/app_error_state_widget.dart';
 import '../../../../core/widgets/feedback/app_loading_indicator.dart';
-import '../../../../core/widgets/feedback/qout_refresh_indicator.dart';
+import '../../../../core/widgets/feedback/alfajr_refresh_indicator.dart';
 import '../view_models/info_cubit.dart';
 import '../view_models/info_state.dart';
 
@@ -53,7 +53,7 @@ class _ContactSupportViewBody extends StatelessWidget {
             );
           }
 
-          return QoutRefreshIndicator(
+          return AlfajrRefreshIndicator(
             onRefresh: () => context.read<InfoCubit>().loadAllInfo(),
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
@@ -128,7 +128,7 @@ class _ContactSupportViewBody extends StatelessWidget {
 
                 _buildChannelCard(
                   icon: Icons.support_agent_rounded,
-                  title: 'خط الطوارئ الإغاثي',
+                  title: 'خط المساعدة والدعم الطارئ',
                   subtitle: 'للتعامل مع حالات البلاغات العاجلة',
                   value: contact.emergencyPhone,
                   color: AppColors.accentDark,

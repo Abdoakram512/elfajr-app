@@ -7,7 +7,7 @@ import 'package:qout/core/constants/app_colors.dart';
 
 import '../../../../app/service_locator.dart';
 import '../../../../core/widgets/feedback/app_loading_indicator.dart';
-import '../../../../core/widgets/feedback/qout_refresh_indicator.dart';
+import '../../../../core/widgets/feedback/alfajr_refresh_indicator.dart';
 import '../models/faq_model.dart';
 import '../view_models/info_cubit.dart';
 import '../view_models/info_state.dart';
@@ -48,7 +48,7 @@ class _FaqViewBody extends StatelessWidget {
           final categories = state.availableFaqCategories;
           final faqs = state.filteredFaqs;
 
-          return QoutRefreshIndicator(
+          return AlfajrRefreshIndicator(
             onRefresh: () => context.read<InfoCubit>().loadAllInfo(),
             child: CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(),

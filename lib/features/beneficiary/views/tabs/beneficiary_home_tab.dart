@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:qout/core/constants/app_colors.dart';
-import 'package:qout/core/widgets/feedback/qout_refresh_indicator.dart';
+import 'package:qout/core/widgets/feedback/alfajr_refresh_indicator.dart';
 import 'package:qout/features/beneficiary/view_models/beneficiary_cubit.dart';
 import 'package:qout/features/beneficiary/view_models/beneficiary_state.dart';
 import 'package:qout/features/beneficiary/widgets/digital_aid_card_widget.dart';
@@ -11,10 +11,7 @@ import 'package:qout/features/beneficiary/widgets/digital_aid_card_widget.dart';
 class BeneficiaryHomeTab extends StatelessWidget {
   final VoidCallback? onSwitchToHistory;
 
-  const BeneficiaryHomeTab({
-    super.key,
-    this.onSwitchToHistory,
-  });
+  const BeneficiaryHomeTab({super.key, this.onSwitchToHistory});
 
   @override
   Widget build(BuildContext context) {
@@ -24,13 +21,13 @@ class BeneficiaryHomeTab extends StatelessWidget {
       builder: (context, state) {
         final card = state.activeCard;
         final redemptions = state.redemptions;
-        
+
         // Calculate monthly metrics
         final now = DateTime.now();
         final thisMonthRedemptions = redemptions.where((r) {
           return r.timestamp.year == now.year && r.timestamp.month == now.month;
         }).toList();
-        
+
         final thisMonthSpent = thisMonthRedemptions.fold<double>(
           0.0,
           (sum, r) => sum + r.amountDeducted,
@@ -45,7 +42,7 @@ class BeneficiaryHomeTab extends StatelessWidget {
             title: Text('app_name'.tr()),
             automaticallyImplyLeading: false,
           ),
-          body: QoutRefreshIndicator(
+          body: AlfajrRefreshIndicator(
             onRefresh: () => context.read<BeneficiaryCubit>().refreshData(),
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
@@ -67,7 +64,7 @@ class BeneficiaryHomeTab extends StatelessWidget {
                       ),
                       child: const Center(
                         child: Text(
-                          'لا توجد بطاقة إغاثية نشطة حالياً',
+                          'لا توجد بطاقة دعم نشطة حالياً',
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
@@ -85,15 +82,14 @@ class BeneficiaryHomeTab extends StatelessWidget {
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
-                        colors: [
-                          AppColors.primarySubtle,
-                          Colors.white,
-                        ],
+                        colors: [AppColors.primarySubtle, Colors.white],
                         begin: Alignment.topRight,
                         end: Alignment.bottomLeft,
                       ),
                       borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+                      border: Border.all(
+                        color: AppColors.primary.withValues(alpha: 0.2),
+                      ),
                       boxShadow: [
                         BoxShadow(
                           color: AppColors.primary.withValues(alpha: 0.04),
@@ -108,37 +104,52 @@ class BeneficiaryHomeTab extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primary,
-                                    borderRadius: BorderRadius.circular(12),
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.primary,
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: const Icon(
+                                      Icons.account_balance_wallet_outlined,
+                                      color: Colors.white,
+                                      size: 18,
+                                    ),
                                   ),
-                                  child: const Icon(
-                                    Icons.account_balance_wallet_outlined,
-                                    color: Colors.white,
-                                    size: 18,
+                                  const Gap(10),
+                                  Expanded(
+                                    child: Text(
+                                      'dashboard.beneficiary.monthly_statement'
+                                          .tr(),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w900,
+                                        color: AppColors.textPrimaryLight,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                                const Gap(10),
-                                Text(
-                                  'dashboard.beneficiary.monthly_statement'.tr(),
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w900,
-                                    color: AppColors.textPrimaryLight,
-                                  ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
+                            const Gap(8),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
                               decoration: BoxDecoration(
                                 color: AppColors.primarySubtle,
                                 borderRadius: BorderRadius.circular(20),
-                                border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                                border: Border.all(
+                                  color: AppColors.primary.withValues(
+                                    alpha: 0.3,
+                                  ),
+                                ),
                               ),
                               child: Text(
                                 DateFormat('MMMM yyyy', 'ar').format(now),
@@ -163,13 +174,16 @@ class BeneficiaryHomeTab extends StatelessWidget {
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(color: AppColors.borderLight),
+                                  border: Border.all(
+                                    color: AppColors.borderLight,
+                                  ),
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'dashboard.beneficiary.monthly_initial'.tr(),
+                                      'dashboard.beneficiary.monthly_initial'
+                                          .tr(),
                                       style: const TextStyle(
                                         fontSize: 11,
                                         fontWeight: FontWeight.bold,
@@ -198,13 +212,16 @@ class BeneficiaryHomeTab extends StatelessWidget {
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(color: AppColors.borderLight),
+                                  border: Border.all(
+                                    color: AppColors.borderLight,
+                                  ),
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'dashboard.beneficiary.monthly_spent'.tr(),
+                                      'dashboard.beneficiary.monthly_spent'
+                                          .tr(),
                                       style: const TextStyle(
                                         fontSize: 11,
                                         fontWeight: FontWeight.bold,
@@ -231,7 +248,10 @@ class BeneficiaryHomeTab extends StatelessWidget {
                         // Current Remaining Badge
                         Container(
                           width: double.infinity,
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 10,
+                          ),
                           decoration: BoxDecoration(
                             color: AppColors.primarySubtle,
                             borderRadius: BorderRadius.circular(14),
@@ -330,44 +350,56 @@ class BeneficiaryHomeTab extends StatelessWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.primarySubtle,
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: const Icon(
-                                      Icons.storefront_rounded,
-                                      color: AppColors.primary,
-                                      size: 20,
-                                    ),
-                                  ),
-                                  const Gap(12),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        r.merchantStoreName,
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: AppColors.textPrimaryLight,
-                                        ),
+                              Expanded(
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.primarySubtle,
+                                        borderRadius: BorderRadius.circular(12),
                                       ),
-                                      const Gap(2),
-                                      Text(
-                                        DateFormat('dd MMM yyyy, hh:mm a', 'ar').format(r.timestamp),
-                                        style: const TextStyle(
-                                          fontSize: 11,
-                                          color: AppColors.textSecondaryLight,
-                                        ),
+                                      child: const Icon(
+                                        Icons.storefront_rounded,
+                                        color: AppColors.primary,
+                                        size: 20,
                                       ),
-                                    ],
-                                  ),
-                                ],
+                                    ),
+                                    const Gap(12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            r.merchantStoreName,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.textPrimaryLight,
+                                            ),
+                                          ),
+                                          const Gap(2),
+                                          Text(
+                                            DateFormat(
+                                              'dd MMM yyyy, hh:mm a',
+                                              'ar',
+                                            ).format(r.timestamp),
+                                            style: const TextStyle(
+                                              fontSize: 11,
+                                              color:
+                                                  AppColors.textSecondaryLight,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
+                              const Gap(8),
                               Text(
                                 '-${currencyFormatter.format(r.amountDeducted)} ${'common.currency'.tr()}',
                                 style: const TextStyle(

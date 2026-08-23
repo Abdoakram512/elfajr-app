@@ -8,7 +8,7 @@ import 'package:qout/core/constants/app_colors.dart';
 import '../../../../app/service_locator.dart';
 import '../../../../core/widgets/feedback/app_error_state_widget.dart';
 import '../../../../core/widgets/feedback/app_loading_indicator.dart';
-import '../../../../core/widgets/feedback/qout_refresh_indicator.dart';
+import '../../../../core/widgets/feedback/alfajr_refresh_indicator.dart';
 import '../view_models/info_cubit.dart';
 import '../view_models/info_state.dart';
 
@@ -99,7 +99,7 @@ class _TermsPrivacyViewBody extends StatelessWidget {
     required List<String> items,
     required String lastUpdated,
   }) {
-    return QoutRefreshIndicator(
+    return AlfajrRefreshIndicator(
       onRefresh: () => context.read<InfoCubit>().loadAllInfo(),
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),

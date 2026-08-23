@@ -228,9 +228,17 @@ class _ExtraDisbursementRequestSheetState extends State<ExtraDisbursementRequest
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
                           foregroundColor: Colors.white,
+                          padding: EdgeInsets.zero,
+                          minimumSize: const Size(double.infinity, 48),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         ),
-                        child: const Text('تأكيد تسليم المبلغ للمستفيد'),
+                        child: const Center(
+                          child: Text(
+                            'تأكيد تسليم المبلغ للمستفيد',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
                       ),
                     ] else if (_currentStatus == 'rejected') ...[
                       const Icon(Icons.cancel_rounded, color: AppColors.error, size: 36),
@@ -299,14 +307,31 @@ class _ExtraDisbursementRequestSheetState extends State<ExtraDisbursementRequest
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
                           foregroundColor: Colors.white,
+                          padding: EdgeInsets.zero,
+                          elevation: 2,
+                          shadowColor: AppColors.primary.withValues(alpha: 0.3),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         ),
-                        child: _isSubmitting
-                            ? const CircularProgressIndicator(color: Colors.white)
-                            : Text(
-                                'extra_disbursement.submit'.tr(),
-                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                              ),
+                        child: Center(
+                          child: _isSubmitting
+                              ? const SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.5,
+                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                  ),
+                                )
+                              : Text(
+                                  'extra_disbursement.submit'.tr(),
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                        ),
                       ),
                     ),
                   ],

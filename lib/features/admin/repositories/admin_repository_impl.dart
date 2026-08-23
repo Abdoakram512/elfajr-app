@@ -1,4 +1,5 @@
 import '../data_sources/admin_remote_data_source.dart';
+import '../models/admin_beneficiary_item.dart';
 import '../models/admin_merchant_item.dart';
 import '../models/admin_redemption_item.dart';
 import 'admin_repository.dart';
@@ -29,4 +30,23 @@ class AdminRepositoryImpl implements AdminRepository {
   Future<void> updateMerchantStatus(String merchantId, bool isActive) async {
     await _remoteDataSource.setMerchantActiveStatus(merchantId, isActive);
   }
+
+  @override
+  Stream<List<AdminBeneficiaryItem>> getBeneficiariesStream() {
+    return _remoteDataSource.getRegisteredBeneficiariesStream();
+  }
+
+  @override
+  Future<void> updateBeneficiaryStatus(
+    String beneficiaryId,
+    bool isActive,
+    String? cardId,
+  ) async {
+    await _remoteDataSource.setBeneficiaryActiveStatus(
+      beneficiaryId,
+      isActive,
+      cardId,
+    );
+  }
 }
+

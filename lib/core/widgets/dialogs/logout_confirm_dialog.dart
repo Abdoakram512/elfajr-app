@@ -10,11 +10,7 @@ class LogoutConfirmDialog extends StatelessWidget {
   final String? title;
   final String? message;
 
-  const LogoutConfirmDialog({
-    super.key,
-    this.title,
-    this.message,
-  });
+  const LogoutConfirmDialog({super.key, this.title, this.message});
 
   static Future<void> show(BuildContext context, {String? message}) {
     return showDialog(
@@ -27,12 +23,9 @@ class LogoutConfirmDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      title: Row(
-        children: [
-          const Icon(Icons.logout_rounded, color: AppColors.error),
-          const SizedBox(width: 8),
-          Text(title ?? 'profile.logout_confirm_title'.tr()),
-        ],
+      title: Text(
+        title ?? 'profile.logout_confirm_title'.tr(),
+        style: const TextStyle(fontWeight: FontWeight.bold),
       ),
       content: Text(
         message ?? 'profile.logout_confirm_desc'.tr(),

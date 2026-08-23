@@ -8,7 +8,7 @@ import 'package:qout/core/constants/app_colors.dart';
 import '../../../../app/service_locator.dart';
 import '../../../../core/widgets/feedback/app_error_state_widget.dart';
 import '../../../../core/widgets/feedback/app_loading_indicator.dart';
-import '../../../../core/widgets/feedback/qout_refresh_indicator.dart';
+import '../../../../core/widgets/feedback/alfajr_refresh_indicator.dart';
 import '../view_models/info_cubit.dart';
 import '../view_models/info_state.dart';
 
@@ -52,7 +52,7 @@ class _AboutUsViewBody extends StatelessWidget {
             );
           }
 
-          return QoutRefreshIndicator(
+          return AlfajrRefreshIndicator(
             onRefresh: () => context.read<InfoCubit>().loadAllInfo(),
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
@@ -77,24 +77,27 @@ class _AboutUsViewBody extends StatelessWidget {
                   child: Column(
                     children: [
                       Container(
-                        width: 84,
-                        height: 84,
+                        width: 88,
+                        height: 88,
                         decoration: BoxDecoration(
-                          color: Colors.white,
                           shape: BoxShape.circle,
-                          border: Border.all(color: AppColors.accent, width: 3),
+                          border: Border.all(
+                            color: AppColors.accentLight.withValues(alpha: 0.9),
+                            width: 2.5,
+                          ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.15),
-                              blurRadius: 10,
+                              color: Colors.black.withValues(alpha: 0.25),
+                              blurRadius: 16,
+                              offset: const Offset(0, 4),
                             ),
                           ],
                         ),
-                        child: Center(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(44),
                           child: Image.asset(
                             'assets/images/app_logo.png',
-                            width: 52,
-                            height: 52,
+                            fit: BoxFit.cover,
                             errorBuilder: (ctx, err, stack) => const Icon(
                               Icons.spa_rounded,
                               size: 44,

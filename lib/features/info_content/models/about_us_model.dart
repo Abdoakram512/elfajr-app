@@ -36,8 +36,8 @@ class AboutUsModel extends Equatable {
     return AboutUsModel(
       title: map['title'] as String? ?? 'مؤسسة الفجر الخيرية (Al-Fajr)',
       tagline: map['tagline'] as String? ??
-          'المنظومة الموحدة لإدارة وتوزيع الدعم الغذائي والإغاثي الذكي المعتمد',
-      description: map['description'] as String? ?? 'منظومة إغاثية رقمية متكاملة لرقمنة توزيع الإعانات والمساعدات الغذائية للمستحقين.',
+          'المنظومة الموحدة لإدارة وتوزيع الدعم الغذائي الذكي المعتمد',
+      description: map['description'] as String? ?? 'منظومة رقمية متكاملة لرقمنة توزيع الإعانات والمساعدات الغذائية للمستحقين.',
       vision: map['vision'] as String? ?? 'الريادة والشفافية التامة في العمل الإنساني والوصول الموثق لكافة الأسر المتعففة.',
       mission: map['mission'] as String? ?? 'توفير منظومة ذكية تعتمد البطاقات المشفرة لضمان كرامة المستفيد وسرعة الصرف.',
       values: parseValues(map['values']).isNotEmpty

@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/widgets/feedback/app_empty_state_widget.dart';
-import '../../../../core/widgets/feedback/qout_refresh_indicator.dart';
+import '../../../../core/widgets/feedback/alfajr_refresh_indicator.dart';
 import '../../../../core/widgets/transactions/transaction_list_item.dart';
 import '../../view_models/merchant_dashboard_cubit.dart';
 import '../../view_models/merchant_dashboard_state.dart';
@@ -22,7 +22,7 @@ class MerchantHistoryTab extends StatelessWidget {
             title: Text('merchant.recent_transactions'.tr()),
             automaticallyImplyLeading: false,
           ),
-          body: QoutRefreshIndicator(
+          body: AlfajrRefreshIndicator(
             onRefresh: () =>
                 context.read<MerchantDashboardCubit>().refreshData(),
             child: state.recentTransactions.isEmpty

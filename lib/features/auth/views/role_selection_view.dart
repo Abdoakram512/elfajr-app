@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/constants/app_assets.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/routes/route_names.dart';
@@ -49,22 +50,39 @@ class _RoleSelectionViewState extends State<RoleSelectionView> {
                           Row(
                             children: [
                               Container(
-                                padding: const EdgeInsets.all(8),
+                                width: 34,
+                                height: 34,
                                 decoration: BoxDecoration(
-                                  color: AppColors.primary.withValues(alpha: 0.1),
                                   shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: AppColors.accentLight,
+                                    width: 1.2,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppColors.primary.withValues(alpha: 0.15),
+                                      blurRadius: 8,
+                                    ),
+                                  ],
                                 ),
-                                child: const Icon(
-                                  Icons.volunteer_activism_rounded,
-                                  color: AppColors.primary,
-                                  size: 22,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(17),
+                                  child: Image.asset(
+                                    AppAssets.appIcon,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) => const Icon(
+                                      Icons.volunteer_activism_rounded,
+                                      color: AppColors.primary,
+                                      size: 20,
+                                    ),
+                                  ),
                                 ),
                               ),
                               const Gap(10),
                               Text(
                                 'app_name'.tr(),
                                 style: const TextStyle(
-                                  fontSize: 20,
+                                  fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                   color: AppColors.primary,
                                 ),
@@ -121,13 +139,13 @@ class _RoleSelectionViewState extends State<RoleSelectionView> {
 
                       // Title & Subtitle
                       Text(
-                        'auth.choose_role'.tr(),
-                        style: const TextStyle(
-                          fontSize: 26,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimaryLight,
-                        ),
-                      )
+                            'auth.choose_role'.tr(),
+                            style: const TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textPrimaryLight,
+                            ),
+                          )
                           .animate()
                           .fadeIn(duration: 400.ms)
                           .slideY(begin: 0.2, end: 0, duration: 400.ms),
@@ -135,12 +153,12 @@ class _RoleSelectionViewState extends State<RoleSelectionView> {
                       const Gap(8),
 
                       Text(
-                        'auth.role_selection_subtitle'.tr(),
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: AppColors.textSecondaryLight,
-                        ),
-                      )
+                            'auth.role_selection_subtitle'.tr(),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: AppColors.textSecondaryLight,
+                            ),
+                          )
                           .animate()
                           .fadeIn(delay: 100.ms, duration: 400.ms)
                           .slideY(begin: 0.2, end: 0, duration: 400.ms),
@@ -149,15 +167,16 @@ class _RoleSelectionViewState extends State<RoleSelectionView> {
 
                       // 1. Beneficiary Card
                       RoleCard(
-                        role: UserRole.beneficiary,
-                        title: 'auth.role_beneficiary'.tr(),
-                        description: 'auth.role_beneficiary_desc'.tr(),
-                        icon: Icons.qr_code_rounded,
-                        themeColor: AppColors.primary,
-                        isSelected: _selectedRole == UserRole.beneficiary,
-                        onSelect: () =>
-                            setState(() => _selectedRole = UserRole.beneficiary),
-                      )
+                            role: UserRole.beneficiary,
+                            title: 'auth.role_beneficiary'.tr(),
+                            description: 'auth.role_beneficiary_desc'.tr(),
+                            icon: Icons.qr_code_rounded,
+                            themeColor: AppColors.primary,
+                            isSelected: _selectedRole == UserRole.beneficiary,
+                            onSelect: () => setState(
+                              () => _selectedRole = UserRole.beneficiary,
+                            ),
+                          )
                           .animate()
                           .fadeIn(delay: 200.ms, duration: 400.ms)
                           .slideX(begin: 0.1, end: 0),
@@ -166,15 +185,16 @@ class _RoleSelectionViewState extends State<RoleSelectionView> {
 
                       // 2. Merchant / Aid Dispenser Card
                       RoleCard(
-                        role: UserRole.merchant,
-                        title: 'auth.role_merchant'.tr(),
-                        description: 'auth.role_merchant_desc'.tr(),
-                        icon: Icons.storefront_rounded,
-                        themeColor: const Color(0xFFD97706),
-                        isSelected: _selectedRole == UserRole.merchant,
-                        onSelect: () =>
-                            setState(() => _selectedRole = UserRole.merchant),
-                      )
+                            role: UserRole.merchant,
+                            title: 'auth.role_merchant'.tr(),
+                            description: 'auth.role_merchant_desc'.tr(),
+                            icon: Icons.storefront_rounded,
+                            themeColor: const Color(0xFFD97706),
+                            isSelected: _selectedRole == UserRole.merchant,
+                            onSelect: () => setState(
+                              () => _selectedRole = UserRole.merchant,
+                            ),
+                          )
                           .animate()
                           .fadeIn(delay: 300.ms, duration: 400.ms)
                           .slideX(begin: 0.1, end: 0),

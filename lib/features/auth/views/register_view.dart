@@ -17,15 +17,12 @@ import '../view_models/auth_state.dart';
 class RegisterView extends StatelessWidget {
   final UserRole initialRole;
 
-  const RegisterView({
-    super.key,
-    this.initialRole = UserRole.beneficiary,
-  });
+  const RegisterView({super.key, this.initialRole = UserRole.beneficiary});
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => getIt<AuthCubit>(),
+    return BlocProvider.value(
+      value: getIt<AuthCubit>(),
       child: _RegisterViewBody(initialRole: initialRole),
     );
   }
@@ -34,9 +31,7 @@ class RegisterView extends StatelessWidget {
 class _RegisterViewBody extends StatefulWidget {
   final UserRole initialRole;
 
-  const _RegisterViewBody({
-    required this.initialRole,
-  });
+  const _RegisterViewBody({required this.initialRole});
 
   @override
   State<_RegisterViewBody> createState() => _RegisterViewBodyState();
@@ -76,15 +71,15 @@ class _RegisterViewBodyState extends State<_RegisterViewBody> {
     if (_formKey.currentState?.validate() ?? false) {
       final isMerchant = _selectedRole == UserRole.merchant;
       context.read<AuthCubit>().register(
-            name: _nameController.text.trim(),
-            email: _emailController.text.trim(),
-            password: _passwordController.text,
-            role: _selectedRole,
-            phone: _phoneController.text.trim(),
-            city: _cityController.text.trim(),
-            storeName: isMerchant ? _nameController.text.trim() : null,
-            commercialReg: isMerchant ? _extraDetailsController.text.trim() : null,
-          );
+        name: _nameController.text.trim(),
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+        role: _selectedRole,
+        phone: _phoneController.text.trim(),
+        city: _cityController.text.trim(),
+        storeName: isMerchant ? _nameController.text.trim() : null,
+        commercialReg: isMerchant ? _extraDetailsController.text.trim() : null,
+      );
     }
   }
 
@@ -93,9 +88,16 @@ class _RegisterViewBodyState extends State<_RegisterViewBody> {
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state is Authenticated) {
+          if (!state.user.isActive || !state.user.isApproved) {
+            context.go(RouteNames.accountSuspended, extra: state.user);
+            return;
+          }
+
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('auth.register_success'.tr(args: [state.user.name])),
+              content: Text(
+                'auth.register_success'.tr(args: [state.user.name]),
+              ),
               backgroundColor: AppColors.success,
             ),
           );
@@ -132,7 +134,13 @@ class _RegisterViewBodyState extends State<_RegisterViewBody> {
             title: Text('auth.register'.tr()),
             leading: IconButton(
               icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
-              onPressed: () => context.pop(),
+              onPressed: () {
+                if (context.canPop()) {
+                  context.pop();
+                } else {
+                  context.go(RouteNames.roleSelection);
+                }
+              },
             ),
           ),
           body: SafeArea(
@@ -162,10 +170,10 @@ class _RegisterViewBodyState extends State<_RegisterViewBody> {
                             _selectedRole == UserRole.donor
                                 ? Icons.favorite_rounded
                                 : _selectedRole == UserRole.beneficiary
-                                    ? Icons.shield_rounded
-                                    : _selectedRole == UserRole.merchant
-                                        ? Icons.storefront_rounded
-                                        : Icons.groups_rounded,
+                                ? Icons.shield_rounded
+                                : _selectedRole == UserRole.merchant
+                                ? Icons.storefront_rounded
+                                : Icons.groups_rounded,
                             color: AppColors.primary,
                             size: 20,
                           ),
@@ -184,9 +192,11 @@ class _RegisterViewBodyState extends State<_RegisterViewBody> {
                           ),
                           const Gap(8),
                           TextButton(
-                            onPressed: () => context.pop(),
+                            onPressed: () => context.go(RouteNames.roleSelection),
                             style: TextButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                              ),
                               minimumSize: Size.zero,
                               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                             ),
@@ -280,18 +290,18 @@ class _RegisterViewBodyState extends State<_RegisterViewBody> {
                         label: _selectedRole == UserRole.merchant
                             ? 'auth.store_name_label'.tr()
                             : (_selectedRole == UserRole.volunteer
-                                ? 'auth.skills_label'.tr()
-                                : 'auth.aid_type_label'.tr()),
+                                  ? 'auth.skills_label'.tr()
+                                  : 'auth.aid_type_label'.tr()),
                         hint: _selectedRole == UserRole.merchant
                             ? 'auth.store_name_hint'.tr()
                             : (_selectedRole == UserRole.volunteer
-                                ? 'auth.skills_hint'.tr()
-                                : 'auth.aid_type_hint'.tr()),
+                                  ? 'auth.skills_hint'.tr()
+                                  : 'auth.aid_type_hint'.tr()),
                         prefixIcon: _selectedRole == UserRole.merchant
                             ? Icons.storefront_rounded
                             : (_selectedRole == UserRole.volunteer
-                                ? Icons.handyman_outlined
-                                : Icons.category_outlined),
+                                  ? Icons.handyman_outlined
+                                  : Icons.category_outlined),
                         maxLines: 1,
                       ),
                       const Gap(18),

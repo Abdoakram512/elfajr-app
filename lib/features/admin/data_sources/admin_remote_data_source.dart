@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:qout/features/admin/models/admin_beneficiary_item.dart';
 import '../models/admin_merchant_item.dart';
 import '../models/admin_redemption_item.dart';
 
@@ -7,6 +8,12 @@ abstract class AdminRemoteDataSource {
   Stream<List<AdminRedemptionItem>> getLiveRedemptionsStream();
   Stream<List<AdminMerchantItem>> getAuthorizedMerchantsStream();
   Future<void> setMerchantActiveStatus(String merchantId, bool isActive);
+  Stream<List<AdminBeneficiaryItem>> getRegisteredBeneficiariesStream();
+  Future<void> setBeneficiaryActiveStatus(
+    String beneficiaryId,
+    bool isActive,
+    String? cardId,
+  );
 }
 
 class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
@@ -86,7 +93,7 @@ class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
           id: doc.id,
           name: data['storeName'] as String? ??
               (data['name'] as String? ?? 'منفذ معتمد'),
-          storeType: 'سوبرماركت وتموينات إغاثية',
+          storeType: 'سوبرماركت وتموينات معتمدة',
           city: data['city'] as String? ?? 'الرياض',
           commercialReg: data['commercialReg'] as String? ?? '-',
           totalTransactions:
@@ -94,7 +101,31 @@ class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
           totalDisbursed:
               (data['totalDisbursed'] as num?)?.toDouble() ?? 0.0,
           isActive: data['isActive'] as bool? ??
-              (data['isApproved'] as bool? ?? true),
+              (data['isApproved'] as bool? ?? false),
+        );
+      }).toList();
+    });
+  }
+
+  @override
+  Stream<List<AdminBeneficiaryItem>> getRegisteredBeneficiariesStream() {
+    return _firestore
+        .collection('users')
+        .where('role', isEqualTo: 'beneficiary')
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        final data = doc.data();
+        return AdminBeneficiaryItem(
+          id: doc.id,
+          name: data['name'] as String? ?? 'مستفيد',
+          email: data['email'] as String? ?? '-',
+          phone: data['phone'] as String? ?? '-',
+          city: data['city'] as String? ?? 'القاهرة',
+          cardId: data['activeCardId'] as String? ?? '-',
+          isApproved: data['isApproved'] as bool? ?? false,
+          isActive: data['isActive'] as bool? ?? false,
+          createdAt: _parseTimestamp(data['createdAt']),
         );
       }).toList();
     });
@@ -106,5 +137,23 @@ class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
       'isActive': isActive,
       'isApproved': isActive,
     }, SetOptions(merge: true));
+  }
+
+  @override
+  Future<void> setBeneficiaryActiveStatus(
+    String beneficiaryId,
+    bool isActive,
+    String? cardId,
+  ) async {
+    await _firestore.collection('users').doc(beneficiaryId).set({
+      'isActive': isActive,
+      'isApproved': isActive,
+    }, SetOptions(merge: true));
+
+    if (cardId != null && cardId.isNotEmpty && cardId != '-') {
+      await _firestore.collection('aid_cards').doc(cardId).set({
+        'status': isActive ? 'active' : 'pending',
+      }, SetOptions(merge: true));
+    }
   }
 }

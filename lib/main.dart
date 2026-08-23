@@ -9,6 +9,9 @@ import 'core/routes/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'firebase_options.dart';
 
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'features/auth/view_models/auth_cubit.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
@@ -43,26 +46,29 @@ class AlFajrApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ScreenUtilInit(
-      designSize: const Size(390, 844),
-      minTextAdapt: true,
-      splitScreenMode: true,
-      builder: (context, child) {
-        return MaterialApp.router(
-          title: 'مؤسسة الفجر الخيرية',
-          debugShowCheckedModeBanner: false,
-          theme: AppTheme.lightTheme,
-          darkTheme: AppTheme.darkTheme,
-          themeMode: ThemeMode.light,
-          localizationsDelegates: context.localizationDelegates,
-          supportedLocales: context.supportedLocales,
-          locale: context.locale,
-          routerConfig: AppRouter.router,
-          builder: (context, routerChild) {
-            return SafeArea(child: routerChild ?? const SizedBox.shrink());
-          },
-        );
-      },
+    return BlocProvider<AuthCubit>.value(
+      value: getIt<AuthCubit>(),
+      child: ScreenUtilInit(
+        designSize: const Size(390, 844),
+        minTextAdapt: true,
+        splitScreenMode: true,
+        builder: (context, child) {
+          return MaterialApp.router(
+            title: 'مؤسسة الفجر الخيرية',
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: ThemeMode.light,
+            localizationsDelegates: context.localizationDelegates,
+            supportedLocales: context.supportedLocales,
+            locale: context.locale,
+            routerConfig: AppRouter.router,
+            builder: (context, routerChild) {
+              return SafeArea(child: routerChild ?? const SizedBox.shrink());
+            },
+          );
+        },
+      ),
     );
   }
 }

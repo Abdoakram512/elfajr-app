@@ -1,6 +1,6 @@
-# qout
+# مؤسسة الفجر الخيرية (Al-Fajr Charity Foundation)
 
-A new Flutter project.
+منظومة المساعدات الرقمية المعتمدة - تطبيق متكامل لإدارة وتوزيع بطاقات الدعم الذكية والسلال الغذائية.
 
 ## Getting Started
 

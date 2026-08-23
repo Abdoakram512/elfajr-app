@@ -18,4 +18,3 @@ abstract class RouteNames {
   static const String contactSupport = '/contact-support';
   static const String accountSuspended = '/account-suspended';
 }
-

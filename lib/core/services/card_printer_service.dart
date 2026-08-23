@@ -12,7 +12,7 @@ class CardPrinterService {
   }) async {
     await Printing.layoutPdf(
       onLayout: (PdfPageFormat format) async => generateCardPdf(card: card),
-      name: 'Qout_Aid_Card_${card.cardId}.pdf',
+      name: 'Alfajr_Aid_Card_${card.cardId}.pdf',
     );
   }
 
@@ -58,7 +58,7 @@ class CardPrinterService {
                             ),
                           ),
                           pw.Text(
-                            'بطاقة الدعم الغذائي والإغاثي الذكي المعتمدة',
+                            'بطاقة الدعم الغذائي الذكي المعتمدة',
                             style: pw.TextStyle(
                               font: fontRegular,
                               fontSize: 10,

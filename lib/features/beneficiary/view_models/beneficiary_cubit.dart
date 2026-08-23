@@ -31,7 +31,7 @@ class BeneficiaryCubit extends Cubit<BeneficiaryState> {
     final beneficiaryId = user.uid;
     final cardId = user.activeCardId?.isNotEmpty == true
         ? user.activeCardId!
-        : beneficiaryId.replaceFirst('usr_ben_case_', 'QOUT-CARD-');
+        : beneficiaryId.replaceFirst('usr_ben_case_', 'FAJR-CARD-');
 
     debugPrint('[BeneficiaryCubit] 🔍 user.uid       = $beneficiaryId');
     debugPrint('[BeneficiaryCubit] 🔍 user.activeCardId = ${user.activeCardId}');
