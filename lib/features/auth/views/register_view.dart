@@ -43,6 +43,7 @@ class _RegisterViewBodyState extends State<_RegisterViewBody> {
   late UserRole _selectedRole;
 
   final _nameController = TextEditingController();
+  final _nationalIdController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -92,6 +93,7 @@ class _RegisterViewBodyState extends State<_RegisterViewBody> {
   @override
   void dispose() {
     _nameController.dispose();
+    _nationalIdController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
     _passwordController.dispose();
@@ -108,7 +110,7 @@ class _RegisterViewBodyState extends State<_RegisterViewBody> {
 
       context.read<AuthCubit>().register(
         name: _nameController.text.trim(),
-        email: _emailController.text.trim(),
+        email: isBeneficiary ? '' : _emailController.text.trim(),
         password: _passwordController.text,
         role: _selectedRole,
         phone: _phoneController.text.trim(),
@@ -116,6 +118,7 @@ class _RegisterViewBodyState extends State<_RegisterViewBody> {
         storeName: isMerchant ? _nameController.text.trim() : null,
         commercialReg: isMerchant ? _extraDetailsController.text.trim() : null,
         nationality: isBeneficiary ? _selectedNationality : null,
+        nationalId: isBeneficiary ? _nationalIdController.text.trim() : null,
       );
     }
   }
@@ -271,31 +274,50 @@ class _RegisterViewBodyState extends State<_RegisterViewBody> {
 
                     const Gap(18),
 
-                    // Email Field
-                    CustomTextField(
-                      controller: _emailController,
-                      label: 'auth.email'.tr(),
-                      hint: 'example@domain.com',
-                      prefixIcon: Icons.email_outlined,
-                      keyboardType: TextInputType.emailAddress,
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'auth.validation_email_required'.tr();
-                        }
-                        if (!value.contains('@') || !value.contains('.')) {
-                          return 'auth.validation_email_invalid'.tr();
-                        }
-                        return null;
-                      },
-                    ),
+                    // National ID Field for Beneficiary OR Email Field for Other Roles
+                    if (_selectedRole == UserRole.beneficiary) ...[
+                      CustomTextField(
+                        controller: _nationalIdController,
+                        label: 'auth.national_id'.tr(),
+                        hint: 'auth.national_id_hint'.tr(),
+                        prefixIcon: Icons.badge_outlined,
+                        keyboardType: TextInputType.text,
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'auth.validation_national_id_required'.tr();
+                          }
+                          if (value.trim().length < 6) {
+                            return 'auth_errors.invalid_national_id'.tr();
+                          }
+                          return null;
+                        },
+                      ),
+                      const Gap(18),
+                    ] else ...[
+                      CustomTextField(
+                        controller: _emailController,
+                        label: 'auth.email'.tr(),
+                        hint: 'example@domain.com',
+                        prefixIcon: Icons.email_outlined,
+                        keyboardType: TextInputType.emailAddress,
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'auth.validation_email_required'.tr();
+                          }
+                          if (!value.contains('@') || !value.contains('.')) {
+                            return 'auth.validation_email_invalid'.tr();
+                          }
+                          return null;
+                        },
+                      ),
+                      const Gap(18),
+                    ],
 
-                    const Gap(18),
-
-                    // Phone Number Field
+                    // Phone Number Field (Strictly Unique)
                     CustomTextField(
                       controller: _phoneController,
                       label: 'auth.phone'.tr(),
-                      hint: '+966 50 000 0000',
+                      hint: '01xxxxxxxxx',
                       prefixIcon: Icons.phone_outlined,
                       keyboardType: TextInputType.phone,
                       validator: (value) {

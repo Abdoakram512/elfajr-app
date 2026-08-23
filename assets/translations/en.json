@@ -98,13 +98,21 @@
     "validation_password_min": "Password must be at least 6 characters",
     "validation_passwords_mismatch": "Passwords do not match",
     "validation_name_required": "Please enter your name",
-    "validation_phone_required": "Please enter your phone number",
-    "validation_city_required": "Please enter your city"
+    "validation_phone_required": "Phone number is required",
+    "validation_city_required": "Please enter your city",
+    "identifier": "National ID / Passport or Email",
+    "identifier_hint": "Enter National ID or Email",
+    "national_id": "National ID / Passport",
+    "national_id_hint": "Enter 14-digit ID or passport number",
+    "validation_national_id_required": "National ID or passport number is required"
   },
   "auth_errors": {
-    "user_not_found": "Account not found or invalid credentials",
+    "user_not_found": "Invalid login credentials. Please check your National ID / email and password",
     "wrong_password": "Incorrect password",
-    "email_already_in_use": "Email is already registered",
+    "email_already_in_use": "Email is already registered to another account",
+    "phone_already_in_use": "Phone number is already in use by another account",
+    "national_id_already_in_use": "National ID / Passport is already registered to another account",
+    "invalid_national_id": "Please enter a valid National ID or Passport",
     "invalid_email": "Invalid email address format",
     "weak_password": "Password is too weak"
   },

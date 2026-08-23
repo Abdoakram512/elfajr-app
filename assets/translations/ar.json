@@ -98,13 +98,21 @@
     "validation_password_min": "كلمة المرور يجب أن لا تقل عن 6 خانات",
     "validation_passwords_mismatch": "كلمتا المرور غير متطابقتين",
     "validation_name_required": "يرجى إدخال الاسم",
-    "validation_phone_required": "يرجى إدخال رقم الهاتف",
-    "validation_city_required": "يرجى إدخال المدينة"
+    "validation_phone_required": "يرجى إدخال رقم الهاتف للتواصل",
+    "validation_city_required": "يرجى إدخال المدينة",
+    "identifier": "رقم البطاقة / الجواز أو البريد الإلكتروني",
+    "identifier_hint": "أدخل رقم البطاقة القومية أو البريد",
+    "national_id": "رقم البطاقة القومية / جواز السفر",
+    "national_id_hint": "أدخل الـ 14 رقماً للبطاقة أو رقم الجواز",
+    "validation_national_id_required": "يرجى إدخال رقم البطاقة القومية أو جواز السفر"
   },
   "auth_errors": {
-    "user_not_found": "الحساب غير مسجل أو البيانات المدخلة غير صحيحة",
+    "user_not_found": "بيانات الدخول غير صحيحة، يرجى التأكد من رقم البطاقة أو الإيميل وكلمة المرور",
     "wrong_password": "كلمة المرور غير صحيحة",
-    "email_already_in_use": "البريد الإلكتروني مسجل مسبقاً",
+    "email_already_in_use": "البريد الإلكتروني مسجل بالفعل بحساب آخر",
+    "phone_already_in_use": "رقم الهاتف مسجل بالفعل بحساب آخر، يرجى استخدام رقم مختلف",
+    "national_id_already_in_use": "رقم البطاقة القومية أو جواز السفر مسجل بالفعل بحساب آخر",
+    "invalid_national_id": "يرجى إدخال رقم بطاقة قومية أو جواز سفر صحيح",
     "invalid_email": "صيغة البريد الإلكتروني غير صحيحة",
     "weak_password": "كلمة المرور ضعيفة جداً"
   },

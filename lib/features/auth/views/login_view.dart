@@ -234,27 +234,23 @@ class _LoginViewBodyState extends State<_LoginViewBody> {
 
                       const Gap(32),
 
-                      // Email Field
+                      // Identifier (National ID / Passport / Email) Field
                       CustomTextField(
                             controller: _emailController,
-                            label: 'auth.email'.tr(),
-                            hint: 'example@domain.com',
-                            prefixIcon: Icons.email_outlined,
-                            keyboardType: TextInputType.emailAddress,
+                            label: 'auth.identifier'.tr(),
+                            hint: 'auth.identifier_hint'.tr(),
+                            prefixIcon: Icons.badge_outlined,
+                            keyboardType: TextInputType.text,
                             validator: (value) {
                               if (value == null || value.trim().isEmpty) {
-                                return 'auth.validation_email_required'.tr();
-                              }
-                              if (!value.contains('@') ||
-                                  !value.contains('.')) {
-                                return 'auth.validation_email_invalid'.tr();
+                                return 'auth.validation_national_id_required'.tr();
                               }
                               return null;
                             },
                           )
                           .animate()
-                          .fadeIn(delay: 200.ms, duration: 400.ms)
-                          .slideX(begin: 0.1, end: 0),
+                          .fadeIn(delay: 200.ms, duration: 300.ms)
+                          .slideY(begin: 0.2, end: 0),
 
                       const Gap(20),
 

@@ -22,6 +22,7 @@ abstract class AuthRemoteDataSource {
     String? storeName,
     String? commercialReg,
     String? nationality,
+    String? nationalId,
   });
   Future<void> signOut();
   Future<void> sendPasswordResetEmail(String email);
@@ -101,20 +102,46 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String email,
     required String password,
   }) async {
-    final normalizedEmail = email.trim().toLowerCase();
+    final rawIdentifier = email.trim();
+    final normalizedEmail = rawIdentifier.toLowerCase();
 
     try {
-      // 1. First look up user document directly in Firestore
-      final query = await _firestore
+      // 1. Look up user document in Firestore by email, nationalId, activeCardId, or phone
+      QuerySnapshot<Map<String, dynamic>> query = await _firestore
           .collection('users')
           .where('email', isEqualTo: normalizedEmail)
           .limit(1)
           .get();
 
+      if (query.docs.isEmpty) {
+        query = await _firestore
+            .collection('users')
+            .where('nationalId', isEqualTo: rawIdentifier)
+            .limit(1)
+            .get();
+      }
+
+      if (query.docs.isEmpty) {
+        query = await _firestore
+            .collection('users')
+            .where('activeCardId', isEqualTo: rawIdentifier.toUpperCase())
+            .limit(1)
+            .get();
+      }
+
+      if (query.docs.isEmpty) {
+        query = await _firestore
+            .collection('users')
+            .where('phone', isEqualTo: rawIdentifier)
+            .limit(1)
+            .get();
+      }
+
       if (query.docs.isNotEmpty) {
         final doc = query.docs.first;
         final data = doc.data();
         final storedPassword = data['password'] as String?;
+        final userEmail = data['email'] as String? ?? normalizedEmail;
 
         if (storedPassword != null && storedPassword != password) {
           throw const AppException('auth_errors.wrong_password');
@@ -123,7 +150,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         // Try Firebase Auth in parallel to establish session if available
         try {
           await _firebaseAuth.signInWithEmailAndPassword(
-            email: normalizedEmail,
+            email: userEmail,
             password: password,
           );
         } catch (_) {}
@@ -170,19 +197,59 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     String? storeName,
     String? commercialReg,
     String? nationality,
+    String? nationalId,
   }) async {
-    final normalizedEmail = email.trim().toLowerCase();
+    final cleanPhone = phone?.trim();
+    final cleanNationalId = (nationalId != null && nationalId.trim().isNotEmpty)
+        ? nationalId.trim().replaceAll(RegExp(r'\s+'), '').toUpperCase()
+        : null;
 
     try {
+      // 1. STRICT UNIQUE CHECK: Phone Number must NOT be duplicated for ANY user
+      if (cleanPhone != null && cleanPhone.isNotEmpty) {
+        final existingPhone = await _firestore
+            .collection('users')
+            .where('phone', isEqualTo: cleanPhone)
+            .limit(1)
+            .get();
+
+        if (existingPhone.docs.isNotEmpty) {
+          throw const AppException('auth_errors.phone_already_in_use');
+        }
+      }
+
+      // 2. STRICT UNIQUE CHECK: National ID / Passport must NOT be duplicated for Beneficiaries
+      if (role == UserRole.beneficiary && cleanNationalId != null && cleanNationalId.isNotEmpty) {
+        final existingNatId = await _firestore
+            .collection('users')
+            .where('nationalId', isEqualTo: cleanNationalId)
+            .limit(1)
+            .get();
+
+        if (existingNatId.docs.isNotEmpty) {
+          throw const AppException('auth_errors.national_id_already_in_use');
+        }
+      }
+
+      // Determine the technical email for Firebase Auth
+      String normalizedEmail = email.trim().toLowerCase();
+      if (role == UserRole.beneficiary && (normalizedEmail.isEmpty || !normalizedEmail.contains('@'))) {
+        normalizedEmail = '${cleanNationalId?.toLowerCase() ?? 'usr_${DateTime.now().millisecondsSinceEpoch}'}@alfajr.app';
+      }
+
       // Check if email already exists in Firestore
-      final existing = await _firestore
+      final existingEmail = await _firestore
           .collection('users')
           .where('email', isEqualTo: normalizedEmail)
           .limit(1)
           .get();
 
-      if (existing.docs.isNotEmpty) {
-        throw const AppException('auth_errors.email_already_in_use');
+      if (existingEmail.docs.isNotEmpty) {
+        if (role == UserRole.beneficiary) {
+          throw const AppException('auth_errors.national_id_already_in_use');
+        } else {
+          throw const AppException('auth_errors.email_already_in_use');
+        }
       }
 
       String uid = 'usr_${DateTime.now().millisecondsSinceEpoch}';
@@ -200,7 +267,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       } catch (_) {}
 
       String? activeCardId;
-      String? nationalId;
+      String? finalNationalId = cleanNationalId;
 
       final bool isAutoApproved = role == UserRole.admin;
 
@@ -208,13 +275,13 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       if (role == UserRole.beneficiary) {
         final uniqueSuffix = '${DateTime.now().millisecondsSinceEpoch}'.substring(4);
         activeCardId = 'FAJR-CARD-$uniqueSuffix';
-        nationalId = (phone != null && phone.trim().isNotEmpty) ? phone.trim() : 'N-$uniqueSuffix';
+        finalNationalId = cleanNationalId ?? 'N-$uniqueSuffix';
 
         final aidCardData = {
           'cardId': activeCardId,
           'beneficiaryId': uid,
           'beneficiaryName': name,
-          'nationalId': nationalId,
+          'nationalId': finalNationalId,
           'familyCount': 4,
           'totalBalance': 600.0,
           'foodBasketsQuota': 2,
@@ -236,12 +303,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
               .doc(activeCardId)
               .set(aidCardData);
         } catch (e) {
-          // If set fails with string date, try basic map
           await _firestore.collection('aid_cards').doc(activeCardId).set({
             'cardId': activeCardId,
             'beneficiaryId': uid,
             'beneficiaryName': name,
-            'nationalId': nationalId,
+            'nationalId': finalNationalId,
             'familyCount': 4,
             'totalBalance': 600.0,
             'foodBasketsQuota': 2,
@@ -256,13 +322,13 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         uid: uid,
         email: normalizedEmail,
         name: name,
-        phone: phone,
+        phone: cleanPhone,
         role: role,
         city: city ?? 'القاهرة',
         isApproved: isAutoApproved,
         isActive: isAutoApproved,
         activeCardId: activeCardId,
-        nationalId: nationalId,
+        nationalId: finalNationalId,
         nationality: nationality ?? (role == UserRole.beneficiary ? 'مصرية' : null),
         storeName: storeName,
         commercialReg: commercialReg,

@@ -19,6 +19,7 @@ abstract class AuthRepository {
     String? storeName,
     String? commercialReg,
     String? nationality,
+    String? nationalId,
   });
   Future<void> signOut();
   Future<void> sendPasswordReset(String email);

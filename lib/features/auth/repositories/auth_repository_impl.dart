@@ -117,6 +117,7 @@ class AuthRepositoryImpl implements AuthRepository {
     String? storeName,
     String? commercialReg,
     String? nationality,
+    String? nationalId,
   }) async {
     final user = await _remoteDataSource.registerWithEmailAndPassword(
       email: email,
@@ -128,6 +129,7 @@ class AuthRepositoryImpl implements AuthRepository {
       storeName: storeName,
       commercialReg: commercialReg,
       nationality: nationality,
+      nationalId: nationalId,
     );
 
     await _localDataSource.setRememberMe(true);
