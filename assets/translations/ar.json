@@ -107,7 +107,8 @@
     "validation_national_id_required": "يرجى إدخال رقم البطاقة القومية أو جواز السفر",
     "nationality": "الجنسية",
     "select_nationality": "اختر الجنسية",
-    "search_nationalities": "بحث في الجنسيات..."
+    "search_nationalities": "بحث في الجنسيات...",
+    "validation_nationality_required": "يرجى اختيار الجنسية"
   },
   "auth_errors": {
     "user_not_found": "بيانات الدخول غير صحيحة، يرجى التأكد من رقم البطاقة أو الإيميل وكلمة المرور",

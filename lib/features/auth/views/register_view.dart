@@ -13,6 +13,7 @@ import '../../../../core/widgets/primary_button.dart';
 import '../models/user_role.dart';
 import '../view_models/auth_cubit.dart';
 import '../view_models/auth_state.dart';
+import '../widgets/dynamic_nationality_picker_sheet.dart';
 import '../widgets/role_selection_pill_group.dart';
 
 class RegisterView extends StatelessWidget {
@@ -51,6 +52,8 @@ class _RegisterViewBodyState extends State<_RegisterViewBody> {
   final _cityController = TextEditingController();
   final _extraDetailsController = TextEditingController();
 
+  String? _selectedNationality;
+
   @override
   void initState() {
     super.initState();
@@ -75,6 +78,17 @@ class _RegisterViewBodyState extends State<_RegisterViewBody> {
       final isMerchant = _selectedRole == UserRole.merchant;
       final isBeneficiary = _selectedRole == UserRole.beneficiary;
 
+      if (isBeneficiary && (_selectedNationality == null || _selectedNationality!.isEmpty)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('auth.validation_nationality_required'.tr()),
+            backgroundColor: AppColors.error,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        return;
+      }
+
       context.read<AuthCubit>().register(
         name: _nameController.text.trim(),
         email: isBeneficiary ? '' : _emailController.text.trim(),
@@ -84,6 +98,7 @@ class _RegisterViewBodyState extends State<_RegisterViewBody> {
         city: _cityController.text.trim(),
         storeName: isMerchant ? _nameController.text.trim() : null,
         commercialReg: isMerchant ? _extraDetailsController.text.trim() : null,
+        nationality: isBeneficiary ? _selectedNationality : null,
         nationalId: isBeneficiary ? _nationalIdController.text.trim() : null,
       );
     }
@@ -211,7 +226,7 @@ class _RegisterViewBodyState extends State<_RegisterViewBody> {
 
                       const Gap(16),
 
-                      // Beneficiary: National ID
+                      // Beneficiary: National ID & Dynamic Live Nationality Picker
                       if (isBeneficiary) ...[
                         CustomTextField(
                           controller: _nationalIdController,
@@ -222,6 +237,83 @@ class _RegisterViewBodyState extends State<_RegisterViewBody> {
                           validator: (val) => val == null || val.trim().isEmpty
                               ? 'auth.validation_national_id_required'.tr()
                               : null,
+                        ),
+                        const Gap(16),
+
+                        // Dynamic Nationality Selector Field
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'auth.nationality'.tr(),
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.textPrimaryLight,
+                              ),
+                            ),
+                            const Gap(6),
+                            InkWell(
+                              onTap: () => DynamicNationalityPickerSheet.show(
+                                context,
+                                selectedNationality: _selectedNationality,
+                                onSelected: (nat) =>
+                                    setState(() => _selectedNationality = nat),
+                              ),
+                              borderRadius: BorderRadius.circular(16),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: _selectedNationality != null
+                                        ? AppColors.primary
+                                        : AppColors.borderLight,
+                                  ),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 14,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(6),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.primarySubtle,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: const Icon(
+                                        Icons.public_rounded,
+                                        size: 18,
+                                        color: AppColors.primary,
+                                      ),
+                                    ),
+                                    const Gap(12),
+                                    Expanded(
+                                      child: Text(
+                                        _selectedNationality ??
+                                            'auth.select_nationality'.tr(),
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: _selectedNationality != null
+                                              ? FontWeight.bold
+                                              : FontWeight.normal,
+                                          color: _selectedNationality != null
+                                              ? AppColors.textPrimaryLight
+                                              : AppColors.textSecondaryLight,
+                                        ),
+                                      ),
+                                    ),
+                                    const Icon(
+                                      Icons.keyboard_arrow_down_rounded,
+                                      color: AppColors.textSecondaryLight,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                         const Gap(16),
                       ],

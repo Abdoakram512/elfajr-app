@@ -107,7 +107,8 @@
     "validation_national_id_required": "National ID or passport number is required",
     "nationality": "Nationality",
     "select_nationality": "Select Nationality",
-    "search_nationalities": "Search nationalities..."
+    "search_nationalities": "Search nationalities...",
+    "validation_nationality_required": "Please select your nationality"
   },
   "auth_errors": {
     "user_not_found": "Invalid login credentials. Please check your National ID / email and password",
