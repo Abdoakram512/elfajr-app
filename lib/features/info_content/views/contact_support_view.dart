@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:qout/core/constants/app_colors.dart';
 
 import '../../../../app/service_locator.dart';
+import '../../../../core/widgets/cards/app_hero_card.dart';
 import '../../../../core/widgets/feedback/app_error_state_widget.dart';
 import '../../../../core/widgets/feedback/app_loading_indicator.dart';
 import '../../../../core/widgets/feedback/alfajr_refresh_indicator.dart';
@@ -64,58 +65,14 @@ class _ContactSupportViewBody extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   // 1. Hero Card
-                  Container(
-                    padding: const EdgeInsets.all(22),
-                    decoration: BoxDecoration(
-                      gradient: AppColors.primaryGradient,
-                      borderRadius: BorderRadius.circular(26),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primary.withValues(alpha: 0.3),
-                          blurRadius: 20,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        Container(
-                          width: 72,
-                          height: 72,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.headset_mic_rounded,
-                            size: 38,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const Gap(14),
-                        Text(
-                          'info_content.contact.hero_title'.tr(),
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        if (contact.workingHours(lang).isNotEmpty) ...[
-                          const Gap(6),
-                          Text(
-                            'info_content.contact.working_hours_label'.tr(namedArgs: {'hours': contact.workingHours(lang)}),
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.white.withValues(alpha: 0.9),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ).animate().fadeIn(duration: 300.ms),
+                  AppHeroCard(
+                    icon: Icons.headset_mic_rounded,
+                    title: 'info_content.contact.hero_title'.tr(),
+                    subtitle: contact.workingHours(lang).isNotEmpty
+                        ? 'info_content.contact.working_hours_label'.tr(namedArgs: {'hours': contact.workingHours(lang)})
+                        : null,
+                    iconSize: 72,
+                  ),
 
                   const Gap(20),
 

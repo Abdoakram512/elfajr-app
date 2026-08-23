@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/utils/nationality_formatter.dart';
 import '../../beneficiary/models/aid_card_model.dart';
 import 'enlarged_qr_dialog.dart';
 
@@ -20,6 +21,7 @@ class BeneficiaryCardSummary extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currencyFormatter = NumberFormat('#,###');
+    final formattedNat = card.nationality.toMasculineNationality();
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -53,7 +55,7 @@ class BeneficiaryCardSummary extends StatelessWidget {
                         height: 1.3,
                       ),
                     ),
-                    if (card.socialStatus != null || card.nationality != null) ...[
+                    if (card.socialStatus != null || formattedNat.isNotEmpty) ...[
                       const Gap(4),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -62,7 +64,7 @@ class BeneficiaryCardSummary extends StatelessWidget {
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          '${card.socialStatus ?? ''}${card.socialStatus != null && card.nationality != null ? ' • ' : ''}${card.nationality == 'مصرية' ? 'مصري' : (card.nationality == 'سورية' ? 'سوري' : (card.nationality == 'سودانية' ? 'سوداني' : (card.nationality == 'يمنية' ? 'يمني' : (card.nationality == 'فلسطينية' ? 'فلسطيني' : (card.nationality == 'أردنية' ? 'أردني' : (card.nationality == 'عراقية' ? 'عراقي' : (card.nationality == 'لبنانية' ? 'لبناني' : (card.nationality ?? ''))))))))}',
+                          '${card.socialStatus ?? ''}${card.socialStatus != null && formattedNat.isNotEmpty ? ' • ' : ''}$formattedNat',
                           style: const TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.bold,

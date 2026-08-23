@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/services/card_printer_service.dart';
+import '../../../../core/widgets/common/info_key_value_row.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../beneficiary/models/aid_card_model.dart';
 import '../models/redemption_transaction_model.dart';
@@ -76,35 +77,41 @@ class RedemptionReceiptCard extends StatelessWidget {
               const Divider(height: 1, color: Colors.black12),
               const Gap(16),
 
-              _buildRow('merchant.redemption_receipt.beneficiary_label'.tr(), transaction.beneficiaryName),
+              InfoKeyValueRow(
+                label: 'merchant.redemption_receipt.beneficiary_label'.tr(),
+                value: transaction.beneficiaryName,
+              ),
               const Gap(8),
-              _buildRow('merchant.redemption_receipt.outlet_label'.tr(), transaction.merchantStoreName),
+              InfoKeyValueRow(
+                label: 'merchant.redemption_receipt.outlet_label'.tr(),
+                value: transaction.merchantStoreName,
+              ),
               const Gap(8),
-              _buildRow(
-                'merchant.redemption_receipt.deducted_amount'.tr(),
-                '${currencyFormatter.format(transaction.amountDeducted)} ${'common.currency'.tr()}',
+              InfoKeyValueRow(
+                label: 'merchant.redemption_receipt.deducted_amount'.tr(),
+                value: '${currencyFormatter.format(transaction.amountDeducted)} ${'common.currency'.tr()}',
                 isBold: true,
-                color: AppColors.error,
+                valueColor: AppColors.error,
               ),
               if (transaction.foodBasketsDeducted > 0) ...[
                 const Gap(8),
-                _buildRow(
-                  'merchant.redemption_receipt.deducted_baskets'.tr(),
-                  '${transaction.foodBasketsDeducted} ${'common.baskets_unit'.tr()}',
+                InfoKeyValueRow(
+                  label: 'merchant.redemption_receipt.deducted_baskets'.tr(),
+                  value: '${transaction.foodBasketsDeducted} ${'common.baskets_unit'.tr()}',
                   isBold: true,
                 ),
               ],
               const Gap(8),
-              _buildRow(
-                'merchant.redemption_receipt.remaining_balance'.tr(),
-                '${currencyFormatter.format(transaction.remainingBalance)} ${'common.currency'.tr()}',
+              InfoKeyValueRow(
+                label: 'merchant.redemption_receipt.remaining_balance'.tr(),
+                value: '${currencyFormatter.format(transaction.remainingBalance)} ${'common.currency'.tr()}',
                 isBold: true,
-                color: AppColors.primary,
+                valueColor: AppColors.primary,
               ),
               const Gap(8),
-              _buildRow(
-                'merchant.redemption_receipt.remaining_baskets'.tr(),
-                '${transaction.remainingBaskets} ${'common.baskets_unit'.tr()}',
+              InfoKeyValueRow(
+                label: 'merchant.redemption_receipt.remaining_baskets'.tr(),
+                value: '${transaction.remainingBaskets} ${'common.baskets_unit'.tr()}',
               ),
             ],
           ),
@@ -162,29 +169,6 @@ class RedemptionReceiptCard extends StatelessWidget {
             ),
           ),
         ],
-      ],
-    );
-  }
-
-  Widget _buildRow(String label, String value, {bool isBold = false, Color? color}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 12.5,
-            color: AppColors.textSecondaryLight,
-          ),
-        ),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: isBold ? 14 : 12.5,
-            fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
-            color: color ?? AppColors.textPrimaryLight,
-          ),
-        ),
       ],
     );
   }

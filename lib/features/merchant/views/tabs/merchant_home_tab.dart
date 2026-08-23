@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:qout/app/service_locator.dart';
 import 'package:qout/core/constants/app_colors.dart';
+import 'package:qout/core/widgets/cards/app_kpi_card.dart';
 import 'package:qout/core/widgets/feedback/app_empty_state_widget.dart';
 import 'package:qout/core/widgets/feedback/alfajr_refresh_indicator.dart';
 import 'package:qout/core/widgets/transactions/transaction_list_item.dart';
@@ -512,66 +513,22 @@ class MerchantHomeTab extends StatelessWidget {
                     Row(
                       children: [
                         Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(18),
-                              border: Border.all(color: AppColors.borderLight),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'dashboard.merchant.today_dispensed'.tr(),
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    color: AppColors.textSecondaryLight,
-                                  ),
-                                ),
-                                const Gap(6),
-                                Text(
-                                  '${currencyFormatter.format(state.todayDispensedAmount)} ${'common.currency'.tr()}',
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w900,
-                                    color: AppColors.primary,
-                                  ),
-                                ),
-                              ],
-                            ),
+                          child: AppKpiCard(
+                            label: 'dashboard.merchant.today_dispensed'.tr(),
+                            value: '${currencyFormatter.format(state.todayDispensedAmount)} ${'common.currency'.tr()}',
+                            icon: Icons.payments_rounded,
+                            color: const Color(0xFF0A734D),
+                            bgColor: const Color(0xFFECFDF5),
                           ),
                         ),
                         const Gap(12),
                         Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(18),
-                              border: Border.all(color: AppColors.borderLight),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'dashboard.merchant.today_txns'.tr(),
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    color: AppColors.textSecondaryLight,
-                                  ),
-                                ),
-                                const Gap(6),
-                                Text(
-                                  '${state.todayTransactionsCount}',
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w900,
-                                    color: AppColors.accent,
-                                  ),
-                                ),
-                              ],
-                            ),
+                          child: AppKpiCard(
+                            label: 'dashboard.merchant.today_txns'.tr(),
+                            value: '${state.todayTransactionsCount}',
+                            icon: Icons.receipt_long_rounded,
+                            color: const Color(0xFF2563EB),
+                            bgColor: const Color(0xFFEFF6FF),
                           ),
                         ),
                       ],

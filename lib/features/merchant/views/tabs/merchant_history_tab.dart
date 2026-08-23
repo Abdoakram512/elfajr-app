@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/utils/arabic_normalizer.dart';
+import '../../../../core/widgets/cards/app_kpi_card.dart';
 import '../../../../core/widgets/feedback/app_empty_state_widget.dart';
 import '../../../../core/widgets/feedback/alfajr_refresh_indicator.dart';
 import '../../../../core/widgets/transactions/transaction_list_item.dart';
@@ -230,7 +231,7 @@ class _MerchantHistoryTabState extends State<MerchantHistoryTab> {
                       Row(
                         children: [
                           Expanded(
-                            child: _buildKpiBox(
+                            child: AppKpiCard(
                               label: 'merchant.stats_total_amount'.tr(),
                               value: '${currencyFormatter.format(totalDisbursed)} ${'common.currency'.tr()}',
                               icon: Icons.payments_rounded,
@@ -240,7 +241,7 @@ class _MerchantHistoryTabState extends State<MerchantHistoryTab> {
                           ),
                           const Gap(10),
                           Expanded(
-                            child: _buildKpiBox(
+                            child: AppKpiCard(
                               label: 'merchant.stats_total_baskets'.tr(),
                               value: '$totalBaskets ${'common.baskets_unit'.tr()}',
                               icon: Icons.inventory_2_rounded,
@@ -254,7 +255,7 @@ class _MerchantHistoryTabState extends State<MerchantHistoryTab> {
                       Row(
                         children: [
                           Expanded(
-                            child: _buildKpiBox(
+                            child: AppKpiCard(
                               label: 'merchant.stats_operations'.tr(),
                               value: '$opsCount ${'merchant.txns_unit_label'.tr()}',
                               icon: Icons.receipt_long_rounded,
@@ -264,7 +265,7 @@ class _MerchantHistoryTabState extends State<MerchantHistoryTab> {
                           ),
                           const Gap(10),
                           Expanded(
-                            child: _buildKpiBox(
+                            child: AppKpiCard(
                               label: 'merchant.stats_beneficiaries'.tr(),
                               value: '$uniqueBeneficiaries ${'merchant.beneficiaries_cases_label'.tr()}',
                               icon: Icons.people_alt_rounded,
@@ -392,55 +393,6 @@ class _MerchantHistoryTabState extends State<MerchantHistoryTab> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildKpiBox({
-    required String label,
-    required String value,
-    required IconData icon,
-    required Color color,
-    required Color bgColor,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(icon, size: 15, color: color),
-              const Gap(6),
-              Expanded(
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                    color: color,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-          const Gap(4),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w900,
-              color: color,
-              fontFamily: 'monospace',
-            ),
-          ),
-        ],
       ),
     );
   }

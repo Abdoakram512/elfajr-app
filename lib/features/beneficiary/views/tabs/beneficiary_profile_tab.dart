@@ -5,11 +5,13 @@ import 'package:gap/gap.dart';
 
 import '../../../../app/service_locator.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/utils/nationality_formatter.dart';
 import '../../../../core/widgets/dialogs/logout_confirm_dialog.dart';
 import '../../../../core/widgets/profile/profile_info_content_links.dart';
 import '../../../../core/widgets/profile/profile_info_row.dart';
 import '../../../../core/widgets/profile/profile_language_tile.dart';
 import '../../../../core/widgets/profile/profile_section_card.dart';
+import '../../../../core/widgets/profile/unified_profile_header.dart';
 import '../../../auth/view_models/auth_cubit.dart';
 import '../../../auth/view_models/auth_state.dart';
 import '../../view_models/beneficiary_cubit.dart';
@@ -25,36 +27,22 @@ class BeneficiaryProfileTab extends StatelessWidget {
     final dateFormatter = DateFormat('yyyy/MM/dd');
 
     final displayName =
-        user?.name.isNotEmpty == true ? user!.name : 'مستفيد معتمد';
+        user?.name.isNotEmpty == true ? user!.name : 'auth.role_beneficiary'.tr();
     final rawEmail = user?.email.isNotEmpty == true ? user!.email : '-';
     final displayEmail = rawEmail.endsWith('@alfajr.app')
         ? (user?.phone?.isNotEmpty == true ? user!.phone! : rawEmail)
         : rawEmail;
     final displayPhone = user?.phone?.isNotEmpty == true ? user!.phone! : '-';
     final displayCity =
-        user?.city?.isNotEmpty == true ? user!.city! : 'المدينة';
+        user?.city?.isNotEmpty == true ? user!.city! : '';
 
     return BlocBuilder<BeneficiaryCubit, BeneficiaryState>(
       builder: (context, state) {
         final card = state.activeCard;
         final rawNat = user?.nationality ?? card?.nationality;
-        final displayNat = rawNat == 'مصرية'
-            ? 'مصري'
-            : (rawNat == 'سورية'
-                ? 'سوري'
-                : (rawNat == 'سودانية'
-                    ? 'سوداني'
-                    : (rawNat == 'يمنية'
-                        ? 'يمني'
-                        : (rawNat == 'فلسطينية'
-                            ? 'فلسطيني'
-                            : (rawNat == 'أردنية'
-                                ? 'أردني'
-                                : (rawNat == 'عراقية'
-                                    ? 'عراقي'
-                                    : (rawNat == 'لبنانية'
-                                        ? 'لبناني'
-                                        : (rawNat ?? '-'))))))));
+        final displayNat = rawNat.toMasculineNationality().isNotEmpty
+            ? rawNat.toMasculineNationality()
+            : '-';
 
         return Scaffold(
           backgroundColor: AppColors.backgroundLight,
@@ -67,95 +55,12 @@ class BeneficiaryProfileTab extends StatelessWidget {
             child: Column(
               children: [
                 // 1. User Header Profile Card
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(22),
-                  decoration: BoxDecoration(
-                    gradient: AppColors.primaryGradient,
-                    borderRadius: BorderRadius.circular(24),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.35),
-                        blurRadius: 20,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      Container(
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: AppColors.accentLight,
-                            width: 3,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.15),
-                              blurRadius: 10,
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.person_rounded,
-                          size: 48,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                      const Gap(14),
-                      Text(
-                        displayName,
-                        style: const TextStyle(
-                          fontSize: 19,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const Gap(4),
-                      Text(
-                        displayEmail,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.white.withValues(alpha: 0.8),
-                        ),
-                      ),
-                      const Gap(12),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: Colors.white30),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.verified_user_rounded,
-                              size: 15,
-                              color: AppColors.accentLight,
-                            ),
-                            const Gap(6),
-                            Text(
-                              'auth.role_beneficiary'.tr(),
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                UnifiedProfileHeader(
+                  name: displayName,
+                  subtitle: displayEmail,
+                  badgeText: 'auth.role_beneficiary'.tr(),
+                  badgeIcon: Icons.verified_user_rounded,
+                  avatarIcon: Icons.person_rounded,
                 ),
 
                 const Gap(20),
@@ -244,11 +149,12 @@ class BeneficiaryProfileTab extends StatelessWidget {
                       label: 'auth.email'.tr(),
                       value: displayEmail,
                     ),
-                    ProfileInfoRow(
-                      label: 'auth.city'.tr(),
-                      value: displayCity,
-                      showDivider: false,
-                    ),
+                    if (displayCity.isNotEmpty)
+                      ProfileInfoRow(
+                        label: 'auth.city'.tr(),
+                        value: displayCity,
+                        showDivider: false,
+                      ),
                   ],
                 ),
 

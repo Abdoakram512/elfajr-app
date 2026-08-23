@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/widgets/feedback/app_empty_state_widget.dart';
+import '../../../../core/widgets/sheets/app_sheet_scaffold.dart';
 import '../../auth/models/user_model.dart';
 import '../models/payment_receipt_model.dart';
 import 'receipt_image_viewer_dialog.dart';
@@ -82,86 +83,13 @@ class _MerchantPaymentReceiptsSheetState
   Widget build(BuildContext context) {
     final currencyFormatter = NumberFormat('#,##0');
 
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.85,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
-      ),
-      child: Column(
-        children: [
-          // Drag Handle
-          const Gap(12),
-          Container(
-            width: 48,
-            height: 5,
-            decoration: BoxDecoration(
-              color: Colors.grey.shade300,
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-          const Gap(16),
-
-          // Header
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFEF3C7),
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: const Icon(
-                        Icons.payments_rounded,
-                        color: Color(0xFFD97706),
-                        size: 24,
-                      ),
-                    ),
-                    const Gap(12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'merchant.receipts.sheet_title'.tr(),
-                          style: const TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w900,
-                            color: AppColors.textPrimaryLight,
-                          ),
-                        ),
-                        Text(
-                          'merchant.receipts.sheet_subtitle'.tr(),
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: AppColors.textSecondaryLight,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                IconButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(Icons.close_rounded),
-                  style: IconButton.styleFrom(
-                    backgroundColor: Colors.grey.shade100,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          const Gap(12),
-          const Divider(height: 1),
-
-          // Stream Content
-          Expanded(
-            child: StreamBuilder<QuerySnapshot>(
+    return AppSheetScaffold(
+      title: 'merchant.receipts.sheet_title'.tr(),
+      subtitle: 'merchant.receipts.sheet_subtitle'.tr(),
+      icon: Icons.payments_rounded,
+      iconColor: const Color(0xFFD97706),
+      iconBgColor: const Color(0xFFFEF3C7),
+      child: StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
                   .collection('payment_receipts')
                   .where('merchantId', isEqualTo: widget.merchant.uid)
@@ -472,9 +400,6 @@ class _MerchantPaymentReceiptsSheetState
                 );
               },
             ),
-          ),
-        ],
-      ),
     );
   }
 }

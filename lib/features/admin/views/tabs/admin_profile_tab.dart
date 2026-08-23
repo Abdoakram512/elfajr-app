@@ -9,6 +9,7 @@ import '../../../../core/widgets/profile/profile_info_content_links.dart';
 import '../../../../core/widgets/profile/profile_info_row.dart';
 import '../../../../core/widgets/profile/profile_language_tile.dart';
 import '../../../../core/widgets/profile/profile_section_card.dart';
+import '../../../../core/widgets/profile/unified_profile_header.dart';
 import '../../../auth/view_models/auth_cubit.dart';
 import '../../../auth/view_models/auth_state.dart';
 import '../../../../app/service_locator.dart';
@@ -38,12 +39,12 @@ class _AdminProfileTabBody extends StatelessWidget {
 
     final displayName = user?.name.isNotEmpty == true
         ? user!.name
-        : 'المشرف العام';
+        : 'profile.admin_role_badge'.tr();
     final displayEmail = user?.email.isNotEmpty == true ? user!.email : '-';
     final displayPhone = user?.phone?.isNotEmpty == true ? user!.phone! : '-';
     final displayCity = user?.city?.isNotEmpty == true
         ? user!.city!
-        : 'المقر الرئيسي';
+        : 'info_content.headquarters'.tr();
 
     return BlocBuilder<AdminOverviewCubit, AdminOverviewState>(
       builder: (context, state) {
@@ -58,95 +59,12 @@ class _AdminProfileTabBody extends StatelessWidget {
             child: Column(
               children: [
                 // 1. Admin Header Card
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(22),
-                  decoration: BoxDecoration(
-                    gradient: AppColors.primaryGradient,
-                    borderRadius: BorderRadius.circular(24),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.35),
-                        blurRadius: 20,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      Container(
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: AppColors.accentLight,
-                            width: 3,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.15),
-                              blurRadius: 10,
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.admin_panel_settings_rounded,
-                          size: 44,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                      const Gap(14),
-                      Text(
-                        displayName,
-                        style: const TextStyle(
-                          fontSize: 19,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const Gap(4),
-                      Text(
-                        displayEmail,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.white.withValues(alpha: 0.8),
-                        ),
-                      ),
-                      const Gap(12),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: Colors.white30),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.security_rounded,
-                              size: 15,
-                              color: AppColors.accentLight,
-                            ),
-                            const Gap(6),
-                            Text(
-                              'profile.admin_role_badge'.tr(),
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                UnifiedProfileHeader(
+                  name: displayName,
+                  subtitle: displayEmail,
+                  badgeText: 'profile.admin_role_badge'.tr(),
+                  badgeIcon: Icons.security_rounded,
+                  avatarIcon: Icons.admin_panel_settings_rounded,
                 ),
 
                 const Gap(20),

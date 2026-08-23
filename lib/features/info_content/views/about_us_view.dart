@@ -7,6 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'package:qout/core/constants/app_colors.dart';
 
 import '../../../../app/service_locator.dart';
+import '../../../../core/widgets/cards/app_hero_card.dart';
+import '../../../../core/widgets/common/info_key_value_row.dart';
 import '../../../../core/widgets/feedback/app_error_state_widget.dart';
 import '../../../../core/widgets/feedback/app_loading_indicator.dart';
 import '../../../../core/widgets/feedback/alfajr_refresh_indicator.dart';
@@ -64,98 +66,13 @@ class _AboutUsViewBody extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   // 1. Hero Brand Card
-                  Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      gradient: AppColors.primaryGradient,
-                      borderRadius: BorderRadius.circular(28),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primary.withValues(alpha: 0.35),
-                          blurRadius: 22,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        Container(
-                          width: 88,
-                          height: 88,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: AppColors.accentLight.withValues(alpha: 0.9),
-                              width: 2.5,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.25),
-                                blurRadius: 16,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(44),
-                            child: Image.asset(
-                              'assets/images/app_logo.png',
-                              fit: BoxFit.cover,
-                              errorBuilder: (ctx, err, stack) => const Icon(
-                                Icons.spa_rounded,
-                                size: 44,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const Gap(14),
-                        Text(
-                          about.title(lang),
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        if (about.tagline(lang).isNotEmpty) ...[
-                          const Gap(6),
-                          Text(
-                            about.tagline(lang),
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.white.withValues(alpha: 0.9),
-                              height: 1.4,
-                            ),
-                          ),
-                        ],
-                        const Gap(14),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.18),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.3),
-                            ),
-                          ),
-                          child: Text(
-                            'info_content.about.version_label'.tr(namedArgs: {'version': about.version}),
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.accentLight,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1, end: 0),
+                  AppHeroCard(
+                    imageAssetPath: 'assets/images/app_logo.png',
+                    title: about.title(lang),
+                    subtitle: about.tagline(lang),
+                    badgeText: 'info_content.about.version_label'.tr(namedArgs: {'version': about.version}),
+                    iconSize: 88,
+                  ),
 
                   if (about.description(lang).isNotEmpty) ...[
                     const Gap(20),
@@ -249,27 +166,25 @@ class _AboutUsViewBody extends StatelessWidget {
                     title: 'info_content.about.hq_and_contact'.tr(),
                     content: Column(
                       children: [
-                        if (about.headquarters(lang).isNotEmpty) ...[
-                          _buildInfoRow(
-                            Icons.location_on_outlined,
-                            'info_content.about.headquarters'.tr(),
-                            about.headquarters(lang),
+                        if (about.headquarters(lang).isNotEmpty)
+                          InfoKeyValueRow(
+                            icon: Icons.location_on_outlined,
+                            label: 'info_content.about.headquarters'.tr(),
+                            value: about.headquarters(lang),
+                            showDivider: true,
                           ),
-                          const Divider(height: 16, color: AppColors.borderLight),
-                        ],
-                        if (about.email.isNotEmpty) ...[
-                          _buildInfoRow(
-                            Icons.email_outlined,
-                            'info_content.about.official_email'.tr(),
-                            about.email,
+                        if (about.email.isNotEmpty)
+                          InfoKeyValueRow(
+                            icon: Icons.email_outlined,
+                            label: 'info_content.about.official_email'.tr(),
+                            value: about.email,
+                            showDivider: about.phone.isNotEmpty,
                           ),
-                          const Divider(height: 16, color: AppColors.borderLight),
-                        ],
                         if (about.phone.isNotEmpty)
-                          _buildInfoRow(
-                            Icons.phone_outlined,
-                            'info_content.about.hotline'.tr(),
-                            about.phone,
+                          InfoKeyValueRow(
+                            icon: Icons.phone_outlined,
+                            label: 'info_content.about.hotline'.tr(),
+                            value: about.phone,
                           ),
                       ],
                     ),
@@ -332,31 +247,6 @@ class _AboutUsViewBody extends StatelessWidget {
           content,
         ],
       ),
-    );
-  }
-
-  Widget _buildInfoRow(IconData icon, String label, String value) {
-    return Row(
-      children: [
-        Icon(icon, size: 16, color: AppColors.textMutedLight),
-        const Gap(8),
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 13,
-            color: AppColors.textSecondaryLight,
-          ),
-        ),
-        const Spacer(),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimaryLight,
-          ),
-        ),
-      ],
     );
   }
 }
