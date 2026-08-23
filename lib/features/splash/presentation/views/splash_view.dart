@@ -124,11 +124,13 @@ class _SplashViewBody extends StatelessWidget {
                   // 2. Brand Name Typography
                   Text(
                         'app_name'.tr(),
+                        textAlign: TextAlign.center,
                         style: const TextStyle(
-                          fontSize: 38,
-                          fontWeight: FontWeight.w800,
+                          fontSize: 28,
+                          fontWeight: FontWeight.w900,
                           color: Colors.white,
-                          letterSpacing: 2.0,
+                          letterSpacing: 0,
+                          height: 1.2,
                         ),
                       )
                       .animate()

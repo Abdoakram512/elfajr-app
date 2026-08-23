@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:qout/core/constants/app_colors.dart';
 import 'package:qout/core/widgets/feedback/alfajr_refresh_indicator.dart';
+import 'package:qout/core/widgets/feedback/alfajr_shimmer.dart';
 import 'package:qout/features/beneficiary/view_models/beneficiary_cubit.dart';
 import 'package:qout/features/beneficiary/view_models/beneficiary_state.dart';
 import 'package:qout/features/beneficiary/widgets/digital_aid_card_widget.dart';
@@ -53,6 +54,8 @@ class BeneficiaryHomeTab extends StatelessWidget {
                   // Digital Aid Card Widget
                   if (card != null)
                     DigitalAidCardWidget(card: card)
+                  else if (state.isLoading)
+                    const AlfajrShimmer.card()
                   else
                     Container(
                       width: double.infinity,

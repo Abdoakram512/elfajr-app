@@ -11,8 +11,8 @@ class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl({
     required AuthRemoteDataSource remoteDataSource,
     required AuthLocalDataSource localDataSource,
-  })  : _remoteDataSource = remoteDataSource,
-        _localDataSource = localDataSource;
+  }) : _remoteDataSource = remoteDataSource,
+       _localDataSource = localDataSource;
 
   @override
   Future<UserModel?> getCurrentUser() async {
@@ -22,7 +22,8 @@ class AuthRepositoryImpl implements AuthRepository {
     // 1. Try to fetch fresh live state from Firestore first
     try {
       if (cachedUser != null) {
-        final remoteUser = await _remoteDataSource.getUserDataById(cachedUser.uid) ??
+        final remoteUser =
+            await _remoteDataSource.getUserDataById(cachedUser.uid) ??
             await _remoteDataSource.getUserDataByEmail(cachedUser.email);
 
         if (remoteUser != null) {
@@ -60,7 +61,8 @@ class AuthRepositoryImpl implements AuthRepository {
     final cachedUser = _localDataSource.getCachedUserSession();
     try {
       if (cachedUser != null) {
-        final remoteUser = await _remoteDataSource.getUserDataById(cachedUser.uid) ??
+        final remoteUser =
+            await _remoteDataSource.getUserDataById(cachedUser.uid) ??
             await _remoteDataSource.getUserDataByEmail(cachedUser.email);
 
         if (remoteUser != null) {
@@ -114,6 +116,7 @@ class AuthRepositoryImpl implements AuthRepository {
     String? city,
     String? storeName,
     String? commercialReg,
+    String? nationality,
   }) async {
     final user = await _remoteDataSource.registerWithEmailAndPassword(
       email: email,
@@ -124,6 +127,7 @@ class AuthRepositoryImpl implements AuthRepository {
       city: city,
       storeName: storeName,
       commercialReg: commercialReg,
+      nationality: nationality,
     );
 
     await _localDataSource.setRememberMe(true);

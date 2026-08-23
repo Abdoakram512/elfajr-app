@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import '../../../../core/utils/arabic_normalizer.dart';
 import '../models/admin_beneficiary_item.dart';
 import '../models/admin_merchant_item.dart';
 
@@ -21,23 +22,21 @@ class AdminMerchantsState extends Equatable {
 
   List<AdminMerchantItem> get filteredMerchants {
     if (searchQuery.trim().isEmpty) return merchants;
-    final q = searchQuery.toLowerCase().trim();
     return merchants.where((m) {
-      return m.name.toLowerCase().contains(q) ||
-          m.city.toLowerCase().contains(q) ||
-          m.storeType.toLowerCase().contains(q);
+      return ArabicNormalizer.matches(m.name, searchQuery) ||
+          ArabicNormalizer.matches(m.city, searchQuery) ||
+          ArabicNormalizer.matches(m.storeType, searchQuery);
     }).toList();
   }
 
   List<AdminBeneficiaryItem> get filteredBeneficiaries {
     if (searchQuery.trim().isEmpty) return beneficiaries;
-    final q = searchQuery.toLowerCase().trim();
     return beneficiaries.where((b) {
-      return b.name.toLowerCase().contains(q) ||
-          b.email.toLowerCase().contains(q) ||
-          b.phone.toLowerCase().contains(q) ||
-          b.city.toLowerCase().contains(q) ||
-          b.cardId.toLowerCase().contains(q);
+      return ArabicNormalizer.matches(b.name, searchQuery) ||
+          ArabicNormalizer.matches(b.email, searchQuery) ||
+          ArabicNormalizer.matches(b.phone, searchQuery) ||
+          ArabicNormalizer.matches(b.city, searchQuery) ||
+          ArabicNormalizer.matches(b.cardId, searchQuery);
     }).toList();
   }
 

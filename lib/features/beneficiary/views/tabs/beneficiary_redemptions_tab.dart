@@ -6,6 +6,7 @@ import 'package:gap/gap.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/utils/app_formatters.dart';
 import '../../../../core/widgets/feedback/alfajr_refresh_indicator.dart';
+import '../../../../core/widgets/feedback/alfajr_shimmer.dart';
 import '../../view_models/beneficiary_cubit.dart';
 import '../../view_models/beneficiary_state.dart';
 
@@ -24,7 +25,14 @@ class BeneficiaryRedemptionsTab extends StatelessWidget {
           ),
           body: AlfajrRefreshIndicator(
             onRefresh: () => context.read<BeneficiaryCubit>().refreshData(),
-            child: state.redemptions.isEmpty
+            child: state.isLoading && state.redemptions.isEmpty
+                ? ListView.separated(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                    itemCount: 4,
+                    separatorBuilder: (context, index) => const Gap(12),
+                    itemBuilder: (context, index) => const AlfajrShimmer.listTile(),
+                  )
+                : state.redemptions.isEmpty
                 ? ListView(
                     physics: const AlwaysScrollableScrollPhysics(),
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 80),

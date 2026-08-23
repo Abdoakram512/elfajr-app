@@ -21,6 +21,7 @@ abstract class AuthRemoteDataSource {
     String? city,
     String? storeName,
     String? commercialReg,
+    String? nationality,
   });
   Future<void> signOut();
   Future<void> sendPasswordResetEmail(String email);
@@ -168,6 +169,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     String? city,
     String? storeName,
     String? commercialReg,
+    String? nationality,
   }) async {
     final normalizedEmail = email.trim().toLowerCase();
 
@@ -217,7 +219,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           'totalBalance': 600.0,
           'foodBasketsQuota': 2,
           'status': isAutoApproved ? 'active' : 'pending',
-          'nationality': 'مصرية',
+          'nationality': nationality ?? 'مصرية',
           'residence': city ?? 'القاهرة',
           'securityHash': uniqueSuffix,
           'activatedAt': DateTime.now().toIso8601String(),
@@ -244,6 +246,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
             'totalBalance': 600.0,
             'foodBasketsQuota': 2,
             'status': isAutoApproved ? 'active' : 'pending',
+            'nationality': nationality ?? 'مصرية',
             'securityHash': uniqueSuffix,
           });
         }
@@ -260,6 +263,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         isActive: isAutoApproved,
         activeCardId: activeCardId,
         nationalId: nationalId,
+        nationality: nationality ?? (role == UserRole.beneficiary ? 'مصرية' : null),
         storeName: storeName,
         commercialReg: commercialReg,
         createdAt: DateTime.now(),

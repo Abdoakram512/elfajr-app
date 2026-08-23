@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -49,10 +50,43 @@ class _RegisterViewBodyState extends State<_RegisterViewBody> {
   final _cityController = TextEditingController();
   final _extraDetailsController = TextEditingController();
 
+  String _selectedNationality = 'مصرية';
+  List<String> _nationalities = [
+    'مصرية',
+    'سورية',
+    'سودانية',
+    'يمنية',
+    'فلسطينية',
+    'أردنية',
+    'عراقية',
+    'لبنانية',
+    'أخرى',
+  ];
+
   @override
   void initState() {
     super.initState();
     _selectedRole = widget.initialRole;
+    _fetchNationalities();
+  }
+
+  void _fetchNationalities() {
+    FirebaseFirestore.instance.collection('nationalities').get().then((snap) {
+      if (snap.docs.isNotEmpty && mounted) {
+        setState(() {
+          final list = snap.docs
+              .map((d) => (d.data()['name'] ?? d.id).toString().trim())
+              .where((name) => name.isNotEmpty)
+              .toList();
+          if (list.isNotEmpty) {
+            _nationalities = list;
+            if (!_nationalities.contains(_selectedNationality)) {
+              _selectedNationality = _nationalities.first;
+            }
+          }
+        });
+      }
+    }).catchError((_) {});
   }
 
   @override
@@ -70,6 +104,8 @@ class _RegisterViewBodyState extends State<_RegisterViewBody> {
   void _submitRegister() {
     if (_formKey.currentState?.validate() ?? false) {
       final isMerchant = _selectedRole == UserRole.merchant;
+      final isBeneficiary = _selectedRole == UserRole.beneficiary;
+
       context.read<AuthCubit>().register(
         name: _nameController.text.trim(),
         email: _emailController.text.trim(),
@@ -79,6 +115,7 @@ class _RegisterViewBodyState extends State<_RegisterViewBody> {
         city: _cityController.text.trim(),
         storeName: isMerchant ? _nameController.text.trim() : null,
         commercialReg: isMerchant ? _extraDetailsController.text.trim() : null,
+        nationality: isBeneficiary ? _selectedNationality : null,
       );
     }
   }
@@ -179,14 +216,17 @@ class _RegisterViewBodyState extends State<_RegisterViewBody> {
                           ),
                           const Gap(8),
                           Expanded(
-                            child: Text(
-                              '${'auth.registering_as'.tr()} ${'auth.role_${_selectedRole.name}'.tr()}',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primary,
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerRight,
+                              child: Text(
+                                '${'auth.registering_as'.tr()} ${'auth.role_${_selectedRole.name}'.tr()}',
+                                maxLines: 1,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primary,
+                                ),
                               ),
                             ),
                           ),
@@ -268,7 +308,7 @@ class _RegisterViewBodyState extends State<_RegisterViewBody> {
 
                     const Gap(18),
 
-                    // Role-Specific Fields (City, Skills, Store Info)
+                    // Role-Specific Fields (City, Nationality, Skills, Store Info)
                     if (_selectedRole == UserRole.volunteer ||
                         _selectedRole == UserRole.beneficiary ||
                         _selectedRole == UserRole.merchant) ...[
@@ -285,26 +325,95 @@ class _RegisterViewBodyState extends State<_RegisterViewBody> {
                         },
                       ),
                       const Gap(18),
-                      CustomTextField(
-                        controller: _extraDetailsController,
-                        label: _selectedRole == UserRole.merchant
-                            ? 'auth.store_name_label'.tr()
-                            : (_selectedRole == UserRole.volunteer
-                                  ? 'auth.skills_label'.tr()
-                                  : 'auth.aid_type_label'.tr()),
-                        hint: _selectedRole == UserRole.merchant
-                            ? 'auth.store_name_hint'.tr()
-                            : (_selectedRole == UserRole.volunteer
-                                  ? 'auth.skills_hint'.tr()
-                                  : 'auth.aid_type_hint'.tr()),
-                        prefixIcon: _selectedRole == UserRole.merchant
-                            ? Icons.storefront_rounded
-                            : (_selectedRole == UserRole.volunteer
-                                  ? Icons.handyman_outlined
-                                  : Icons.category_outlined),
-                        maxLines: 1,
-                      ),
-                      const Gap(18),
+
+                      // Nationality Dropdown for Beneficiary
+                      if (_selectedRole == UserRole.beneficiary) ...[
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'الجنسية',
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.textPrimaryLight,
+                              ),
+                            ),
+                            const Gap(6),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(color: AppColors.borderLight),
+                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton<String>(
+                                  value: _selectedNationality,
+                                  isExpanded: true,
+                                  icon: const Icon(
+                                    Icons.keyboard_arrow_down_rounded,
+                                    color: AppColors.primary,
+                                  ),
+                                  items: _nationalities.map((nat) {
+                                    return DropdownMenuItem<String>(
+                                      value: nat,
+                                      child: Row(
+                                        children: [
+                                          const Icon(
+                                            Icons.public_rounded,
+                                            size: 18,
+                                            color: AppColors.textSecondaryLight,
+                                          ),
+                                          const Gap(10),
+                                          Text(
+                                            nat,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.textPrimaryLight,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }).toList(),
+                                  onChanged: (val) {
+                                    if (val != null) {
+                                      setState(() => _selectedNationality = val);
+                                    }
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const Gap(18),
+                      ],
+
+                      // Volunteer Skills Field
+                      if (_selectedRole == UserRole.volunteer) ...[
+                        CustomTextField(
+                          controller: _extraDetailsController,
+                          label: 'auth.skills_label'.tr(),
+                          hint: 'auth.skills_hint'.tr(),
+                          prefixIcon: Icons.handyman_outlined,
+                          maxLines: 1,
+                        ),
+                        const Gap(18),
+                      ],
+
+                      // Merchant Commercial Reg Field
+                      if (_selectedRole == UserRole.merchant) ...[
+                        CustomTextField(
+                          controller: _extraDetailsController,
+                          label: 'auth.store_name_label'.tr(),
+                          hint: 'auth.store_name_hint'.tr(),
+                          prefixIcon: Icons.storefront_rounded,
+                          maxLines: 1,
+                        ),
+                        const Gap(18),
+                      ],
                     ],
 
                     // Password Field

@@ -28,7 +28,8 @@ class _ForgotPasswordViewBody extends StatefulWidget {
   const _ForgotPasswordViewBody();
 
   @override
-  State<_ForgotPasswordViewBody> createState() => _ForgotPasswordViewBodyState();
+  State<_ForgotPasswordViewBody> createState() =>
+      _ForgotPasswordViewBodyState();
 }
 
 class _ForgotPasswordViewBodyState extends State<_ForgotPasswordViewBody> {
@@ -44,8 +45,8 @@ class _ForgotPasswordViewBodyState extends State<_ForgotPasswordViewBody> {
   void _submitReset() {
     if (_formKey.currentState?.validate() ?? false) {
       context.read<AuthCubit>().resetPassword(
-            email: _emailController.text.trim(),
-          );
+        email: _emailController.text.trim(),
+      );
     }
   }
 
@@ -105,7 +106,10 @@ class _ForgotPasswordViewBodyState extends State<_ForgotPasswordViewBody> {
                           color: AppColors.primary,
                         ),
                       ),
-                    ).animate().scale(duration: 400.ms, curve: Curves.easeOutBack),
+                    ).animate().scale(
+                      duration: 400.ms,
+                      curve: Curves.easeOutBack,
+                    ),
 
                     const Gap(28),
 

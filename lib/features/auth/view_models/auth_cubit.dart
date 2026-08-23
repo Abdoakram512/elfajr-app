@@ -60,6 +60,7 @@ class AuthCubit extends Cubit<AuthState> {
     String? city,
     String? storeName,
     String? commercialReg,
+    String? nationality,
   }) async {
     emit(AuthLoading());
     try {
@@ -72,6 +73,7 @@ class AuthCubit extends Cubit<AuthState> {
         city: city,
         storeName: storeName,
         commercialReg: commercialReg,
+        nationality: nationality,
       );
       emit(Authenticated(user));
     } catch (e) {
