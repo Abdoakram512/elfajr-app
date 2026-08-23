@@ -293,6 +293,7 @@ class MerchantHomeTab extends StatelessWidget {
                           );
                         },
                         style: ElevatedButton.styleFrom(
+                          alignment: Alignment.center,
                           backgroundColor: AppColors.primary,
                           foregroundColor: Colors.white,
                           elevation: 2,
@@ -303,27 +304,30 @@ class MerchantHomeTab extends StatelessWidget {
                           ),
                         ),
                         child: Center(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(
-                                Icons.qr_code_scanner_rounded,
-                                color: Colors.white,
-                                size: 22,
-                              ),
-                              const Gap(10),
-                              Text(
-                                'dashboard.merchant.scan_to_redeem'.tr(),
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.qr_code_scanner_rounded,
                                   color: Colors.white,
+                                  size: 22,
                                 ),
-                              ),
-                            ],
+                                const Gap(10),
+                                Text(
+                                  'dashboard.merchant.scan_to_redeem'.tr(),
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -341,6 +345,7 @@ class MerchantHomeTab extends StatelessWidget {
                           ManualSearchSheet.show(context, cubit);
                         },
                         style: OutlinedButton.styleFrom(
+                          alignment: Alignment.center,
                           backgroundColor: Colors.white,
                           padding: EdgeInsets.zero,
                           side: BorderSide(
@@ -352,27 +357,30 @@ class MerchantHomeTab extends StatelessWidget {
                           ),
                         ),
                         child: Center(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(
-                                Icons.search_rounded,
-                                color: AppColors.primary,
-                                size: 20,
-                              ),
-                              const Gap(8),
-                              Text(
-                                'dashboard.merchant.manual_search'.tr(),
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.textPrimaryLight,
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.search_rounded,
+                                  color: AppColors.primary,
+                                  size: 20,
                                 ),
-                              ),
-                            ],
+                                const Gap(8),
+                                Text(
+                                  'dashboard.merchant.manual_search'.tr(),
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.textPrimaryLight,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -396,6 +404,7 @@ class MerchantHomeTab extends StatelessWidget {
                             );
                           },
                           style: OutlinedButton.styleFrom(
+                            alignment: Alignment.center,
                             backgroundColor: const Color(0xFFFFFBEB),
                             padding: EdgeInsets.zero,
                             side: const BorderSide(
@@ -407,28 +416,31 @@ class MerchantHomeTab extends StatelessWidget {
                             ),
                           ),
                           child: Center(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(
-                                  Icons.add_alert_rounded,
-                                  color: Color(0xFFD97706),
-                                  size: 20,
-                                ),
-                                const Gap(8),
-                                Text(
-                                  'dashboard.merchant.request_extra_disbursement'
-                                      .tr(),
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFFB45309),
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(
+                                    Icons.add_alert_rounded,
+                                    color: Color(0xFFD97706),
+                                    size: 20,
                                   ),
-                                ),
-                              ],
+                                  const Gap(8),
+                                  Text(
+                                    'dashboard.merchant.request_extra_disbursement'
+                                        .tr(),
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFFB45309),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -452,6 +464,7 @@ class MerchantHomeTab extends StatelessWidget {
                             );
                           },
                           style: OutlinedButton.styleFrom(
+                            alignment: Alignment.center,
                             backgroundColor: const Color(0xFFF0FDF4),
                             padding: EdgeInsets.zero,
                             side: const BorderSide(
@@ -463,27 +476,30 @@ class MerchantHomeTab extends StatelessWidget {
                             ),
                           ),
                           child: const Center(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.receipt_long_rounded,
-                                  color: Color(0xFF15803D),
-                                  size: 20,
-                                ),
-                                Gap(8),
-                                Text(
-                                  'سجل وصولات الدفع والحوالات (معاينة الصور)',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.receipt_long_rounded,
                                     color: Color(0xFF15803D),
+                                    size: 20,
                                   ),
-                                ),
-                              ],
+                                  Gap(8),
+                                  Text(
+                                    'سجل وصولات الدفع والحوالات (معاينة الصور)',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF15803D),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),

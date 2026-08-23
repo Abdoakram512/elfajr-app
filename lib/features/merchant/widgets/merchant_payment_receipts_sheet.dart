@@ -416,39 +416,58 @@ class _MerchantPaymentReceiptsSheetState
                             const Gap(14),
                             SizedBox(
                               width: double.infinity,
-                              height: 42,
-                              child: ElevatedButton.icon(
+                              height: 44,
+                              child: ElevatedButton(
                                 onPressed: isConfirming
                                     ? null
                                     : () => _confirmReceipt(r),
-                                icon: isConfirming
-                                    ? const SizedBox(
-                                        width: 16,
-                                        height: 16,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          color: Colors.white,
-                                        ),
-                                      )
-                                    : const Icon(
-                                        Icons.check_circle_outline_rounded,
-                                        size: 18,
-                                      ),
-                                label: Text(
-                                  isConfirming
-                                      ? 'جاري التأكيد...'
-                                      : 'تأكيد استلام المبلغ في حسابي ✅',
-                                  style: const TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
                                 style: ElevatedButton.styleFrom(
+                                  alignment: Alignment.center,
                                   backgroundColor: const Color(0xFF0A734D),
                                   foregroundColor: Colors.white,
+                                  padding: EdgeInsets.zero,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
                                   ),
+                                ),
+                                child: Center(
+                                  child: isConfirming
+                                      ? const SizedBox(
+                                          width: 18,
+                                          height: 18,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: Colors.white,
+                                          ),
+                                        )
+                                      : const FittedBox(
+                                          fit: BoxFit.scaleDown,
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(
+                                                Icons
+                                                    .check_circle_outline_rounded,
+                                                size: 18,
+                                                color: Colors.white,
+                                              ),
+                                              Gap(8),
+                                              Text(
+                                                'تأكيد استلام المبلغ في حسابي ✅',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
                                 ),
                               ),
                             ),
