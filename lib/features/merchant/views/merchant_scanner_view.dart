@@ -6,6 +6,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../../../app/service_locator.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/utils/haptic_feedback_helper.dart';
 import '../view_models/redemption_cubit.dart';
 import '../view_models/redemption_state.dart';
 import '../widgets/manual_search_sheet.dart';
@@ -51,6 +52,7 @@ class _MerchantScannerBodyState extends State<_MerchantScannerBody> {
     final barcodes = capture.barcodes;
     if (barcodes.isNotEmpty && barcodes.first.rawValue != null) {
       final code = barcodes.first.rawValue!;
+      HapticHelper.medium();
       setState(() => _isProcessing = true);
       context.read<RedemptionCubit>().onQrCodeScanned(code);
     }
@@ -89,6 +91,7 @@ class _MerchantScannerBodyState extends State<_MerchantScannerBody> {
             }
           });
         } else if (state is RedemptionSuccess) {
+          HapticHelper.success();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Row(

@@ -16,6 +16,16 @@ class CardPrinterService {
     );
   }
 
+  static Future<void> shareAidCard({
+    required AidCardModel card,
+  }) async {
+    final bytes = await generateCardPdf(card: card);
+    await Printing.sharePdf(
+      bytes: bytes,
+      filename: 'Alfajr_Aid_Card_${card.cardId}.pdf',
+    );
+  }
+
   static Future<Uint8List> generateCardPdf({
     required AidCardModel card,
   }) async {

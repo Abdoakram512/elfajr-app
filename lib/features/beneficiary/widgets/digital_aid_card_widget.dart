@@ -5,6 +5,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/services/card_printer_service.dart';
+import '../../../../core/utils/haptic_feedback_helper.dart';
 import '../models/aid_card_model.dart';
 
 class DigitalAidCardWidget extends StatelessWidget {
@@ -13,6 +14,7 @@ class DigitalAidCardWidget extends StatelessWidget {
   const DigitalAidCardWidget({super.key, required this.card});
 
   void _showEnlargedQrDialog(BuildContext context) {
+    HapticHelper.light();
     final cleanedNationalId = card.nationalId.replaceAll(RegExp(r'\s+'), '');
 
     showDialog(
@@ -107,27 +109,60 @@ class DigitalAidCardWidget extends StatelessWidget {
                   ),
                 ],
                 const Gap(16),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.pop(dialogContext);
-                    CardPrinterService.printAidCard(card: card);
-                  },
-                  icon: const Icon(Icons.print_rounded, size: 20),
-                  label: Text(
-                    'digital_card.print_card_button'.tr(),
-                    style: const TextStyle(
-                      fontSize: 14.5,
-                      fontWeight: FontWeight.bold,
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          HapticHelper.medium();
+                          Navigator.pop(dialogContext);
+                          CardPrinterService.printAidCard(card: card);
+                        },
+                        icon: const Icon(Icons.print_rounded, size: 18),
+                        label: Text(
+                          'digital_card.print_card_button'.tr(),
+                          style: const TextStyle(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    minimumSize: const Size(double.infinity, 48),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
+                    const Gap(10),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          HapticHelper.medium();
+                          Navigator.pop(dialogContext);
+                          CardPrinterService.shareAidCard(card: card);
+                        },
+                        icon: const Icon(Icons.share_rounded, size: 18),
+                        label: const Text(
+                          'مشاركة / حفظ',
+                          style: TextStyle(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.primary,
+                          side: const BorderSide(color: AppColors.primary, width: 1.5),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
                 const Gap(8),
                 Container(
