@@ -7,6 +7,7 @@ import 'package:qout/core/widgets/feedback/alfajr_refresh_indicator.dart';
 import 'package:qout/core/widgets/feedback/alfajr_shimmer.dart';
 import 'package:qout/features/beneficiary/view_models/beneficiary_cubit.dart';
 import 'package:qout/features/beneficiary/view_models/beneficiary_state.dart';
+import 'package:qout/features/beneficiary/widgets/beneficiary_monthly_statement.dart';
 import 'package:qout/features/beneficiary/widgets/digital_aid_card_widget.dart';
 
 class BeneficiaryHomeTab extends StatelessWidget {
@@ -32,6 +33,11 @@ class BeneficiaryHomeTab extends StatelessWidget {
         final thisMonthSpent = thisMonthRedemptions.fold<double>(
           0.0,
           (sum, r) => sum + r.amountDeducted,
+        );
+
+        final thisMonthBasketsSpent = thisMonthRedemptions.fold<int>(
+          0,
+          (sum, r) => sum + r.foodBasketsDeducted,
         );
 
         final currentBalance = card?.totalBalance ?? 0.0;
@@ -79,211 +85,16 @@ class BeneficiaryHomeTab extends StatelessWidget {
 
                   const Gap(20),
 
-                  // ── NEW: Monthly Balance & Aid Statement ("كان كام وبقى كام") ──
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [AppColors.primarySubtle, Colors.white],
-                        begin: Alignment.topRight,
-                        end: Alignment.bottomLeft,
-                      ),
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(
-                        color: AppColors.primary.withValues(alpha: 0.2),
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primary.withValues(alpha: 0.04),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
+                  // ── Section 2: Smart Monthly Statement Breakdown ──
+                  if (card != null)
+                    BeneficiaryMonthlyStatement(
+                      initialMonthEstimate: initialMonthEstimate,
+                      thisMonthSpent: thisMonthSpent,
+                      availableBalance: currentBalance,
+                      foodBasketsQuota: card.foodBasketsQuota,
+                      thisMonthBasketsSpent: thisMonthBasketsSpent,
+                      now: now,
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.primary,
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: const Icon(
-                                      Icons.account_balance_wallet_outlined,
-                                      color: Colors.white,
-                                      size: 18,
-                                    ),
-                                  ),
-                                  const Gap(10),
-                                  Expanded(
-                                    child: Text(
-                                      'dashboard.beneficiary.monthly_statement'
-                                          .tr(),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w900,
-                                        color: AppColors.textPrimaryLight,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const Gap(8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppColors.primarySubtle,
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: AppColors.primary.withValues(
-                                    alpha: 0.3,
-                                  ),
-                                ),
-                              ),
-                              child: Text(
-                                DateFormat('MMMM yyyy', 'ar').format(now),
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.primary,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const Gap(16),
-
-                        // Financial Breakdown Row
-                        Row(
-                          children: [
-                            // Initial Balance
-                            Expanded(
-                              child: Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(
-                                    color: AppColors.borderLight,
-                                  ),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'dashboard.beneficiary.monthly_initial'
-                                          .tr(),
-                                      style: const TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.textSecondaryLight,
-                                      ),
-                                    ),
-                                    const Gap(4),
-                                    Text(
-                                      '${currencyFormatter.format(initialMonthEstimate)} ${'common.currency'.tr()}',
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w900,
-                                        color: AppColors.textPrimaryLight,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            const Gap(10),
-
-                            // Spent this month
-                            Expanded(
-                              child: Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(
-                                    color: AppColors.borderLight,
-                                  ),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'dashboard.beneficiary.monthly_spent'
-                                          .tr(),
-                                      style: const TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.textSecondaryLight,
-                                      ),
-                                    ),
-                                    const Gap(4),
-                                    Text(
-                                      '-${currencyFormatter.format(thisMonthSpent)} ${'common.currency'.tr()}',
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w900,
-                                        color: AppColors.error,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const Gap(12),
-
-                        // Current Remaining Badge
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 10,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.primarySubtle,
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'dashboard.beneficiary.monthly_remaining'.tr(),
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.primary,
-                                ),
-                              ),
-                              Text(
-                                '${currencyFormatter.format(currentBalance)} ${'common.currency'.tr()}',
-                                style: const TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w900,
-                                  color: AppColors.primary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
 
                   const Gap(24),
 

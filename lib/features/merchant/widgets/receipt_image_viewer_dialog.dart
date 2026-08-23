@@ -19,6 +19,18 @@ class ReceiptImageViewerDialog extends StatelessWidget {
     required this.referenceNumber,
   });
 
+  static Future<void> show(BuildContext context, dynamic receipt) {
+    return showDialog(
+      context: context,
+      builder: (ctx) => ReceiptImageViewerDialog(
+        imageUrl: receipt.receiptImageUrl ?? '',
+        title: receipt.merchantStoreName ?? receipt.merchantName,
+        amount: receipt.amount,
+        referenceNumber: receipt.referenceNumber,
+      ),
+    );
+  }
+
   Widget _buildImage() {
     if (imageUrl.startsWith('data:image')) {
       try {
