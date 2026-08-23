@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../models/user_role.dart';
+import '../models/register_params.dart';
 import '../repositories/auth_repository.dart';
 import 'auth_state.dart';
 
@@ -9,6 +9,10 @@ class AuthCubit extends Cubit<AuthState> {
   AuthCubit({required AuthRepository authRepository})
       : _authRepository = authRepository,
         super(AuthInitial());
+
+  Stream<List<String>> streamNationalities() {
+    return _authRepository.streamNationalities();
+  }
 
   Future<void> checkAuthStatus() async {
     emit(AuthLoading());
@@ -47,39 +51,19 @@ class AuthCubit extends Cubit<AuthState> {
       );
       emit(Authenticated(user));
     } catch (e) {
-      emit(AuthError(e.toString().replaceAll('Exception: ', '')));
+      final messageKey = _normalizeError(e);
+      emit(AuthError(messageKey));
     }
   }
 
-  Future<void> register({
-    required String email,
-    required String password,
-    required String name,
-    required UserRole role,
-    String? phone,
-    String? city,
-    String? storeName,
-    String? commercialReg,
-    String? nationality,
-    String? nationalId,
-  }) async {
+  Future<void> register(RegisterParams params) async {
     emit(AuthLoading());
     try {
-      final user = await _authRepository.register(
-        email: email,
-        password: password,
-        name: name,
-        role: role,
-        phone: phone,
-        city: city,
-        storeName: storeName,
-        commercialReg: commercialReg,
-        nationality: nationality,
-        nationalId: nationalId,
-      );
+      final user = await _authRepository.register(params);
       emit(Authenticated(user));
     } catch (e) {
-      emit(AuthError(e.toString().replaceAll('Exception: ', '')));
+      final messageKey = _normalizeError(e);
+      emit(AuthError(messageKey));
     }
   }
 
@@ -89,7 +73,8 @@ class AuthCubit extends Cubit<AuthState> {
       await _authRepository.sendPasswordReset(email);
       emit(PasswordResetSent(email));
     } catch (e) {
-      emit(AuthError(e.toString().replaceAll('Exception: ', '')));
+      final messageKey = _normalizeError(e);
+      emit(AuthError(messageKey));
     }
   }
 
@@ -99,10 +84,18 @@ class AuthCubit extends Cubit<AuthState> {
       await _authRepository.signOut();
       emit(Unauthenticated());
     } catch (e) {
-      emit(AuthError(e.toString().replaceAll('Exception: ', '')));
+      final messageKey = _normalizeError(e);
+      emit(AuthError(messageKey));
     }
   }
 
   String? getSavedEmail() => _authRepository.getSavedEmail();
   bool getRememberMe() => _authRepository.getRememberMe();
+
+  String _normalizeError(dynamic error) {
+    var str = error.toString();
+    str = str.replaceAll('Exception: ', '').replaceAll('AppException: ', '').trim();
+    if (str.isEmpty) return 'auth_errors.user_not_found';
+    return str;
+  }
 }

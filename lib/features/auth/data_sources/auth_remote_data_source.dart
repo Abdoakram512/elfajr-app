@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../core/errors/failure.dart';
+import '../models/register_params.dart';
 import '../models/user_model.dart';
-import '../models/user_role.dart';
 
 abstract class AuthRemoteDataSource {
   Future<UserModel?> getCurrentUserData();
@@ -12,20 +12,10 @@ abstract class AuthRemoteDataSource {
     required String email,
     required String password,
   });
-  Future<UserModel> registerWithEmailAndPassword({
-    required String email,
-    required String password,
-    required String name,
-    required UserRole role,
-    String? phone,
-    String? city,
-    String? storeName,
-    String? commercialReg,
-    String? nationality,
-    String? nationalId,
-  });
+  Future<UserModel> registerWithEmailAndPassword(RegisterParams params);
   Future<void> signOut();
   Future<void> sendPasswordResetEmail(String email);
+  Stream<List<String>> streamNationalities();
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -39,6 +29,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         _firestore = firestore ?? FirebaseFirestore.instance;
 
   @override
+  Stream<List<String>> streamNationalities() {
+    return _firestore.collection('nationalities').snapshots().map((snap) {
+      return snap.docs
+          .map((d) => (d.data()['name'] ?? d.id).toString().trim())
+          .where((n) => n.isNotEmpty)
+          .toSet()
+          .toList();
+    });
+  }
+
+  @override
   Future<UserModel?> getCurrentUserData() async {
     final currentUser = _firebaseAuth.currentUser;
     if (currentUser == null) return null;
@@ -48,19 +49,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       if (doc.exists && doc.data() != null) {
         return UserModel.fromMap(doc.data()!, documentId: doc.id);
       }
-
-      if (currentUser.email != null) {
-        final emailUser = await getUserDataByEmail(currentUser.email!);
-        if (emailUser != null) {
-          return emailUser;
-        }
-      }
-
-      // User document was deleted from Firestore -> sign out from Firebase Auth
-      await _firebaseAuth.signOut();
       return null;
-    } catch (e) {
-      throw AppException('Failed to fetch user data: $e');
+    } catch (_) {
+      return null;
     }
   }
 
@@ -140,40 +131,46 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       if (query.docs.isNotEmpty) {
         final doc = query.docs.first;
         final data = doc.data();
-        final storedPassword = data['password'] as String?;
-        final userEmail = data['email'] as String? ?? normalizedEmail;
 
-        if (storedPassword != null && storedPassword != password) {
-          throw const AppException('auth_errors.wrong_password');
+        // Direct Password Match
+        final storedPassword = data['password']?.toString();
+        if (storedPassword != null && storedPassword.isNotEmpty) {
+          if (storedPassword == password) {
+            return UserModel.fromMap(data, documentId: doc.id);
+          } else {
+            throw const AppException('auth_errors.wrong_password');
+          }
         }
 
-        // Try Firebase Auth in parallel to establish session if available
+        // Fallback: If no plaintext password, authenticate via Firebase Auth
+        final firestoreEmail = data['email']?.toString() ?? normalizedEmail;
         try {
-          await _firebaseAuth.signInWithEmailAndPassword(
-            email: userEmail,
+          final credential = await _firebaseAuth.signInWithEmailAndPassword(
+            email: firestoreEmail,
             password: password,
           );
-        } catch (_) {}
-
-        return UserModel.fromMap(data, documentId: doc.id);
+          if (credential.user != null) {
+            return UserModel.fromMap(data, documentId: doc.id);
+          }
+        } on FirebaseAuthException catch (e) {
+          throw AppException(_mapFirebaseAuthError(e.code));
+        }
       }
 
-      // 2. If not found in direct Firestore query, attempt Firebase Auth sign in
-      final credential = await _firebaseAuth.signInWithEmailAndPassword(
-        email: normalizedEmail,
-        password: password,
-      );
-
-      final user = credential.user;
-      if (user != null) {
-        final doc = await _firestore.collection('users').doc(user.uid).get();
-        if (doc.exists && doc.data() != null) {
-          return UserModel.fromMap(doc.data()!, documentId: doc.id);
+      // If document not found in Firestore query, attempt Firebase Auth as last resort
+      try {
+        final credential = await _firebaseAuth.signInWithEmailAndPassword(
+          email: normalizedEmail,
+          password: password,
+        );
+        if (credential.user != null) {
+          final userDoc = await _firestore.collection('users').doc(credential.user!.uid).get();
+          if (userDoc.exists && userDoc.data() != null) {
+            return UserModel.fromMap(userDoc.data()!, documentId: userDoc.id);
+          }
         }
-
-        // The user document was deleted by Admin from Firestore -> Reject and Sign Out!
-        await _firebaseAuth.signOut();
-        throw const AppException('auth_errors.user_not_found');
+      } on FirebaseAuthException catch (e) {
+        throw AppException(_mapFirebaseAuthError(e.code));
       }
 
       throw const AppException('auth_errors.user_not_found');
@@ -182,30 +179,19 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('auth_errors.user_not_found');
+      throw const AppException('auth_errors.user_not_found');
     }
   }
 
   @override
-  Future<UserModel> registerWithEmailAndPassword({
-    required String email,
-    required String password,
-    required String name,
-    required UserRole role,
-    String? phone,
-    String? city,
-    String? storeName,
-    String? commercialReg,
-    String? nationality,
-    String? nationalId,
-  }) async {
-    final cleanPhone = phone?.trim();
-    final cleanNationalId = (nationalId != null && nationalId.trim().isNotEmpty)
-        ? nationalId.trim().replaceAll(RegExp(r'\s+'), '').toUpperCase()
+  Future<UserModel> registerWithEmailAndPassword(RegisterParams params) async {
+    final cleanPhone = params.phone?.trim();
+    final cleanNationalId = (params.nationalId != null && params.nationalId!.trim().isNotEmpty)
+        ? params.nationalId!.trim().replaceAll(RegExp(r'\s+'), '').toUpperCase()
         : null;
 
     try {
-      // 1. STRICT UNIQUE CHECK: Phone Number must NOT be duplicated for ANY user
+      // 1. UNIQUE CHECK: Phone Number
       if (cleanPhone != null && cleanPhone.isNotEmpty) {
         final existingPhone = await _firestore
             .collection('users')
@@ -218,8 +204,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         }
       }
 
-      // 2. STRICT UNIQUE CHECK: National ID / Passport must NOT be duplicated for Beneficiaries
-      if (role == UserRole.beneficiary && cleanNationalId != null && cleanNationalId.isNotEmpty) {
+      // 2. UNIQUE CHECK: National ID / Passport for Beneficiaries
+      if (params.isBeneficiary && cleanNationalId != null && cleanNationalId.isNotEmpty) {
         final existingNatId = await _firestore
             .collection('users')
             .where('nationalId', isEqualTo: cleanNationalId)
@@ -231,13 +217,13 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         }
       }
 
-      // Determine the technical email for Firebase Auth
-      String normalizedEmail = email.trim().toLowerCase();
-      if (role == UserRole.beneficiary && (normalizedEmail.isEmpty || !normalizedEmail.contains('@'))) {
+      // Technical email for Firebase Auth
+      String normalizedEmail = params.email.trim().toLowerCase();
+      if (params.isBeneficiary && (normalizedEmail.isEmpty || !normalizedEmail.contains('@'))) {
         normalizedEmail = '${cleanNationalId?.toLowerCase() ?? 'usr_${DateTime.now().millisecondsSinceEpoch}'}@alfajr.app';
       }
 
-      // Check if email already exists in Firestore
+      // Check email uniqueness
       final existingEmail = await _firestore
           .collection('users')
           .where('email', isEqualTo: normalizedEmail)
@@ -245,7 +231,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           .get();
 
       if (existingEmail.docs.isNotEmpty) {
-        if (role == UserRole.beneficiary) {
+        if (params.isBeneficiary) {
           throw const AppException('auth_errors.national_id_already_in_use');
         } else {
           throw const AppException('auth_errors.email_already_in_use');
@@ -258,21 +244,20 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       try {
         final credential = await _firebaseAuth.createUserWithEmailAndPassword(
           email: normalizedEmail,
-          password: password,
+          password: params.password,
         );
         if (credential.user != null) {
           uid = credential.user!.uid;
-          await credential.user!.updateDisplayName(name);
+          await credential.user!.updateDisplayName(params.name);
         }
       } catch (_) {}
 
       String? activeCardId;
       String? finalNationalId = cleanNationalId;
+      final bool isAutoApproved = params.isAdmin;
 
-      final bool isAutoApproved = role == UserRole.admin;
-
-      // Automatically provision an Aid Card if registering as a beneficiary (pending approval)
-      if (role == UserRole.beneficiary) {
+      // Automatically provision Aid Card for Beneficiaries
+      if (params.isBeneficiary) {
         final uniqueSuffix = '${DateTime.now().millisecondsSinceEpoch}'.substring(4);
         activeCardId = 'FAJR-CARD-$uniqueSuffix';
         finalNationalId = cleanNationalId ?? 'N-$uniqueSuffix';
@@ -280,63 +265,46 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         final aidCardData = {
           'cardId': activeCardId,
           'beneficiaryId': uid,
-          'beneficiaryName': name,
+          'beneficiaryName': params.name,
           'nationalId': finalNationalId,
           'familyCount': 4,
           'totalBalance': 600.0,
           'foodBasketsQuota': 2,
           'status': isAutoApproved ? 'active' : 'pending',
-          'nationality': nationality ?? 'مصرية',
-          'residence': city ?? 'القاهرة',
+          'nationality': params.nationality ?? 'مصري',
+          'residence': params.city ?? 'القاهرة',
           'securityHash': uniqueSuffix,
           'activatedAt': DateTime.now().toIso8601String(),
           'expiresAt': DateTime.now().add(const Duration(days: 365)).toIso8601String(),
-          'fieldResearchStatus':
-              isAutoApproved ? 'معتمد ومسجل حديثاً' : 'قيد مراجعة الإدارة',
+          'fieldResearchStatus': isAutoApproved ? 'معتمد ومسجل حديثاً' : 'قيد مراجعة الإدارة',
           'totalBasketsDelivered': 0,
           'extraNotes': 'حساب مستفيد رسمي مسجل من التطبيق',
         };
 
         try {
-          await _firestore
-              .collection('aid_cards')
-              .doc(activeCardId)
-              .set(aidCardData);
-        } catch (e) {
-          await _firestore.collection('aid_cards').doc(activeCardId).set({
-            'cardId': activeCardId,
-            'beneficiaryId': uid,
-            'beneficiaryName': name,
-            'nationalId': finalNationalId,
-            'familyCount': 4,
-            'totalBalance': 600.0,
-            'foodBasketsQuota': 2,
-            'status': isAutoApproved ? 'active' : 'pending',
-            'nationality': nationality ?? 'مصرية',
-            'securityHash': uniqueSuffix,
-          });
-        }
+          await _firestore.collection('aid_cards').doc(activeCardId).set(aidCardData);
+        } catch (_) {}
       }
 
       final userModel = UserModel(
         uid: uid,
         email: normalizedEmail,
-        name: name,
+        name: params.name,
         phone: cleanPhone,
-        role: role,
-        city: city ?? 'القاهرة',
+        role: params.role,
+        city: params.city ?? 'القاهرة',
         isApproved: isAutoApproved,
         isActive: isAutoApproved,
         activeCardId: activeCardId,
         nationalId: finalNationalId,
-        nationality: nationality ?? (role == UserRole.beneficiary ? 'مصرية' : null),
-        storeName: storeName,
-        commercialReg: commercialReg,
+        nationality: params.nationality,
+        storeName: params.storeName,
+        commercialReg: params.commercialReg,
         createdAt: DateTime.now(),
       );
 
       final userMap = userModel.toMap();
-      userMap['password'] = password;
+      userMap['password'] = params.password;
 
       await _firestore.collection('users').doc(uid).set(userMap);
       return userModel;
@@ -345,13 +313,15 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('auth_errors.user_not_found');
+      throw const AppException('auth_errors.user_not_found');
     }
   }
 
   @override
   Future<void> signOut() async {
-    await _firebaseAuth.signOut();
+    try {
+      await _firebaseAuth.signOut();
+    } catch (_) {}
   }
 
   @override
@@ -366,12 +336,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   String _mapFirebaseAuthError(String code) {
     switch (code) {
       case 'user-not-found':
-      case 'invalid-credential':
-      case 'configuration-not-found':
-      case 'operation-not-allowed':
-        return 'auth_errors.user_not_found';
       case 'wrong-password':
-        return 'auth_errors.wrong_password';
+      case 'invalid-credential':
+        return 'auth_errors.user_not_found';
       case 'email-already-in-use':
         return 'auth_errors.email_already_in_use';
       case 'invalid-email':

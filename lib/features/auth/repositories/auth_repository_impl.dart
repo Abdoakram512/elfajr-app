@@ -1,7 +1,7 @@
 import '../data_sources/auth_local_data_source.dart';
 import '../data_sources/auth_remote_data_source.dart';
+import '../models/register_params.dart';
 import '../models/user_model.dart';
-import '../models/user_role.dart';
 import 'auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
@@ -11,8 +11,13 @@ class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl({
     required AuthRemoteDataSource remoteDataSource,
     required AuthLocalDataSource localDataSource,
-  }) : _remoteDataSource = remoteDataSource,
-       _localDataSource = localDataSource;
+  })  : _remoteDataSource = remoteDataSource,
+        _localDataSource = localDataSource;
+
+  @override
+  Stream<List<String>> streamNationalities() {
+    return _remoteDataSource.streamNationalities();
+  }
 
   @override
   Future<UserModel?> getCurrentUser() async {
@@ -47,7 +52,7 @@ class AuthRepositoryImpl implements AuthRepository {
         }
       }
     } catch (_) {
-      // If network error / completely offline, allow cached session as fallback
+      // If offline, fallback to cached session if rememberMe is enabled
       if (rememberMe && cachedUser != null) {
         return cachedUser;
       }
@@ -69,7 +74,6 @@ class AuthRepositoryImpl implements AuthRepository {
           await _localDataSource.saveUserSession(remoteUser);
           return remoteUser;
         } else {
-          // User was deleted from Firestore!
           await _localDataSource.clearUserSession();
           await _remoteDataSource.signOut();
           return null;
@@ -107,30 +111,8 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<UserModel> register({
-    required String email,
-    required String password,
-    required String name,
-    required UserRole role,
-    String? phone,
-    String? city,
-    String? storeName,
-    String? commercialReg,
-    String? nationality,
-    String? nationalId,
-  }) async {
-    final user = await _remoteDataSource.registerWithEmailAndPassword(
-      email: email,
-      password: password,
-      name: name,
-      role: role,
-      phone: phone,
-      city: city,
-      storeName: storeName,
-      commercialReg: commercialReg,
-      nationality: nationality,
-      nationalId: nationalId,
-    );
+  Future<UserModel> register(RegisterParams params) async {
+    final user = await _remoteDataSource.registerWithEmailAndPassword(params);
 
     await _localDataSource.setRememberMe(true);
     await _localDataSource.saveUserSession(user);

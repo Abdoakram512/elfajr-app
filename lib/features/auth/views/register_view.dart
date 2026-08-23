@@ -10,6 +10,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/routes/route_names.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../core/widgets/primary_button.dart';
+import '../models/register_params.dart';
 import '../models/user_role.dart';
 import '../view_models/auth_cubit.dart';
 import '../view_models/auth_state.dart';
@@ -89,7 +90,7 @@ class _RegisterViewBodyState extends State<_RegisterViewBody> {
         return;
       }
 
-      context.read<AuthCubit>().register(
+      final params = RegisterParams(
         name: _nameController.text.trim(),
         email: isBeneficiary ? '' : _emailController.text.trim(),
         password: _passwordController.text,
@@ -101,6 +102,8 @@ class _RegisterViewBodyState extends State<_RegisterViewBody> {
         nationality: isBeneficiary ? _selectedNationality : null,
         nationalId: isBeneficiary ? _nationalIdController.text.trim() : null,
       );
+
+      context.read<AuthCubit>().register(params);
     }
   }
 
@@ -111,7 +114,7 @@ class _RegisterViewBodyState extends State<_RegisterViewBody> {
         if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.message),
+              content: Text(state.message.tr()),
               backgroundColor: AppColors.error,
               behavior: SnackBarBehavior.floating,
             ),

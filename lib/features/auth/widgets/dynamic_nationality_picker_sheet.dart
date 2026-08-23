@@ -1,25 +1,29 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import '../../../../app/service_locator.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/utils/arabic_normalizer.dart';
 import '../../../../core/widgets/sheets/app_sheet_scaffold.dart';
+import '../repositories/auth_repository.dart';
 
 class DynamicNationalityPickerSheet extends StatefulWidget {
   final String? selectedNationality;
   final ValueChanged<String> onSelected;
+  final Stream<List<String>>? nationalitiesStream;
 
   const DynamicNationalityPickerSheet({
     super.key,
     this.selectedNationality,
     required this.onSelected,
+    this.nationalitiesStream,
   });
 
   static Future<void> show(
     BuildContext context, {
     String? selectedNationality,
     required ValueChanged<String> onSelected,
+    Stream<List<String>>? nationalitiesStream,
   }) {
     return showModalBottomSheet(
       context: context,
@@ -28,6 +32,8 @@ class DynamicNationalityPickerSheet extends StatefulWidget {
       builder: (ctx) => DynamicNationalityPickerSheet(
         selectedNationality: selectedNationality,
         onSelected: onSelected,
+        nationalitiesStream:
+            nationalitiesStream ?? getIt<AuthRepository>().streamNationalities(),
       ),
     );
   }
@@ -43,14 +49,15 @@ class _DynamicNationalityPickerSheetState
 
   @override
   Widget build(BuildContext context) {
+    final stream = widget.nationalitiesStream ??
+        getIt<AuthRepository>().streamNationalities();
+
     return AppSheetScaffold(
       title: 'auth.select_nationality'.tr(),
       subtitle: 'auth.search_nationalities'.tr(),
       icon: Icons.flag_rounded,
-      child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-        stream: FirebaseFirestore.instance
-            .collection('nationalities')
-            .snapshots(),
+      child: StreamBuilder<List<String>>(
+        stream: stream,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Padding(
@@ -73,16 +80,7 @@ class _DynamicNationalityPickerSheetState
             );
           }
 
-          final docs = snapshot.data?.docs ?? [];
-          final allNationalities = docs
-              .map((d) {
-                final data = d.data();
-                final name = (data['name'] ?? d.id).toString().trim();
-                return name;
-              })
-              .where((n) => n.isNotEmpty)
-              .toSet()
-              .toList();
+          final allNationalities = snapshot.data ?? [];
 
           final filtered = allNationalities.where((n) {
             if (_searchQuery.isEmpty) return true;
