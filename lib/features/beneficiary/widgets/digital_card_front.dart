@@ -4,7 +4,6 @@ import 'package:gap/gap.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/services/card_printer_service.dart';
-import '../../../../core/utils/nationality_formatter.dart';
 import '../models/aid_card_model.dart';
 import 'digital_card_enlarged_qr_dialog.dart';
 
@@ -23,7 +22,7 @@ class DigitalCardFront extends StatelessWidget {
     final currencyFormatter = NumberFormat('#,###');
     final dateFormatter = DateFormat('yyyy/MM/dd');
     final cleanedNationalId = card.nationalId.replaceAll(RegExp(r'\s+'), '');
-    final displayNat = card.nationality.toMasculineNationality();
+    final displayNat = card.nationality ?? '';
 
     return Container(
       width: double.infinity,

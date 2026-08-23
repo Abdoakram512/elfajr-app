@@ -5,7 +5,6 @@ import 'package:gap/gap.dart';
 
 import '../../../../app/service_locator.dart';
 import '../../../../core/constants/app_colors.dart';
-import '../../../../core/utils/nationality_formatter.dart';
 import '../../../../core/widgets/dialogs/logout_confirm_dialog.dart';
 import '../../../../core/widgets/profile/profile_info_content_links.dart';
 import '../../../../core/widgets/profile/profile_info_row.dart';
@@ -39,10 +38,10 @@ class BeneficiaryProfileTab extends StatelessWidget {
     return BlocBuilder<BeneficiaryCubit, BeneficiaryState>(
       builder: (context, state) {
         final card = state.activeCard;
-        final rawNat = user?.nationality ?? card?.nationality;
-        final displayNat = rawNat.toMasculineNationality().isNotEmpty
-            ? rawNat.toMasculineNationality()
-            : '-';
+        final rawNat = (user?.nationality?.isNotEmpty == true)
+            ? user!.nationality!
+            : (card?.nationality?.isNotEmpty == true ? card!.nationality! : '-');
+        final displayNat = rawNat;
 
         return Scaffold(
           backgroundColor: AppColors.backgroundLight,

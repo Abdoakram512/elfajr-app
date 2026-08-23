@@ -4,7 +4,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../../../../core/constants/app_colors.dart';
-import '../../../../core/utils/nationality_formatter.dart';
 import '../../beneficiary/models/aid_card_model.dart';
 import 'enlarged_qr_dialog.dart';
 
@@ -21,7 +20,7 @@ class BeneficiaryCardSummary extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currencyFormatter = NumberFormat('#,###');
-    final formattedNat = card.nationality.toMasculineNationality();
+    final formattedNat = card.nationality ?? '';
 
     return Container(
       padding: const EdgeInsets.all(16),
