@@ -35,7 +35,8 @@ class ReceiptImageViewerDialog extends StatelessWidget {
     if (imageUrl.startsWith('data:image')) {
       try {
         final commaIdx = imageUrl.indexOf(',');
-        final base64Str = commaIdx != -1 ? imageUrl.substring(commaIdx + 1) : imageUrl;
+        final base64Str =
+            commaIdx != -1 ? imageUrl.substring(commaIdx + 1) : imageUrl;
         final Uint8List bytes = base64Decode(base64Str);
         return Image.memory(
           bytes,
@@ -53,7 +54,7 @@ class ReceiptImageViewerDialog extends StatelessWidget {
       loadingBuilder: (context, child, progress) {
         if (progress == null) return child;
         return const Center(
-          child: CircularProgressIndicator(color: AppColors.accent),
+          child: CircularProgressIndicator(color: AppColors.primary),
         );
       },
       errorBuilder: (context, error, stackTrace) => _buildFallback(),
@@ -65,11 +66,19 @@ class ReceiptImageViewerDialog extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.broken_image_rounded, size: 48, color: Colors.white54),
+          const Icon(
+            Icons.broken_image_rounded,
+            size: 48,
+            color: AppColors.textMutedLight,
+          ),
           const Gap(8),
           Text(
             'merchant.receipt_viewer.error_loading'.tr(),
-            style: const TextStyle(color: Colors.white70, fontSize: 13),
+            style: const TextStyle(
+              color: AppColors.textSecondaryLight,
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ],
       ),
@@ -78,18 +87,20 @@ class ReceiptImageViewerDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currencyFormatter = NumberFormat('#,##0', 'ar');
+
     return Dialog(
       backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.all(16),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 24),
       child: Container(
         constraints: const BoxConstraints(maxHeight: 650, maxWidth: 500),
         decoration: BoxDecoration(
-          color: const Color(0xFF0F172A),
+          color: Colors.white,
           borderRadius: BorderRadius.circular(28),
-          border: Border.all(color: Colors.white12),
+          border: Border.all(color: AppColors.borderLight, width: 1.5),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.5),
+              color: Colors.black.withValues(alpha: 0.15),
               blurRadius: 30,
               offset: const Offset(0, 10),
             ),
@@ -98,9 +109,17 @@ class ReceiptImageViewerDialog extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Top Bar
-            Padding(
+            // ── 1. Branded Header (Imperial Emerald & Gold) ──
+            Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFF063A28), Color(0xFF0A734D)],
+                  begin: Alignment.topRight,
+                  end: Alignment.bottomLeft,
+                ),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(26)),
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -109,12 +128,15 @@ class ReceiptImageViewerDialog extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: AppColors.accent.withValues(alpha: 0.2),
+                          color: Colors.white.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.25),
+                          ),
                         ),
                         child: const Icon(
                           Icons.receipt_long_rounded,
-                          color: AppColors.accent,
+                          color: Color(0xFFFDE68A),
                           size: 20,
                         ),
                       ),
@@ -130,35 +152,35 @@ class ReceiptImageViewerDialog extends StatelessWidget {
                               color: Colors.white,
                             ),
                           ),
-                          Text(
-                            'merchant.receipt_viewer.ref_label'.tr(namedArgs: {'ref': referenceNumber}),
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontFamily: 'monospace',
-                              color: Colors.white.withValues(alpha: 0.6),
+                          if (referenceNumber.isNotEmpty)
+                            Text(
+                              'merchant.receipt_viewer.ref_label'
+                                  .tr(namedArgs: {'ref': referenceNumber}),
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontFamily: 'monospace',
+                                color: Colors.white.withValues(alpha: 0.8),
+                              ),
                             ),
-                          ),
                         ],
                       ),
                     ],
                   ),
                   IconButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(Icons.close_rounded, color: Colors.white70),
+                    icon: const Icon(Icons.close_rounded, color: Colors.white),
                     style: IconButton.styleFrom(
-                      backgroundColor: Colors.white10,
+                      backgroundColor: Colors.white.withValues(alpha: 0.15),
                     ),
                   ),
                 ],
               ),
             ),
 
-            const Divider(color: Colors.white12, height: 1),
-
-            // Zoomable Image
+            // ── 2. Zoomable Image Container ──
             Expanded(
               child: Container(
-                color: Colors.black38,
+                color: const Color(0xFFF8FAFC),
                 child: InteractiveViewer(
                   minScale: 0.8,
                   maxScale: 4.0,
@@ -175,9 +197,9 @@ class ReceiptImageViewerDialog extends StatelessWidget {
               ),
             ),
 
-            const Divider(color: Colors.white12, height: 1),
+            const Divider(color: AppColors.borderLight, height: 1),
 
-            // Bottom Info Bar
+            // ── 3. Bottom Info Bar ──
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
               child: Row(
@@ -188,25 +210,36 @@ class ReceiptImageViewerDialog extends StatelessWidget {
                     children: [
                       Text(
                         'merchant.receipt_viewer.amount_label'.tr(),
-                        style: const TextStyle(fontSize: 11, color: Colors.white60),
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textSecondaryLight,
+                        ),
                       ),
                       Text(
-                        '${amount.toStringAsFixed(0)} ${'common.currency'.tr()}',
+                        '${currencyFormatter.format(amount)} ${'common.currency'.tr()}',
                         style: const TextStyle(
-                          fontSize: 18,
+                          fontSize: 19,
                           fontWeight: FontWeight.w900,
-                          color: AppColors.accent,
+                          color: Color(0xFF0A734D),
                         ),
                       ),
                     ],
                   ),
                   ElevatedButton.icon(
                     onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(Icons.check_rounded, size: 18),
-                    label: Text('merchant.receipt_viewer.close'.tr()),
+                    icon: const Icon(Icons.check_rounded,
+                        size: 18, color: Colors.white),
+                    label: Text(
+                      'merchant.receipt_viewer.close'.tr(),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.accent,
-                      foregroundColor: AppColors.primaryDark,
+                      backgroundColor: AppColors.primary,
+                      elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
                       ),

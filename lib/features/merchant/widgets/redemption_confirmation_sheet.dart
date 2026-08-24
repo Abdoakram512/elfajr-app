@@ -14,10 +14,7 @@ import 'redemption_receipt_card.dart';
 class RedemptionConfirmationSheet extends StatefulWidget {
   final AidCardModel card;
 
-  const RedemptionConfirmationSheet({
-    super.key,
-    required this.card,
-  });
+  const RedemptionConfirmationSheet({super.key, required this.card});
 
   @override
   State<RedemptionConfirmationSheet> createState() =>
@@ -52,7 +49,9 @@ class _RedemptionConfirmationSheetState
       amount: amount,
       foodBaskets: 0,
       enteredPin: _pinController.text,
-      notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
+      notes: _notesController.text.trim().isEmpty
+          ? null
+          : _notesController.text.trim(),
     );
   }
 
@@ -63,7 +62,9 @@ class _RedemptionConfirmationSheetState
         final isSuccess = state is RedemptionSuccess;
         final isSubmitting = state is RedemptionSubmitting;
         final pinError = state is RedemptionCardLoaded ? state.pinError : null;
-        final amountError = state is RedemptionCardLoaded ? state.amountError : null;
+        final amountError = state is RedemptionCardLoaded
+            ? state.amountError
+            : null;
 
         return Padding(
           padding: EdgeInsets.only(
@@ -97,8 +98,12 @@ class _RedemptionConfirmationSheetState
                     Row(
                       children: [
                         Icon(
-                          isSuccess ? Icons.check_circle_rounded : Icons.person_rounded,
-                          color: isSuccess ? AppColors.success : AppColors.primary,
+                          isSuccess
+                              ? Icons.check_circle_rounded
+                              : Icons.person_rounded,
+                          color: isSuccess
+                              ? AppColors.success
+                              : AppColors.primary,
                         ),
                         const Gap(8),
                         Text(
@@ -114,7 +119,10 @@ class _RedemptionConfirmationSheetState
                       ],
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
                       decoration: BoxDecoration(
                         color: isSuccess
                             ? AppColors.success.withValues(alpha: 0.15)
@@ -127,7 +135,9 @@ class _RedemptionConfirmationSheetState
                           Icon(
                             Icons.security_rounded,
                             size: 13,
-                            color: isSuccess ? AppColors.success : AppColors.primary,
+                            color: isSuccess
+                                ? AppColors.success
+                                : AppColors.primary,
                           ),
                           const Gap(4),
                           Text(
@@ -135,7 +145,9 @@ class _RedemptionConfirmationSheetState
                             style: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
-                              color: isSuccess ? AppColors.success : AppColors.primary,
+                              color: isSuccess
+                                  ? AppColors.success
+                                  : AppColors.primary,
                             ),
                           ),
                         ],
@@ -159,7 +171,10 @@ class _RedemptionConfirmationSheetState
 
                   // Automatic Fixed Amount Policy Banner
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 10,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFECFDF5),
                       borderRadius: BorderRadius.circular(14),
@@ -193,7 +208,9 @@ class _RedemptionConfirmationSheetState
                     label: 'merchant.enter_deduction_amount'.tr(),
                     hint: '30.0',
                     prefixIcon: Icons.payments_outlined,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
                   ),
                   if (amountError != null) ...[
                     const Gap(6),
@@ -216,7 +233,9 @@ class _RedemptionConfirmationSheetState
                       color: AppColors.backgroundLight,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: pinError != null ? AppColors.error : AppColors.borderLight,
+                        color: pinError != null
+                            ? AppColors.error
+                            : AppColors.borderLight,
                         width: pinError != null ? 1.5 : 1.0,
                       ),
                     ),
@@ -225,7 +244,11 @@ class _RedemptionConfirmationSheetState
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.verified_user_rounded, size: 16, color: AppColors.primary),
+                            const Icon(
+                              Icons.verified_user_rounded,
+                              size: 16,
+                              color: AppColors.primary,
+                            ),
                             const Gap(6),
                             Text(
                               'merchant.security_verification_title'.tr(),

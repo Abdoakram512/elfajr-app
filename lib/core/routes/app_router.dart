@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:qout/features/merchant/views/merchant_payment_receipts_view.dart';
 
 import '../../features/admin/views/admin_main_view.dart';
 import '../../features/auth/models/user_role.dart';
@@ -54,7 +55,9 @@ class AppRouter {
       GoRoute(
         path: RouteNames.accountSuspended,
         builder: (context, state) {
-          final user = state.extra is UserModel ? state.extra as UserModel : null;
+          final user = state.extra is UserModel
+              ? state.extra as UserModel
+              : null;
           return AccountSuspendedView(user: user);
         },
       ),
@@ -90,7 +93,15 @@ class AppRouter {
         path: RouteNames.contactSupport,
         builder: (context, state) => const ContactSupportView(),
       ),
+      GoRoute(
+        path: RouteNames.merchantPaymentReceipts,
+        builder: (context, state) {
+          final merchant = state.extra is UserModel
+              ? state.extra as UserModel
+              : null;
+          return MerchantPaymentReceiptsView(merchant: merchant);
+        },
+      ),
     ],
   );
 }
-

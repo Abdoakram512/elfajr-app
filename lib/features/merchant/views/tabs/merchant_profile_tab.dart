@@ -38,10 +38,8 @@ class MerchantProfileTab extends StatelessWidget {
 
     return BlocBuilder<MerchantDashboardCubit, MerchantDashboardState>(
       builder: (context, state) {
-        final totalBasketsDispensed = state.recentTransactions.fold<int>(
-          0,
-          (sum, item) => sum + item.foodBasketsDeducted,
-        );
+        final uniqueBeneficiaries =
+            state.recentTransactions.map((t) => t.cardId).toSet().length;
 
         return Scaffold(
           backgroundColor: AppColors.backgroundLight,
@@ -105,8 +103,8 @@ class MerchantProfileTab extends StatelessWidget {
                       valueColor: AppColors.primaryDark,
                     ),
                     ProfileInfoRow(
-                      label: 'profile.total_baskets_label'.tr(),
-                      value: '$totalBasketsDispensed ${'profile.baskets_unit'.tr()}',
+                      label: 'merchant.stats_beneficiaries'.tr(),
+                      value: '$uniqueBeneficiaries ${'merchant.beneficiaries_cases_label'.tr()}',
                       valueColor: AppColors.accentDark,
                     ),
                     ProfileInfoRow(

@@ -179,20 +179,20 @@
       "sheet_title": "Payment & Transfer Receipts",
       "sheet_subtitle": "Transfers and funds sent from foundation to your account",
       "empty_title": "No payment receipts sent yet",
-      "empty_desc": "All bank, Vodafone Cash and InstaPay transfer receipts will appear here",
-      "confirm_success": "Transfer of {amount} EGP confirmed successfully ✅",
+      "empty_desc": "All bank, e-wallet and InstaPay transfer receipts will appear here",
+      "confirm_success": "Transfer of {amount} EGP confirmed successfully",
       "confirm_error": "Failed to update receipt confirmation, please try again",
-      "method_instapay": "⚡ InstaPay",
-      "method_vodafone_cash": "📱 Vodafone Cash",
-      "method_bank_transfer": "🏛️ Bank Transfer",
-      "method_cash": "💵 Cash Handover",
-      "status_confirmed": "Confirmed ✅",
-      "status_pending": "Pending Confirmation ⏳",
+      "method_instapay": "InstaPay",
+      "method_vodafone_cash": "E-Wallet",
+      "method_bank_transfer": "Bank Transfer",
+      "method_cash": "Cash Handover",
+      "status_confirmed": "Confirmed",
+      "status_pending": "Pending Confirmation",
       "ref_label": "Ref: {ref}",
       "admin_notes_label": "Admin Note: {notes}",
       "receipt_image_title": "Transfer Receipt ({amount} EGP)",
-      "tap_to_preview": "Tap here to preview and enlarge receipt image 📸",
-      "confirm_button": "Confirm Fund Receipt in My Account ✅"
+      "tap_to_preview": "Tap here to preview receipt image",
+      "confirm_button": "Confirm Fund Receipt"
     },
     "redemption_receipt": {
       "success_title": "Redemption Completed Successfully!",
@@ -257,7 +257,8 @@
       "home": "Home",
       "history": "History",
       "profile": "Profile",
-      "redemptions": "Redemptions"
+      "redemptions": "Redemptions",
+      "receipts": "Receipts"
     },
     "beneficiary": {
       "card_title": "Digital Aid Card",

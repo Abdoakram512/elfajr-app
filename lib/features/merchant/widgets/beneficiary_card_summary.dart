@@ -172,71 +172,41 @@ class BeneficiaryCardSummary extends StatelessWidget {
 
               const Gap(14),
 
-              // Balances Breakdown
+              // Balances Breakdown (Cash Only)
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.14),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'digital_card.available_balance'.tr(),
-                            style: TextStyle(
-                              fontSize: 10.5,
-                              color: Colors.white.withValues(alpha: 0.8),
-                            ),
-                          ),
-                          const Gap(2),
-                          Text(
-                            '${currencyFormatter.format(card.totalBalance)} ${'common.currency'.tr()}',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w900,
-                              color: AppColors.accentLight,
-                            ),
-                          ),
-                        ],
-                      ),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.14),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.2),
                     ),
-                    const Gap(8),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.14),
-                        borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'digital_card.available_balance'.tr(),
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white.withValues(alpha: 0.85),
+                        ),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'digital_card.food_baskets'.tr(),
-                            style: TextStyle(
-                              fontSize: 10.5,
-                              color: Colors.white.withValues(alpha: 0.8),
-                            ),
-                          ),
-                          const Gap(2),
-                          Text(
-                            '${card.foodBasketsQuota} ${'digital_card.baskets_unit'.tr()}',
-                            style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w900,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
+                      const Gap(4),
+                      Text(
+                        '${currencyFormatter.format(card.totalBalance)} ${'common.currency'.tr()}',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.accentLight,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ],

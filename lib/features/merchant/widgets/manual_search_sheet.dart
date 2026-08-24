@@ -39,7 +39,6 @@ class _ManualSearchSheetState extends State<ManualSearchSheet> {
   final _amountController = TextEditingController();
   final _pinController = TextEditingController();
   final _notesController = TextEditingController();
-  bool _deductFoodBasket = false;
 
   @override
   void dispose() {
@@ -56,11 +55,10 @@ class _ManualSearchSheetState extends State<ManualSearchSheet> {
 
   void _onConfirmRedemption() {
     final amount = double.tryParse(_amountController.text.trim()) ?? 0.0;
-    final baskets = _deductFoodBasket ? 1 : 0;
 
     widget.cubit.confirmRedemption(
       amount: amount,
-      foodBaskets: baskets,
+      foodBaskets: 0,
       enteredPin: _pinController.text,
       notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
     );
@@ -71,7 +69,6 @@ class _ManualSearchSheetState extends State<ManualSearchSheet> {
     _amountController.clear();
     _pinController.clear();
     _notesController.clear();
-    setState(() => _deductFoodBasket = false);
     widget.cubit.reset();
   }
 
@@ -213,55 +210,6 @@ class _ManualSearchSheetState extends State<ManualSearchSheet> {
                     prefixIcon: Icons.payments_outlined,
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   ),
-
-                  const Gap(12),
-
-                  if (loadedCard.foodBasketsQuota > 0)
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: AppColors.primarySubtle,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: AppColors.borderLight),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.shopping_basket_rounded,
-                            color: AppColors.primary,
-                            size: 22,
-                          ),
-                          const Gap(12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'merchant.deduct_food_basket'.tr(),
-                                  style: const TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.textPrimaryLight,
-                                  ),
-                                ),
-                                Text(
-                                  'merchant.manual_search_ext.available_baskets'.tr(namedArgs: {'count': '${loadedCard.foodBasketsQuota}'}),
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    color: AppColors.textSecondaryLight,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Switch(
-                            value: _deductFoodBasket,
-                            activeThumbColor: AppColors.primary,
-                            onChanged: (val) => setState(() => _deductFoodBasket = val),
-                          ),
-                        ],
-                      ),
-                    ),
 
                   const Gap(14),
 

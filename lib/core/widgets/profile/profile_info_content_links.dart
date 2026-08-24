@@ -26,7 +26,7 @@ class ProfileInfoContentLinks extends StatelessWidget {
         onTap: () => context.push(RouteNames.aboutUs),
       ),
       ProfileNavigationTile(
-        title: 'info_content.faq'.tr(),
+        title: 'info_content.faq.title'.tr(),
         icon: Icons.quiz_outlined,
         onTap: () => context.push(RouteNames.faq),
       ),

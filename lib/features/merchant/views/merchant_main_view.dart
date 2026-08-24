@@ -8,6 +8,7 @@ import '../view_models/merchant_dashboard_cubit.dart';
 import 'tabs/merchant_history_tab.dart';
 import 'tabs/merchant_home_tab.dart';
 import 'tabs/merchant_profile_tab.dart';
+import 'merchant_payment_receipts_view.dart';
 
 class MerchantMainView extends StatelessWidget {
   const MerchantMainView({super.key});
@@ -40,6 +41,7 @@ class _MerchantMainViewBodyState extends State<_MerchantMainViewBody> {
     final tabs = [
       MerchantHomeTab(onSwitchToHistory: () => _onSwitchTab(1)),
       const MerchantHistoryTab(),
+      const MerchantPaymentReceiptsView(),
       const MerchantProfileTab(),
     ];
 
@@ -58,6 +60,11 @@ class _MerchantMainViewBodyState extends State<_MerchantMainViewBody> {
             icon: Icons.receipt_long_outlined,
             activeIcon: Icons.receipt_long_rounded,
             label: 'dashboard.tabs.history'.tr(),
+          ),
+          CustomBottomNavBarItem(
+            icon: Icons.payments_outlined,
+            activeIcon: Icons.payments_rounded,
+            label: 'dashboard.tabs.receipts'.tr(),
           ),
           CustomBottomNavBarItem(
             icon: Icons.person_outline_rounded,

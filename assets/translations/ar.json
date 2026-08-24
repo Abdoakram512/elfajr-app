@@ -179,20 +179,20 @@
       "sheet_title": "سجل وصولات الدفع والحوالات",
       "sheet_subtitle": "الحوالات والمبالغ المحولة من المؤسسة لحسابك",
       "empty_title": "لا توجد وصولات دفع مرسلة حتى الآن",
-      "empty_desc": "ستظهر هنا كافة إيصالات التحويل البنكي وفودافون كاش وإنستاباي المرسلة لك من الإدارة مع صور الإيصالات",
-      "confirm_success": "تم تأكيد استلام الحوالة بمبلغ {amount} ج.م بنجاح ✅",
+      "empty_desc": "ستظهر هنا كافة إيصالات التحويل البنكي والمحافظ الإلكترونية وإنستاباي المرسلة لك من الإدارة مع صور الإيصالات",
+      "confirm_success": "تم تأكيد استلام الحوالة بمبلغ {amount} ج.م بنجاح",
       "confirm_error": "تعذر تحديث حالة الاستلام، يرجى المحاولة لاحقاً",
-      "method_instapay": "⚡ إنستا باي (InstaPay)",
-      "method_vodafone_cash": "📱 فودافون كاش",
-      "method_bank_transfer": "🏛️ تحويل بنكي",
-      "method_cash": "💵 نقدي باليد",
-      "status_confirmed": "تم التأكيد ✅",
-      "status_pending": "بانتظار تأكيدك ⏳",
+      "method_instapay": "إنستا باي (InstaPay)",
+      "method_vodafone_cash": "محفظة إلكترونية",
+      "method_bank_transfer": "تحويل بنكي",
+      "method_cash": "نقدي باليد",
+      "status_confirmed": "تم التأكيد",
+      "status_pending": "بانتظار التأكيد",
       "ref_label": "مرجع: {ref}",
       "admin_notes_label": "ملاحظة الإدارة: {notes}",
       "receipt_image_title": "صورة إيصال تحويل {amount} ج.م",
-      "tap_to_preview": "اضغط هنا لمعاينة وتكبير صورة وصل التحويل 📸",
-      "confirm_button": "تأكيد استلام المبلغ في حسابي ✅"
+      "tap_to_preview": "اضغط لمعاينة وتكبير صورة الوصل",
+      "confirm_button": "تأكيد استلام المبلغ"
     },
     "redemption_receipt": {
       "success_title": "تمت عملية الصرف بنجاح!",
@@ -257,7 +257,8 @@
       "home": "الرئيسية",
       "history": "السجل",
       "profile": "حسابي",
-      "redemptions": "سجل الصرف"
+      "redemptions": "سجل الصرف",
+      "receipts": "الوصولات"
     },
     "beneficiary": {
       "card_title": "بطاقة الدعم الرقمية",

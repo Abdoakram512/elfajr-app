@@ -10,11 +10,7 @@ class DigitalCardBack extends StatelessWidget {
   final AidCardModel card;
   final VoidCallback onFlip;
 
-  const DigitalCardBack({
-    super.key,
-    required this.card,
-    required this.onFlip,
-  });
+  const DigitalCardBack({super.key, required this.card, required this.onFlip});
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +38,11 @@ class DigitalCardBack extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.verified_user_rounded, color: AppColors.accentLight, size: 20),
+                  const Icon(
+                    Icons.verified_user_rounded,
+                    color: AppColors.accentLight,
+                    size: 20,
+                  ),
                   const Gap(8),
                   Text(
                     'digital_card.usage_instructions_title'.tr(),
@@ -56,7 +56,11 @@ class DigitalCardBack extends StatelessWidget {
               ),
               IconButton(
                 onPressed: onFlip,
-                icon: const Icon(Icons.flip_to_front_rounded, color: Colors.white, size: 20),
+                icon: const Icon(
+                  Icons.flip_to_front_rounded,
+                  color: Colors.white,
+                  size: 20,
+                ),
                 style: IconButton.styleFrom(
                   backgroundColor: Colors.white.withValues(alpha: 0.12),
                   padding: const EdgeInsets.all(6),
@@ -87,7 +91,10 @@ class DigitalCardBack extends StatelessWidget {
                   data: card.cardId,
                   version: QrVersions.auto,
                   size: 64,
-                  eyeStyle: const QrEyeStyle(eyeShape: QrEyeShape.square, color: Colors.black),
+                  eyeStyle: const QrEyeStyle(
+                    eyeShape: QrEyeShape.square,
+                    color: Colors.black,
+                  ),
                 ),
               ),
             ),

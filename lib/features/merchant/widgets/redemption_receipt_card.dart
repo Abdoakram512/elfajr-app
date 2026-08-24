@@ -93,25 +93,12 @@ class RedemptionReceiptCard extends StatelessWidget {
                 isBold: true,
                 valueColor: AppColors.error,
               ),
-              if (transaction.foodBasketsDeducted > 0) ...[
-                const Gap(8),
-                InfoKeyValueRow(
-                  label: 'merchant.redemption_receipt.deducted_baskets'.tr(),
-                  value: '${transaction.foodBasketsDeducted} ${'common.baskets_unit'.tr()}',
-                  isBold: true,
-                ),
-              ],
               const Gap(8),
               InfoKeyValueRow(
                 label: 'merchant.redemption_receipt.remaining_balance'.tr(),
                 value: '${currencyFormatter.format(transaction.remainingBalance)} ${'common.currency'.tr()}',
                 isBold: true,
                 valueColor: AppColors.primary,
-              ),
-              const Gap(8),
-              InfoKeyValueRow(
-                label: 'merchant.redemption_receipt.remaining_baskets'.tr(),
-                value: '${transaction.remainingBaskets} ${'common.baskets_unit'.tr()}',
               ),
             ],
           ),

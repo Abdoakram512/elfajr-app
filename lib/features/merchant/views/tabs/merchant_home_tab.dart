@@ -359,7 +359,7 @@ class MerchantHomeTab extends StatelessWidget {
                             cardId: item.cardId,
                             beneficiaryName: item.beneficiaryName,
                             amount: item.amountDeducted,
-                            foodBaskets: item.foodBasketsDeducted,
+                            foodBaskets: 0,
                             timestamp: item.timestamp,
                             showPrintButton: true,
                           );

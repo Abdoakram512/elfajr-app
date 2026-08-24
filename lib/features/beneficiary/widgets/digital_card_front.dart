@@ -11,11 +11,7 @@ class DigitalCardFront extends StatelessWidget {
   final AidCardModel card;
   final VoidCallback onFlip;
 
-  const DigitalCardFront({
-    super.key,
-    required this.card,
-    required this.onFlip,
-  });
+  const DigitalCardFront({super.key, required this.card, required this.onFlip});
 
   @override
   Widget build(BuildContext context) {
@@ -104,7 +100,10 @@ class DigitalCardFront extends StatelessWidget {
               ),
               const Gap(8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.accent.withValues(alpha: 0.22),
                   borderRadius: BorderRadius.circular(12),
@@ -124,7 +123,11 @@ class DigitalCardFront extends StatelessWidget {
               const Gap(6),
               IconButton(
                 onPressed: onFlip,
-                icon: const Icon(Icons.flip_to_back_rounded, color: Colors.white, size: 20),
+                icon: const Icon(
+                  Icons.flip_to_back_rounded,
+                  color: Colors.white,
+                  size: 20,
+                ),
                 style: IconButton.styleFrom(
                   backgroundColor: Colors.white.withValues(alpha: 0.15),
                   padding: const EdgeInsets.all(6),
@@ -175,7 +178,11 @@ class DigitalCardFront extends StatelessWidget {
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.fullscreen_rounded, size: 12, color: AppColors.primary),
+                          const Icon(
+                            Icons.fullscreen_rounded,
+                            size: 12,
+                            color: AppColors.primary,
+                          ),
                           const Gap(2),
                           Text(
                             'digital_card.tap_to_enlarge'.tr(),
@@ -316,7 +323,10 @@ class DigitalCardFront extends StatelessWidget {
                 children: [
                   if (card.socialStatus != null || displayNat.isNotEmpty)
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(6),
@@ -331,7 +341,10 @@ class DigitalCardFront extends StatelessWidget {
                       ),
                     ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.18),
                       borderRadius: BorderRadius.circular(6),
@@ -339,10 +352,16 @@ class DigitalCardFront extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.people_alt_rounded, size: 12, color: AppColors.accentLight),
+                        const Icon(
+                          Icons.people_alt_rounded,
+                          size: 12,
+                          color: AppColors.accentLight,
+                        ),
                         const Gap(4),
                         Text(
-                          'digital_card.family_members_count'.tr(namedArgs: {'count': '${card.familyCount}'}),
+                          'digital_card.family_members_count'.tr(
+                            namedArgs: {'count': '${card.familyCount}'},
+                          ),
                           style: const TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
@@ -354,7 +373,10 @@ class DigitalCardFront extends StatelessWidget {
                   ),
                   if (card.residence != null && card.residence!.isNotEmpty)
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.18),
                         borderRadius: BorderRadius.circular(6),
@@ -362,7 +384,11 @@ class DigitalCardFront extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.location_on_rounded, size: 12, color: AppColors.accentLight),
+                          const Icon(
+                            Icons.location_on_rounded,
+                            size: 12,
+                            color: AppColors.accentLight,
+                          ),
                           const Gap(4),
                           Text(
                             card.residence!,
@@ -385,7 +411,11 @@ class DigitalCardFront extends StatelessWidget {
                 children: [
                   Text(
                     '${'digital_card.card_number'.tr()}: ',
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                   Text(
                     card.cardId,
@@ -397,7 +427,10 @@ class DigitalCardFront extends StatelessWidget {
                     ),
                   ),
                   if (cleanedNationalId.isNotEmpty) ...[
-                    const Text('   •   ', style: TextStyle(color: Colors.white54)),
+                    const Text(
+                      '   •   ',
+                      style: TextStyle(color: Colors.white54),
+                    ),
                     Text(
                       cleanedNationalId,
                       style: const TextStyle(
@@ -433,7 +466,11 @@ class DigitalCardFront extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.print_rounded, color: Colors.white, size: 16),
+                  const Icon(
+                    Icons.print_rounded,
+                    color: Colors.white,
+                    size: 16,
+                  ),
                   const Gap(8),
                   Text(
                     'digital_card.print_card_button'.tr(),

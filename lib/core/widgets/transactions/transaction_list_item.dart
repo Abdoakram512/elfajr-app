@@ -32,30 +32,44 @@ class TransactionListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currencyFormatter = NumberFormat('#,##0', 'ar');
 
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(18),
       child: Container(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
-          color: AppColors.surfaceLight,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(color: AppColors.borderLight),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.02),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Column(
           children: [
+            // Top Row: Beneficiary Info + Amount
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
                   child: Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(10),
+                        width: 40,
+                        height: 40,
                         decoration: BoxDecoration(
                           color: AppColors.primarySubtle,
                           borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: AppColors.primary.withValues(alpha: 0.15),
+                          ),
                         ),
                         child: const Icon(
                           Icons.receipt_long_rounded,
@@ -69,22 +83,47 @@ class TransactionListItem extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              merchantStoreName ?? beneficiaryName,
+                              beneficiaryName,
                               style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
+                                fontSize: 14.5,
+                                fontWeight: FontWeight.w800,
                                 color: AppColors.textPrimaryLight,
                                 height: 1.25,
                               ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            if (merchantStoreName != null)
-                              Text(
-                                '${'merchant.beneficiary_label'.tr()}: $beneficiaryName',
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: AppColors.textSecondaryLight,
-                                ),
+                            const Gap(4),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 7, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF1F5F9),
+                                borderRadius: BorderRadius.circular(6),
+                                border:
+                                    Border.all(color: const Color(0xFFE2E8F0)),
                               ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(
+                                    Icons.credit_card_rounded,
+                                    size: 11,
+                                    color: AppColors.primary,
+                                  ),
+                                  const Gap(4),
+                                  Text(
+                                    cardId,
+                                    style: const TextStyle(
+                                      fontSize: 10.5,
+                                      fontWeight: FontWeight.w800,
+                                      color: Color(0xFF0F172A),
+                                      fontFamily: 'monospace',
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -96,85 +135,124 @@ class TransactionListItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      '-${AppFormatters.integerNumber.format(amount)} ${'common.currency'.tr()}',
+                      '-${currencyFormatter.format(amount)} ${'common.currency'.tr()}',
                       style: const TextStyle(
                         fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.error,
+                        fontWeight: FontWeight.w900,
+                        color: Color(0xFF0A734D),
                       ),
                     ),
-                    if (foodBaskets > 0)
-                      Text(
-                        '+$foodBaskets ${'digital_card.food_baskets'.tr()}',
-                        style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.accentDark,
+                    if (foodBaskets > 0) ...[
+                      const Gap(2),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFEF3C7),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(color: const Color(0xFFFDE68A)),
+                        ),
+                        child: Text(
+                          '+$foodBaskets ${'digital_card.food_baskets'.tr()}',
+                          style: const TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF92400E),
+                          ),
                         ),
                       ),
+                    ],
                   ],
                 ),
               ],
             ),
+
             const Gap(10),
-            const Divider(height: 1, color: AppColors.borderLight),
+            const Divider(height: 1, color: Color(0xFFF1F5F9)),
             const Gap(8),
+
+            // Bottom Row: Date/Time + Outlet/City + Print Action
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
-                  child: Row(
-                    children: [
-                      Flexible(
-                        child: Text(
-                          '${'digital_card.card_number'.tr()}: $cardId${city != null ? ' • $city' : ''}',
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: AppColors.textMutedLight,
-                          ),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.schedule_rounded,
+                      size: 13,
+                      color: AppColors.textMutedLight,
+                    ),
+                    const Gap(4),
+                    Text(
+                      AppFormatters.fullDate.format(timestamp),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textSecondaryLight,
+                      ),
+                    ),
+                    if (city != null && city!.isNotEmpty) ...[
+                      Text(
+                        ' • $city',
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: AppColors.textMutedLight,
                         ),
                       ),
-                      if (showPrintButton) ...[
-                        const Gap(6),
-                        InkWell(
-                          onTap: () {
-                            CardPrinterService.printAidCard(
-                              card: AidCardModel(
-                                cardId: cardId,
-                                beneficiaryId: '',
-                                beneficiaryName: beneficiaryName,
-                                nationalId: '1089283746',
-                                familyCount: 5,
-                                totalBalance: amount,
-                                foodBasketsQuota: foodBaskets,
-                                status: AidCardStatus.active,
-                                expiresAt: DateTime.now().add(const Duration(days: 180)),
-                                securityHash: '',
-                              ),
-                            );
-                          },
-                          borderRadius: BorderRadius.circular(6),
-                          child: const Padding(
-                            padding: EdgeInsets.all(2.0),
-                            child: Icon(
-                              Icons.print_rounded,
-                              size: 14,
+                    ],
+                  ],
+                ),
+                if (showPrintButton) ...[
+                  InkWell(
+                    onTap: () {
+                      CardPrinterService.printAidCard(
+                        card: AidCardModel(
+                          cardId: cardId,
+                          beneficiaryId: '',
+                          beneficiaryName: beneficiaryName,
+                          nationalId: '1089283746',
+                          familyCount: 5,
+                          totalBalance: amount,
+                          foodBasketsQuota: foodBaskets,
+                          status: AidCardStatus.active,
+                          expiresAt:
+                              DateTime.now().add(const Duration(days: 180)),
+                          securityHash: '',
+                        ),
+                      );
+                    },
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: AppColors.primarySubtle,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                            color: AppColors.primary.withValues(alpha: 0.2)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.print_rounded,
+                            size: 13,
+                            color: AppColors.primary,
+                          ),
+                          const Gap(4),
+                          Text(
+                            'طباعة',
+                            style: const TextStyle(
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.bold,
                               color: AppColors.primary,
                             ),
                           ),
-                        ),
-                      ],
-                    ],
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-                const Gap(8),
-                Text(
-                  AppFormatters.fullDate.format(timestamp),
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: AppColors.textMutedLight,
-                  ),
-                ),
+                ],
               ],
             ),
           ],
