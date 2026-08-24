@@ -3,6 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+// Core Services
+import '../core/services/notification_service.dart';
+
 // Auth Feature
 import '../features/auth/data_sources/auth_local_data_source.dart';
 import '../features/auth/data_sources/auth_remote_data_source.dart';
@@ -44,13 +47,16 @@ import '../features/splash/presentation/cubit/splash_cubit.dart';
 final getIt = GetIt.instance;
 
 Future<void> initServiceLocator() async {
-  // 1. Core External Infrastructure Singletons
+  // 1. Core External Infrastructure & Services Singletons
   final sharedPreferences = await SharedPreferences.getInstance();
   getIt.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
   getIt.registerLazySingleton<FirebaseFirestore>(
     () => FirebaseFirestore.instance,
   );
   getIt.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
+  getIt.registerLazySingleton<NotificationService>(
+    () => NotificationService.instance,
+  );
 
   // 2. Auth Feature Singletons
   getIt.registerLazySingleton<AuthRemoteDataSource>(

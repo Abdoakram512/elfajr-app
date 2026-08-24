@@ -16,19 +16,24 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
 
-  // Initialize Firebase with project options
+  // 1. Initialize Firebase
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-
-    // Initialize Push & Local Notifications (encapsulates background & foreground handlers)
-    await NotificationService.instance.initialize();
   } catch (e) {
-    debugPrint('Firebase & Notification initialization notice: $e');
+    debugPrint('Firebase initialization notice: $e');
   }
 
+  // 2. Initialize Service Locator Dependency Injection
   await initServiceLocator();
+
+  // 3. Initialize Core Notification Service Singleton
+  try {
+    await getIt<NotificationService>().initialize();
+  } catch (e) {
+    debugPrint('NotificationService initialization notice: $e');
+  }
 
   runApp(
     EasyLocalization(

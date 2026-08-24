@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../app/service_locator.dart';
 import '../../../core/services/notification_service.dart';
 import '../models/register_params.dart';
 import '../repositories/auth_repository.dart';
@@ -20,7 +21,7 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       final user = await _authRepository.getCurrentUser();
       if (user != null) {
-        NotificationService.instance.syncFCMToken(user.uid);
+        getIt<NotificationService>().syncFCMToken(user.uid);
         emit(Authenticated(user));
       } else {
         emit(Unauthenticated());
@@ -34,7 +35,7 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       final user = await _authRepository.refreshCurrentUser();
       if (user != null) {
-        NotificationService.instance.syncFCMToken(user.uid);
+        getIt<NotificationService>().syncFCMToken(user.uid);
         emit(Authenticated(user));
       }
     } catch (_) {}
@@ -52,7 +53,7 @@ class AuthCubit extends Cubit<AuthState> {
         password: password,
         rememberMe: rememberMe,
       );
-      NotificationService.instance.syncFCMToken(user.uid);
+      getIt<NotificationService>().syncFCMToken(user.uid);
       emit(Authenticated(user));
     } catch (e) {
       final messageKey = _normalizeError(e);
@@ -64,7 +65,7 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
     try {
       final user = await _authRepository.register(params);
-      NotificationService.instance.syncFCMToken(user.uid);
+      getIt<NotificationService>().syncFCMToken(user.uid);
       emit(Authenticated(user));
     } catch (e) {
       final messageKey = _normalizeError(e);
