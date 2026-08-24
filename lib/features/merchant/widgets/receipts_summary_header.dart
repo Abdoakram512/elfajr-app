@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:qout/core/constants/app_colors.dart';
 
 class ReceiptsSummaryHeader extends StatelessWidget {
   final double totalConfirmed;
@@ -25,19 +26,15 @@ class ReceiptsSummaryHeader extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(22),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF063A28), Color(0xFF0A734D), Color(0xFF0F8A5D)],
-              begin: Alignment.topRight,
-              end: Alignment.bottomLeft,
-            ),
+            gradient: AppColors.receiptsHeaderGradient,
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: const Color(0xFFF59E0B).withValues(alpha: 0.35),
+              color: AppColors.accent.withValues(alpha: 0.35),
               width: 1.5,
             ),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF0A734D).withValues(alpha: 0.25),
+                color: AppColors.primary.withValues(alpha: 0.25),
                 blurRadius: 18,
                 offset: const Offset(0, 6),
               ),
@@ -150,12 +147,12 @@ class ReceiptsSummaryHeader extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
             decoration: BoxDecoration(
-              color: const Color(0xFFFFFBEB),
+              color: AppColors.amber50,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: const Color(0xFFFDE68A), width: 1.5),
+              border: Border.all(color: AppColors.accentLight, width: 1.5),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFFD97706).withValues(alpha: 0.05),
+                  color: AppColors.accentDark.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 3),
                 ),
@@ -166,12 +163,12 @@ class ReceiptsSummaryHeader extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFEF3C7),
+                    color: AppColors.amber100,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
                     Icons.schedule_rounded,
-                    color: Color(0xFFD97706),
+                    color: AppColors.accentDark,
                     size: 22,
                   ),
                 ),

@@ -170,8 +170,8 @@ class _OnboardingViewBodyState extends State<_OnboardingViewBody> {
                         icon: Icons.favorite_rounded,
                         accentColor: AppColors.primary,
                         gradientColors: const [
-                          Color(0xFFE6F5EF),
-                          Color(0xFFC7EBDD),
+                          AppColors.onboardingEmeraldStart,
+                          AppColors.onboardingEmeraldEnd,
                         ],
                         titleKey: 'onboarding.title_1',
                         descKey: 'onboarding.desc_1',
@@ -186,8 +186,8 @@ class _OnboardingViewBodyState extends State<_OnboardingViewBody> {
                         icon: Icons.shield_rounded,
                         accentColor: AppColors.accentDark,
                         gradientColors: const [
-                          Color(0xFFFEF3C7),
-                          Color(0xFFFDE68A),
+                          AppColors.onboardingAmberStart,
+                          AppColors.onboardingAmberEnd,
                         ],
                         titleKey: 'onboarding.title_2',
                         descKey: 'onboarding.desc_2',
@@ -200,10 +200,10 @@ class _OnboardingViewBodyState extends State<_OnboardingViewBody> {
                       // Slide 3: Volunteer Impact
                       _OnboardingSlide(
                         icon: Icons.groups_rounded,
-                        accentColor: const Color(0xFF0284C7),
+                        accentColor: AppColors.info,
                         gradientColors: const [
-                          Color(0xFFE0F2FE),
-                          Color(0xFFBAE6FD),
+                          AppColors.onboardingBlueStart,
+                          AppColors.onboardingBlueEnd,
                         ],
                         titleKey: 'onboarding.title_3',
                         descKey: 'onboarding.desc_3',
@@ -232,7 +232,7 @@ class _OnboardingViewBodyState extends State<_OnboardingViewBody> {
                           activeDotColor: isLastPage
                               ? AppColors.accent
                               : AppColors.primary,
-                          dotColor: const Color(0xFFD1D5DB),
+                          dotColor: AppColors.onboardingDotInactive,
                           dotHeight: 8,
                           dotWidth: 8,
                           expansionFactor: 4,

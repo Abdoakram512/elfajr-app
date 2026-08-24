@@ -1,21 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
+import '../../../../core/utils/firebase_parser_utils.dart';
 import 'user_role.dart';
-
-DateTime _parseDateTime(dynamic value) {
-  if (value == null) return DateTime.now();
-  if (value is Timestamp) return value.toDate();
-  if (value is DateTime) return value;
-  if (value is String) return DateTime.tryParse(value) ?? DateTime.now();
-  return DateTime.now();
-}
-
-double? _parseDouble(dynamic value) {
-  if (value == null) return null;
-  if (value is num) return value.toDouble();
-  if (value is String) return double.tryParse(value);
-  return null;
-}
 
 class UserModel extends Equatable {
   final String uid;
@@ -122,6 +107,8 @@ class UserModel extends Equatable {
     );
   }
 
+  String? get residence => city;
+
   Map<String, dynamic> toMap() {
     return {
       'uid': uid,
@@ -132,6 +119,7 @@ class UserModel extends Equatable {
       'isApproved': isApproved,
       'isActive': isActive,
       'city': city,
+      'residence': city,
       'activeCardId': activeCardId,
       'nationalId': nationalId,
       'nationality': nationality,
@@ -154,12 +142,12 @@ class UserModel extends Equatable {
     return UserModel(
       uid: documentId ?? (map['uid'] as String? ?? ''),
       email: map['email'] as String? ?? '',
-      name: map['name'] as String? ?? '',
+      name: map['name'] as String? ?? (map['fullName'] as String? ?? ''),
       phone: map['phone'] as String?,
       role: UserRole.fromString(map['role'] as String?),
       isApproved: map['isApproved'] as bool? ?? true,
       isActive: map['isActive'] as bool? ?? true,
-      city: map['city'] as String?,
+      city: map['residence'] as String? ?? (map['city'] as String?),
       activeCardId: map['activeCardId'] as String?,
       nationalId: map['nationalId'] as String?,
       nationality: map['nationality'] as String?,
@@ -169,12 +157,12 @@ class UserModel extends Equatable {
       inKindNeeds: map['inKindNeeds'] as String?,
       storeName: map['storeName'] as String?,
       commercialReg: map['commercialReg'] as String?,
-      allocatedBudget: _parseDouble(map['allocatedBudget']),
-      currentRemainingBudget: _parseDouble(map['currentRemainingBudget']),
+      allocatedBudget: FirebaseParserUtils.parseNullableDouble(map['allocatedBudget']),
+      currentRemainingBudget: FirebaseParserUtils.parseNullableDouble(map['currentRemainingBudget']),
       instapayAddress: map['instapayAddress'] as String?,
       vodafoneCashNumber: map['vodafoneCashNumber'] as String?,
       liquidityAlertLevel: map['liquidityAlertLevel'] as String?,
-      createdAt: _parseDateTime(map['createdAt']),
+      createdAt: FirebaseParserUtils.parseDate(map['createdAt']),
     );
   }
 

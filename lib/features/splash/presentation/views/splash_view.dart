@@ -59,11 +59,7 @@ class _SplashViewBody extends StatelessWidget {
           width: double.infinity,
           height: double.infinity,
           decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF0A6847), Color(0xFF063A28), Color(0xFF042419)],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
+            gradient: AppColors.splashGradient,
           ),
           child: SafeArea(
             child: Padding(

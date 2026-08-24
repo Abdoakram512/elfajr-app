@@ -175,15 +175,15 @@ class _RedemptionConfirmationSheetState
                       vertical: 10,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFECFDF5),
+                      color: AppColors.emerald50,
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: const Color(0xFFA7F3D0)),
+                      border: Border.all(color: AppColors.emerald200),
                     ),
                     child: Row(
                       children: [
                         const Icon(
                           Icons.verified_rounded,
-                          color: Color(0xFF059669),
+                          color: AppColors.emerald600,
                           size: 18,
                         ),
                         const Gap(8),
@@ -193,7 +193,7 @@ class _RedemptionConfirmationSheetState
                             style: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF065F46),
+                              color: AppColors.emerald800,
                             ),
                           ),
                         ),

@@ -184,7 +184,10 @@ class TransactionListItem extends StatelessWidget {
                     ),
                     const Gap(4),
                     Text(
-                      AppFormatters.fullDate.format(timestamp),
+                      AppFormatters.formatDateTime(
+                        timestamp,
+                        context: context,
+                      ),
                       style: const TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,

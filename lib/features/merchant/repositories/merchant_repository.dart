@@ -1,4 +1,6 @@
 import '../../beneficiary/models/aid_card_model.dart';
+import '../models/extra_disbursement_request_model.dart';
+import '../models/payment_receipt_model.dart';
 import '../models/redemption_transaction_model.dart';
 
 abstract class MerchantRepository {
@@ -17,5 +19,16 @@ abstract class MerchantRepository {
   });
   Stream<Map<String, dynamic>> getStoreStatsStream({
     required String merchantId,
+  });
+  Future<void> submitExtraDisbursementRequest(
+    ExtraDisbursementRequestModel request,
+  );
+  Stream<List<PaymentReceiptModel>> streamPaymentReceipts({
+    required String merchantId,
+  });
+  Future<void> confirmPaymentReceipt({
+    required String receiptId,
+    required String merchantId,
+    required String adminId,
   });
 }

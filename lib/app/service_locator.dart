@@ -26,6 +26,7 @@ import '../features/merchant/data_sources/merchant_remote_data_source_impl.dart'
 import '../features/merchant/repositories/merchant_repository.dart';
 import '../features/merchant/repositories/merchant_repository_impl.dart';
 import '../features/merchant/view_models/merchant_dashboard_cubit.dart';
+import '../features/merchant/view_models/merchant_receipts_cubit.dart';
 import '../features/merchant/view_models/redemption_cubit.dart';
 
 // Admin Feature
@@ -112,6 +113,9 @@ Future<void> initServiceLocator() async {
   );
   getIt.registerFactory<RedemptionCubit>(
     () => RedemptionCubit(repository: getIt<MerchantRepository>()),
+  );
+  getIt.registerFactory<MerchantReceiptsCubit>(
+    () => MerchantReceiptsCubit(repository: getIt<MerchantRepository>()),
   );
 
   // 5. Admin Feature Singletons & Focused Factories

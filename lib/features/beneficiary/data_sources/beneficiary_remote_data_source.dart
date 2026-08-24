@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../merchant/models/redemption_transaction_model.dart';
 import '../models/aid_card_model.dart';
+import '../models/basket_distribution_model.dart';
 import '../view_models/beneficiary_state.dart';
 
 abstract class BeneficiaryRemoteDataSource {
@@ -24,28 +26,23 @@ class BeneficiaryRemoteDataSourceImpl implements BeneficiaryRemoteDataSource {
   BeneficiaryRemoteDataSourceImpl({FirebaseFirestore? firestore})
       : _firestore = firestore ?? FirebaseFirestore.instance;
 
-  DateTime _parseTimestamp(dynamic val) {
-    if (val == null) return DateTime.now();
-    if (val is Timestamp) return val.toDate();
-    if (val is DateTime) return val;
-    if (val is String) return DateTime.tryParse(val) ?? DateTime.now();
-    return DateTime.now();
-  }
-
   BeneficiaryRedemptionItem _mapRedemptionDocToItem(
     String docId,
     Map<String, dynamic> data,
   ) {
+    final model =
+        RedemptionTransactionModel.fromMap(data, documentId: docId);
     return BeneficiaryRedemptionItem(
-      transactionId: data['transactionId'] as String? ?? docId,
-      merchantStoreName:
-          data['merchantStoreName'] as String? ?? 'منفذ صرف معتمد',
-      amountDeducted: (data['amountDeducted'] as num?)?.toDouble() ?? 0.0,
-      foodBasketsDeducted: (data['foodBasketsDeducted'] as num?)?.toInt() ?? 0,
-      remainingBalance: (data['remainingBalance'] as num?)?.toDouble() ?? 0.0,
-      remainingBaskets: (data['remainingBaskets'] as num?)?.toInt() ?? 0,
-      timestamp: _parseTimestamp(data['timestamp'] ?? data['createdAt']),
-      notes: data['notes'] as String?,
+      transactionId: model.transactionId,
+      merchantStoreName: model.merchantStoreName.isNotEmpty
+          ? model.merchantStoreName
+          : 'منفذ صرف معتمد',
+      amountDeducted: model.amountDeducted,
+      foodBasketsDeducted: model.foodBasketsDeducted,
+      remainingBalance: model.remainingBalance,
+      remainingBaskets: model.remainingBaskets,
+      timestamp: model.timestamp,
+      notes: model.notes,
     );
   }
 
@@ -53,17 +50,17 @@ class BeneficiaryRemoteDataSourceImpl implements BeneficiaryRemoteDataSource {
     String docId,
     Map<String, dynamic> data,
   ) {
+    final model =
+        BasketDistributionModel.fromMap(data, documentId: docId);
     return BeneficiaryRedemptionItem(
-      transactionId: data['distributionId'] as String? ?? docId,
-      merchantStoreName: data['distributionCenter'] as String? ??
-          (data['center'] as String? ?? 'المقر الرئيسي - مركز توزيع الفجر'),
+      transactionId: model.distributionId,
+      merchantStoreName: model.distributionCenter,
       amountDeducted: 0.0,
-      foodBasketsDeducted: (data['basketsCount'] as num?)?.toInt() ??
-          ((data['foodBasketsDeducted'] as num?)?.toInt() ?? 1),
-      remainingBalance: (data['remainingBalance'] as num?)?.toDouble() ?? 0.0,
-      remainingBaskets: (data['remainingBaskets'] as num?)?.toInt() ?? 0,
-      timestamp: _parseTimestamp(data['timestamp'] ?? data['createdAt']),
-      notes: data['notes'] as String? ?? 'تسليم سلة غذائية من الإدارة',
+      foodBasketsDeducted: model.basketsCount,
+      remainingBalance: 0.0,
+      remainingBaskets: model.remainingBasketsAfter,
+      timestamp: model.timestamp,
+      notes: model.notes ?? 'تسليم سلة غذائية من الإدارة',
     );
   }
 

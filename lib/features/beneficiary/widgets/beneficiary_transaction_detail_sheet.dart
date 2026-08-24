@@ -230,7 +230,10 @@ class BeneficiaryTransactionDetailSheet extends StatelessWidget {
                   // Date & Time
                   InfoKeyValueRow(
                     label: 'dashboard.beneficiary.txn_date'.tr(),
-                    value: AppFormatters.fullDate.format(transaction.timestamp),
+                    value: AppFormatters.formatDateTime(
+                      transaction.timestamp,
+                      context: context,
+                    ),
                     showDivider: !isFoodBasketOnly || transaction.notes?.isNotEmpty == true,
                   ),
 

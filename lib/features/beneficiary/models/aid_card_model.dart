@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import '../../../../core/utils/firebase_parser_utils.dart';
 
 enum AidCardStatus {
   active,
@@ -125,10 +126,9 @@ class AidCardModel extends Equatable {
       'nationalId': nationalId,
       'familyCount': familyCount,
       'residence': residence,
-      'totalBalance': totalBalance,
       'balance': totalBalance,
+      'totalBalance': totalBalance,
       'foodBasketsQuota': foodBasketsQuota,
-      'quota': foodBasketsQuota,
       'status': status.nameString,
       'socialStatus': socialStatus,
       'nationality': nationality,
@@ -140,63 +140,27 @@ class AidCardModel extends Equatable {
     };
   }
 
-  static DateTime _parseDate(dynamic value) {
-    if (value == null) return DateTime.now().add(const Duration(days: 365));
-    if (value is DateTime) return value;
-    if (value is String) {
-      return DateTime.tryParse(value) ??
-          DateTime.now().add(const Duration(days: 365));
-    }
-    try {
-      return (value as dynamic).toDate();
-    } catch (_) {
-      return DateTime.now().add(const Duration(days: 365));
-    }
-  }
-
-  static double _parseDouble(dynamic value, {double fallback = 0.0}) {
-    if (value == null) return fallback;
-    if (value is num) return value.toDouble();
-    if (value is String) return double.tryParse(value.trim()) ?? fallback;
-    return fallback;
-  }
-
-  static int _parseInt(dynamic value, {int fallback = 0}) {
-    if (value == null) return fallback;
-    if (value is num) return value.toInt();
-    if (value is String) return int.tryParse(value.trim()) ?? fallback;
-    return fallback;
-  }
-
   factory AidCardModel.fromMap(Map<String, dynamic> map, {String? documentId}) {
     return AidCardModel(
-      cardId: documentId ?? (map['cardId'] as String? ?? 'FAJR-CARD-002'),
+      cardId: documentId ?? (map['cardId'] as String? ?? ''),
       beneficiaryId: map['beneficiaryId'] as String? ?? '',
-      beneficiaryName: map['beneficiaryName'] as String? ?? 'مستفيد',
+      beneficiaryName: map['beneficiaryName'] as String? ?? '',
       nationalId: map['nationalId'] as String? ?? '',
-      familyCount: _parseInt(map['familyCount'], fallback: 4),
+      familyCount: FirebaseParserUtils.parseInt(map['familyCount'], fallback: 1),
       residence: map['residence'] as String?,
-      totalBalance: _parseDouble(
-        map['balance'] ??
-            (map['totalBalance'] ?? (map['currentBalance'] ?? map['amount'])),
-        fallback: 600.0,
-      ),
-      foodBasketsQuota: _parseInt(
-        map['foodBasketsQuota'] ??
-            (map['quota'] ?? (map['basketsQuota'] ?? map['basketsCount'])),
-        fallback: 2,
-      ),
+      totalBalance: FirebaseParserUtils.parseDouble(map['balance'] ?? map['totalBalance']),
+      foodBasketsQuota: FirebaseParserUtils.parseInt(map['foodBasketsQuota']),
       status: AidCardStatus.fromString(map['status'] as String?),
       socialStatus: map['socialStatus'] as String?,
       nationality: map['nationality'] as String?,
       fieldResearchStatus: map['fieldResearchStatus'] as String?,
       issuedByVolunteerId: map['issuedByVolunteerId'] as String?,
-      activatedAt: map['activatedAt'] != null
-          ? _parseDate(map['activatedAt'])
-          : null,
-      expiresAt: _parseDate(map['expiresAt']),
-      securityHash:
-          map['securityHash'] as String? ?? 'sha256_secure_card_token',
+      activatedAt: FirebaseParserUtils.parseNullableDate(map['activatedAt']),
+      expiresAt: FirebaseParserUtils.parseDate(
+        map['expiresAt'],
+        fallback: DateTime.now().add(const Duration(days: 365)),
+      ),
+      securityHash: map['securityHash'] as String? ?? '',
     );
   }
 

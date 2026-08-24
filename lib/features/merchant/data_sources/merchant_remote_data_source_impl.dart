@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../beneficiary/models/aid_card_model.dart';
+import '../models/extra_disbursement_request_model.dart';
+import '../models/payment_receipt_model.dart';
 import '../models/redemption_transaction_model.dart';
 import 'merchant_card_search_delegate.dart';
 import 'merchant_redemption_processor.dart';
@@ -127,6 +129,67 @@ class MerchantRemoteDataSourceImpl implements MerchantRemoteDataSource {
     });
   }
 
+  @override
+  Future<void> submitExtraDisbursementRequest(
+    ExtraDisbursementRequestModel request,
+  ) async {
+    final docId = request.requestId.isNotEmpty
+        ? request.requestId
+        : 'REQ-${DateTime.now().millisecondsSinceEpoch}';
+    await _firestore
+        .collection('extra_disbursement_requests')
+        .doc(docId)
+        .set(request.toMap());
+  }
+
+  @override
+  Stream<List<PaymentReceiptModel>> streamPaymentReceipts({
+    required String merchantId,
+  }) {
+    final cleanMerchantId = merchantId.trim();
+    if (cleanMerchantId.isEmpty) {
+      return Stream.value([]);
+    }
+
+    return _firestore
+        .collection('payment_receipts')
+        .where('merchantId', isEqualTo: cleanMerchantId)
+        .snapshots()
+        .map((snapshot) {
+      final list = snapshot.docs
+          .map((doc) => PaymentReceiptModel.fromMap(doc.data(), documentId: doc.id))
+          .toList();
+      list.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+      return list;
+    });
+  }
+
+  @override
+  Future<void> confirmPaymentReceipt({
+    required String receiptId,
+    required String merchantId,
+    required String adminId,
+  }) async {
+    final batch = _firestore.batch();
+    final receiptRef = _firestore.collection('payment_receipts').doc(receiptId);
+
+    batch.update(receiptRef, {
+      'status': 'confirmed',
+      'confirmedAt': FieldValue.serverTimestamp(),
+    });
+
+    final logRef = _firestore.collection('audit_logs').doc();
+    batch.set(logRef, {
+      'action': 'CONFIRM_PAYMENT_RECEIPT',
+      'receiptId': receiptId,
+      'merchantId': merchantId,
+      'adminId': adminId,
+      'timestamp': FieldValue.serverTimestamp(),
+    });
+
+    await batch.commit();
+  }
+
   // ───────────────────────────────────────────────────────────────────────────
   // 4. Safe Data Mappers
   // ───────────────────────────────────────────────────────────────────────────
@@ -134,28 +197,9 @@ class MerchantRemoteDataSourceImpl implements MerchantRemoteDataSource {
   RedemptionTransactionModel _mapDocToRedemptionTransaction(
     QueryDocumentSnapshot<Map<String, dynamic>> doc,
   ) {
-    final data = doc.data();
-    return RedemptionTransactionModel(
-      transactionId: doc.id,
-      cardId: data['cardId'] as String? ?? '',
-      beneficiaryId: data['beneficiaryId'] as String? ?? '',
-      beneficiaryName: data['beneficiaryName'] as String? ?? 'مستفيد معتمد',
-      merchantId: data['merchantId'] as String? ?? '',
-      merchantStoreName: data['merchantStoreName'] as String? ?? 'منفذ صرف',
-      amountDeducted: (data['amountDeducted'] as num?)?.toDouble() ?? 0.0,
-      foodBasketsDeducted: (data['foodBasketsDeducted'] as num?)?.toInt() ?? 0,
-      remainingBalance: (data['remainingBalance'] as num?)?.toDouble() ?? 0.0,
-      remainingBaskets: (data['remainingBaskets'] as num?)?.toInt() ?? 0,
-      notes: data['notes'] as String?,
-      timestamp: _parseTimestamp(data['timestamp']),
+    return RedemptionTransactionModel.fromMap(
+      doc.data(),
+      documentId: doc.id,
     );
-  }
-
-  DateTime _parseTimestamp(dynamic val) {
-    if (val == null) return DateTime.now();
-    if (val is Timestamp) return val.toDate();
-    if (val is DateTime) return val;
-    if (val is String) return DateTime.tryParse(val) ?? DateTime.now();
-    return DateTime.now();
   }
 }

@@ -113,11 +113,7 @@ class ReceiptImageViewerDialog extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color(0xFF063A28), Color(0xFF0A734D)],
-                  begin: Alignment.topRight,
-                  end: Alignment.bottomLeft,
-                ),
+                gradient: AppColors.primaryGradient,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(26)),
               ),
               child: Row(
@@ -136,7 +132,7 @@ class ReceiptImageViewerDialog extends StatelessWidget {
                         ),
                         child: const Icon(
                           Icons.receipt_long_rounded,
-                          color: Color(0xFFFDE68A),
+                          color: AppColors.accentLight,
                           size: 20,
                         ),
                       ),
@@ -180,7 +176,7 @@ class ReceiptImageViewerDialog extends StatelessWidget {
             // ── 2. Zoomable Image Container ──
             Expanded(
               child: Container(
-                color: const Color(0xFFF8FAFC),
+                color: AppColors.slate50,
                 child: InteractiveViewer(
                   minScale: 0.8,
                   maxScale: 4.0,
@@ -221,7 +217,7 @@ class ReceiptImageViewerDialog extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 19,
                           fontWeight: FontWeight.w900,
-                          color: Color(0xFF0A734D),
+                          color: AppColors.primary,
                         ),
                       ),
                     ],

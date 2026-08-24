@@ -1,5 +1,7 @@
 import '../../beneficiary/models/aid_card_model.dart';
 import '../data_sources/merchant_remote_data_source.dart';
+import '../models/extra_disbursement_request_model.dart';
+import '../models/payment_receipt_model.dart';
 import '../models/redemption_transaction_model.dart';
 import 'merchant_repository.dart';
 
@@ -54,6 +56,35 @@ class MerchantRepositoryImpl implements MerchantRepository {
   }) {
     return _remoteDataSource.getMerchantStatsStream(
       merchantId: merchantId,
+    );
+  }
+
+  @override
+  Future<void> submitExtraDisbursementRequest(
+    ExtraDisbursementRequestModel request,
+  ) async {
+    await _remoteDataSource.submitExtraDisbursementRequest(request);
+  }
+
+  @override
+  Stream<List<PaymentReceiptModel>> streamPaymentReceipts({
+    required String merchantId,
+  }) {
+    return _remoteDataSource.streamPaymentReceipts(
+      merchantId: merchantId,
+    );
+  }
+
+  @override
+  Future<void> confirmPaymentReceipt({
+    required String receiptId,
+    required String merchantId,
+    required String adminId,
+  }) async {
+    await _remoteDataSource.confirmPaymentReceipt(
+      receiptId: receiptId,
+      merchantId: merchantId,
+      adminId: adminId,
     );
   }
 }

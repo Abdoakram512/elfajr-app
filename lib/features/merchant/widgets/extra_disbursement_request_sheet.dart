@@ -1,9 +1,11 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:qout/core/constants/app_colors.dart';
-import 'package:qout/features/auth/models/user_model.dart';
+import '../../../app/service_locator.dart';
+import '../../../core/constants/app_colors.dart';
+import '../../auth/models/user_model.dart';
+import '../models/extra_disbursement_request_model.dart';
+import '../repositories/merchant_repository.dart';
 
 class ExtraDisbursementRequestSheet extends StatefulWidget {
   final UserModel merchant;
@@ -50,39 +52,28 @@ class _ExtraDisbursementRequestSheetState extends State<ExtraDisbursementRequest
 
     try {
       final reqId = 'EX-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
-      final docRef = FirebaseFirestore.instance.collection('extra_disbursement_requests').doc(reqId);
+      final request = ExtraDisbursementRequestModel(
+        requestId: reqId,
+        merchantId: widget.merchant.uid,
+        merchantStoreName: widget.merchant.storeName ?? widget.merchant.name,
+        cardId: _cardIdController.text.trim().toUpperCase(),
+        beneficiaryId: '',
+        beneficiaryName: 'مستفيد بطاقة ${_cardIdController.text.trim().toUpperCase()}',
+        requestedAmount: double.tryParse(_amountController.text.trim()) ?? 500,
+        reason: _reasonController.text.trim(),
+        status: DisbursementRequestStatus.pending,
+        timestamp: DateTime.now(),
+      );
 
-      await docRef.set({
-        'id': reqId,
-        'requestId': reqId,
-        'merchantId': widget.merchant.uid,
-        'merchantName': widget.merchant.name,
-        'merchantStoreName': widget.merchant.storeName ?? widget.merchant.name,
-        'cardId': _cardIdController.text.trim().toUpperCase(),
-        'requestedAmount': double.tryParse(_amountController.text.trim()) ?? 500,
-        'reason': _reasonController.text.trim(),
-        'status': 'pending',
-        'timestamp': FieldValue.serverTimestamp(),
-        'createdAt': DateTime.now().toIso8601String(),
-      });
+      await getIt<MerchantRepository>().submitExtraDisbursementRequest(request);
 
-      setState(() {
-        _requestId = reqId;
-        _currentStatus = 'pending';
-        _isSubmitting = false;
-      });
-
-      // Listen for live admin response
-      docRef.snapshots().listen((snap) {
-        if (snap.exists && mounted) {
-          final data = snap.data();
-          if (data != null && data['status'] != null) {
-            setState(() {
-              _currentStatus = data['status'] as String;
-            });
-          }
-        }
-      });
+      if (mounted) {
+        setState(() {
+          _requestId = reqId;
+          _currentStatus = 'pending';
+          _isSubmitting = false;
+        });
+      }
     } catch (e) {
       if (mounted) {
         setState(() => _isSubmitting = false);

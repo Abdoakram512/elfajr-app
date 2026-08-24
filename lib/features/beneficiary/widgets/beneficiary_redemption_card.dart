@@ -86,7 +86,10 @@ class BeneficiaryRedemptionCard extends StatelessWidget {
                       ),
                       const Gap(4),
                       Text(
-                        AppFormatters.fullDate.format(transaction.timestamp),
+                        AppFormatters.formatDateTime(
+                          transaction.timestamp,
+                          context: context,
+                        ),
                         style: const TextStyle(
                           fontSize: 12,
                           color: AppColors.textSecondaryLight,

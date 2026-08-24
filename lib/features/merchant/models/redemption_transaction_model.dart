@@ -1,10 +1,12 @@
 import 'package:equatable/equatable.dart';
+import '../../../../core/utils/firebase_parser_utils.dart';
 
 class RedemptionTransactionModel extends Equatable {
   final String transactionId;
   final String cardId;
   final String beneficiaryId;
   final String beneficiaryName;
+  final String? beneficiaryNationalId;
   final String merchantId;
   final String merchantStoreName;
   final double amountDeducted;
@@ -19,6 +21,7 @@ class RedemptionTransactionModel extends Equatable {
     required this.cardId,
     required this.beneficiaryId,
     required this.beneficiaryName,
+    this.beneficiaryNationalId,
     required this.merchantId,
     required this.merchantStoreName,
     required this.amountDeducted,
@@ -35,13 +38,15 @@ class RedemptionTransactionModel extends Equatable {
       'cardId': cardId,
       'beneficiaryId': beneficiaryId,
       'beneficiaryName': beneficiaryName,
+      if (beneficiaryNationalId != null)
+        'beneficiaryNationalId': beneficiaryNationalId,
       'merchantId': merchantId,
       'merchantStoreName': merchantStoreName,
       'amountDeducted': amountDeducted,
       'foodBasketsDeducted': foodBasketsDeducted,
       'remainingBalance': remainingBalance,
       'remainingBaskets': remainingBaskets,
-      'notes': notes,
+      if (notes != null) 'notes': notes,
       'timestamp': timestamp.toIso8601String(),
     };
   }
@@ -55,16 +60,15 @@ class RedemptionTransactionModel extends Equatable {
       cardId: map['cardId'] as String? ?? '',
       beneficiaryId: map['beneficiaryId'] as String? ?? '',
       beneficiaryName: map['beneficiaryName'] as String? ?? '',
+      beneficiaryNationalId: map['beneficiaryNationalId'] as String?,
       merchantId: map['merchantId'] as String? ?? '',
       merchantStoreName: map['merchantStoreName'] as String? ?? '',
-      amountDeducted: (map['amountDeducted'] as num?)?.toDouble() ?? 0.0,
-      foodBasketsDeducted: map['foodBasketsDeducted'] as int? ?? 0,
-      remainingBalance: (map['remainingBalance'] as num?)?.toDouble() ?? 0.0,
-      remainingBaskets: map['remainingBaskets'] as int? ?? 0,
+      amountDeducted: FirebaseParserUtils.parseDouble(map['amountDeducted']),
+      foodBasketsDeducted: FirebaseParserUtils.parseInt(map['foodBasketsDeducted']),
+      remainingBalance: FirebaseParserUtils.parseDouble(map['remainingBalance']),
+      remainingBaskets: FirebaseParserUtils.parseInt(map['remainingBaskets']),
       notes: map['notes'] as String?,
-      timestamp: map['timestamp'] != null
-          ? DateTime.tryParse(map['timestamp'] as String) ?? DateTime.now()
-          : DateTime.now(),
+      timestamp: FirebaseParserUtils.parseDate(map['timestamp']),
     );
   }
 
@@ -74,6 +78,7 @@ class RedemptionTransactionModel extends Equatable {
         cardId,
         beneficiaryId,
         beneficiaryName,
+        beneficiaryNationalId,
         merchantId,
         merchantStoreName,
         amountDeducted,

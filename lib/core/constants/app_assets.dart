@@ -1,4 +1,7 @@
+import 'app_images.dart';
+
+/// Legacy alias for [AppImages] to ensure backward compatibility.
 abstract class AppAssets {
-  static const String appIcon = 'assets/icons/app_icon.png';
-  static const String appLogo = 'assets/images/app_logo.png';
+  static const String appIcon = AppImages.appIcon;
+  static const String appLogo = AppImages.appLogo;
 }

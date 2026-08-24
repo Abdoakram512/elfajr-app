@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/utils/app_formatters.dart';
 
 class BeneficiaryMonthlyStatement extends StatelessWidget {
   final double initialMonthEstimate;
@@ -27,9 +28,16 @@ class BeneficiaryMonthlyStatement extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currencyFormatter = NumberFormat('#,##0', 'ar');
-    final totalBudget = initialMonthEstimate > 0 ? initialMonthEstimate : (availableBalance + thisMonthSpent);
-    final consumptionRatio = totalBudget > 0 ? (thisMonthSpent / totalBudget).clamp(0.0, 1.0) : 0.0;
-    final isLowBalance = availableBalance > 0 && totalBudget > 0 && ((availableBalance / totalBudget) <= 0.20);
+    final totalBudget = initialMonthEstimate > 0
+        ? initialMonthEstimate
+        : (availableBalance + thisMonthSpent);
+    final consumptionRatio = totalBudget > 0
+        ? (thisMonthSpent / totalBudget).clamp(0.0, 1.0)
+        : 0.0;
+    final isLowBalance =
+        availableBalance > 0 &&
+        totalBudget > 0 &&
+        ((availableBalance / totalBudget) <= 0.20);
 
     return Container(
       width: double.infinity,
@@ -85,7 +93,10 @@ class BeneficiaryMonthlyStatement extends StatelessWidget {
               ),
               const Gap(8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.primarySubtle,
                   borderRadius: BorderRadius.circular(20),
@@ -94,7 +105,7 @@ class BeneficiaryMonthlyStatement extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  DateFormat('MMMM yyyy', 'ar').format(now),
+                  AppFormatters.formatMonthYear(now, context: context),
                   style: const TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
@@ -113,7 +124,8 @@ class BeneficiaryMonthlyStatement extends StatelessWidget {
               Expanded(
                 child: _buildStatementBox(
                   label: 'dashboard.beneficiary.monthly_initial'.tr(),
-                  value: '${currencyFormatter.format(initialMonthEstimate)} ${'common.currency'.tr()}',
+                  value:
+                      '${currencyFormatter.format(initialMonthEstimate)} ${'common.currency'.tr()}',
                   valueColor: AppColors.textPrimaryLight,
                 ),
               ),
@@ -123,7 +135,8 @@ class BeneficiaryMonthlyStatement extends StatelessWidget {
               Expanded(
                 child: _buildStatementBox(
                   label: 'dashboard.beneficiary.monthly_spent'.tr(),
-                  value: '-${currencyFormatter.format(thisMonthSpent)} ${'common.currency'.tr()}',
+                  value:
+                      '-${currencyFormatter.format(thisMonthSpent)} ${'common.currency'.tr()}',
                   valueColor: AppColors.error,
                 ),
               ),
@@ -138,7 +151,8 @@ class BeneficiaryMonthlyStatement extends StatelessWidget {
               Expanded(
                 child: _buildStatementBox(
                   label: 'dashboard.beneficiary.monthly_remaining'.tr(),
-                  value: '${currencyFormatter.format(availableBalance)} ${'common.currency'.tr()}',
+                  value:
+                      '${currencyFormatter.format(availableBalance)} ${'common.currency'.tr()}',
                   valueColor: AppColors.primary,
                   isHighlight: true,
                 ),
@@ -149,10 +163,13 @@ class BeneficiaryMonthlyStatement extends StatelessWidget {
               Expanded(
                 child: _buildStatementBox(
                   label: 'dashboard.beneficiary.monthly_baskets'.tr(),
-                  value: '$foodBasketsQuota ${'digital_card.baskets_unit'.tr()}',
+                  value:
+                      '$foodBasketsQuota ${'digital_card.baskets_unit'.tr()}',
                   valueColor: const Color(0xFFD97706),
                   subtitle: thisMonthBasketsSpent > 0
-                      ? 'dashboard.beneficiary.baskets_spent_sub'.tr(namedArgs: {'spent': '$thisMonthBasketsSpent'})
+                      ? 'dashboard.beneficiary.baskets_spent_sub'.tr(
+                          namedArgs: {'spent': '$thisMonthBasketsSpent'},
+                        )
                       : null,
                 ),
               ),
@@ -173,7 +190,9 @@ class BeneficiaryMonthlyStatement extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 11.5,
                       fontWeight: FontWeight.bold,
-                      color: isLowBalance ? AppColors.error : AppColors.textSecondaryLight,
+                      color: isLowBalance
+                          ? AppColors.error
+                          : AppColors.textSecondaryLight,
                     ),
                   ),
                   if (onOpenFullAnalytics != null)
@@ -230,10 +249,14 @@ class BeneficiaryMonthlyStatement extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isHighlight ? AppColors.primarySubtle.withValues(alpha: 0.4) : Colors.white,
+        color: isHighlight
+            ? AppColors.primarySubtle.withValues(alpha: 0.4)
+            : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isHighlight ? AppColors.primary.withValues(alpha: 0.3) : AppColors.borderLight,
+          color: isHighlight
+              ? AppColors.primary.withValues(alpha: 0.3)
+              : AppColors.borderLight,
         ),
       ),
       child: Column(
@@ -260,10 +283,7 @@ class BeneficiaryMonthlyStatement extends StatelessWidget {
             const Gap(2),
             Text(
               subtitle,
-              style: TextStyle(
-                fontSize: 9.5,
-                color: Colors.grey.shade600,
-              ),
+              style: TextStyle(fontSize: 9.5, color: Colors.grey.shade600),
             ),
           ],
         ],

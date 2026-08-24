@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
+import 'package:qout/core/constants/app_colors.dart';
 
 class FloatingChipWidget extends StatelessWidget {
   final String text;
@@ -61,10 +62,10 @@ class FloatingChipWidget extends StatelessWidget {
           const Gap(8),
           Text(
             text,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.bold,
-              color: const Color(0xFF1E293B),
+              color: AppColors.slate800,
             ),
           ),
         ],

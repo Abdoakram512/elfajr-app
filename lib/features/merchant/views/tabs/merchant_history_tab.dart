@@ -3,21 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import '../../../../core/constants/app_colors.dart';
-import '../../../../core/services/card_printer_service.dart';
-import '../../../../core/utils/app_formatters.dart';
+import '../../../../core/constants/app_icons.dart';
 import '../../../../core/utils/arabic_normalizer.dart';
-import '../../../../core/widgets/common/info_key_value_row.dart';
 import '../../../../core/widgets/feedback/alfajr_refresh_indicator.dart';
 import '../../../../core/widgets/feedback/app_empty_state_widget.dart';
-import '../../../../core/widgets/primary_button.dart';
-import '../../../../core/widgets/sheets/app_sheet_scaffold.dart';
 import '../../../../core/widgets/transactions/transaction_list_item.dart';
-import '../../../beneficiary/models/aid_card_model.dart';
 import '../../models/redemption_transaction_model.dart';
 import '../../view_models/merchant_dashboard_cubit.dart';
 import '../../view_models/merchant_dashboard_state.dart';
-
-enum MerchantTimeframeFilter { today, thisWeek, thisMonth, all, custom }
+import '../../widgets/history/merchant_history_metrics_card.dart';
+import '../../widgets/history/merchant_history_timeframe_selector.dart';
+import '../../widgets/history/merchant_transaction_detail_modal.dart';
 
 class MerchantHistoryTab extends StatefulWidget {
   const MerchantHistoryTab({super.key});
@@ -131,164 +127,19 @@ class _MerchantHistoryTabState extends State<MerchantHistoryTab> {
     }
   }
 
-  void _showTransactionDetails(
-    BuildContext context,
-    RedemptionTransactionModel tx,
-  ) {
-    final currencyFormatter = NumberFormat('#,##0', 'ar');
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) {
-        return AppSheetScaffold(
-          title: 'merchant.history_detail_title'.tr(),
-          subtitle: tx.cardId,
-          icon: Icons.payments_rounded,
-          iconColor: AppColors.primary,
-          iconBgColor: AppColors.primarySubtle,
-          heightFactor: 0.72,
-          child: ListView(
-            padding: const EdgeInsets.only(top: 8, bottom: 24),
-            children: [
-              // Summary Amount Card
-              Container(
-                padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFFECFDF5), Colors.white],
-                    begin: Alignment.topRight,
-                    end: Alignment.bottomLeft,
-                  ),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: AppColors.primary.withValues(alpha: 0.2),
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      'merchant.cash_amount_disbursed'.tr(),
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                    const Gap(4),
-                    Text(
-                      '${currencyFormatter.format(tx.amountDeducted)} ${'common.currency'.tr()}',
-                      style: const TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.w900,
-                        color: Color(0xFF0A734D),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const Gap(16),
-
-              // Detail Rows Card
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: AppColors.borderLight),
-                ),
-                child: Column(
-                  children: [
-                    InfoKeyValueRow(
-                      label: 'merchant.beneficiary_name_label'.tr(),
-                      value: tx.beneficiaryName,
-                      isBold: true,
-                    ),
-                    const Gap(10),
-                    InfoKeyValueRow(
-                      label: 'merchant.card_id_label'.tr(),
-                      value: tx.cardId,
-                      isBold: true,
-                    ),
-                    const Gap(10),
-                    InfoKeyValueRow(
-                      label: 'merchant.txn_time_label'.tr(),
-                      value: AppFormatters.fullDate.format(tx.timestamp),
-                    ),
-                    if (tx.merchantStoreName.isNotEmpty) ...[
-                      const Gap(10),
-                      InfoKeyValueRow(
-                        label: 'merchant.outlet_name_label'.tr(),
-                        value: tx.merchantStoreName,
-                      ),
-                    ],
-                    const Gap(10),
-                    InfoKeyValueRow(
-                      label: 'merchant.ref_number_label'.tr(),
-                      value: tx.transactionId,
-                    ),
-                    if (tx.notes != null && tx.notes!.isNotEmpty) ...[
-                      const Gap(10),
-                      InfoKeyValueRow(
-                        label: 'merchant.notes_label'.tr(),
-                        value: tx.notes!,
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-
-              const Gap(20),
-
-              // Print / Export Button
-              PrimaryButton(
-                text: 'merchant.redemption_receipt.print_receipt_btn'.tr(),
-                leadingIcon: Icons.print_rounded,
-                onPressed: () {
-                  Navigator.pop(ctx);
-                  CardPrinterService.printAidCard(
-                    card: AidCardModel(
-                      cardId: tx.cardId,
-                      beneficiaryId: '',
-                      beneficiaryName: tx.beneficiaryName,
-                      nationalId: '1089283746',
-                      familyCount: 5,
-                      totalBalance: tx.amountDeducted,
-                      foodBasketsQuota: 0,
-                      status: AidCardStatus.active,
-                      expiresAt: DateTime.now().add(const Duration(days: 180)),
-                      securityHash: '',
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    final currencyFormatter = NumberFormat('#,##0', 'ar');
-
     return BlocBuilder<MerchantDashboardCubit, MerchantDashboardState>(
       builder: (context, state) {
         final filteredList = _getFilteredTransactions(state.recentTransactions);
 
-        // Stats calculations (Cash & Operations only - NO food baskets)
         final totalDisbursed = filteredList.fold<double>(
           0.0,
           (sum, item) => sum + item.amountDeducted,
         );
         final opsCount = filteredList.length;
-        final uniqueBeneficiaries = filteredList
-            .map((t) => t.cardId)
-            .toSet()
-            .length;
+        final uniqueBeneficiaries =
+            filteredList.map((t) => t.cardId).toSet().length;
 
         final isFiltered =
             _searchQuery.trim().isNotEmpty ||
@@ -298,464 +149,51 @@ class _MerchantHistoryTabState extends State<MerchantHistoryTab> {
           backgroundColor: AppColors.backgroundLight,
           appBar: AppBar(
             title: Text(
-              'merchant.history_page_title'.tr(),
+              'merchant.history_app_bar_title'.tr(),
               style: const TextStyle(
-                fontSize: 18,
+                fontSize: 19.5,
                 fontWeight: FontWeight.w900,
                 color: AppColors.textPrimaryLight,
               ),
             ),
-            automaticallyImplyLeading: false,
-            elevation: 0,
             backgroundColor: Colors.white,
             surfaceTintColor: Colors.transparent,
+            automaticallyImplyLeading: false,
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(1),
               child: Container(color: AppColors.borderLight, height: 1),
             ),
-            actions: [
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.primarySubtle,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: AppColors.primary.withValues(alpha: 0.2),
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 7,
-                      height: 7,
-                      decoration: const BoxDecoration(
-                        color: AppColors.primary,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const Gap(6),
-                    Text(
-                      '$opsCount عملية',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
           ),
           body: AlfajrRefreshIndicator(
-            onRefresh: () =>
-                context.read<MerchantDashboardCubit>().refreshData(),
+            onRefresh: () async {
+              context.read<MerchantDashboardCubit>().refreshData();
+            },
             child: ListView(
               physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               children: [
-                // ── 1. Timeframe Filter Tabs ──
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  physics: const BouncingScrollPhysics(),
-                  child: Row(
-                    children: [
-                      _buildFilterChip(
-                        MerchantTimeframeFilter.today,
-                        'merchant.filter_today'.tr(),
-                        Icons.today_rounded,
-                      ),
-                      const Gap(8),
-                      _buildFilterChip(
-                        MerchantTimeframeFilter.thisWeek,
-                        'merchant.filter_week'.tr(),
-                        Icons.calendar_view_week_rounded,
-                      ),
-                      const Gap(8),
-                      _buildFilterChip(
-                        MerchantTimeframeFilter.thisMonth,
-                        'merchant.filter_month'.tr(),
-                        Icons.calendar_month_rounded,
-                      ),
-                      const Gap(8),
-                      _buildFilterChip(
-                        MerchantTimeframeFilter.all,
-                        'merchant.filter_all'.tr(),
-                        Icons.all_inclusive_rounded,
-                      ),
-                      const Gap(8),
-                      // Custom Date Chip
-                      InkWell(
-                        onTap: () => _selectCustomDate(context),
-                        borderRadius: BorderRadius.circular(14),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 9,
-                          ),
-                          decoration: BoxDecoration(
-                            color:
-                                _selectedFilter ==
-                                    MerchantTimeframeFilter.custom
-                                ? AppColors.primary
-                                : Colors.white,
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(
-                              color:
-                                  _selectedFilter ==
-                                      MerchantTimeframeFilter.custom
-                                  ? AppColors.primary
-                                  : AppColors.borderLight,
-                            ),
-                            boxShadow:
-                                _selectedFilter ==
-                                    MerchantTimeframeFilter.custom
-                                ? [
-                                    BoxShadow(
-                                      color: AppColors.primary.withValues(
-                                        alpha: 0.22,
-                                      ),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ]
-                                : null,
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.edit_calendar_rounded,
-                                size: 15,
-                                color:
-                                    _selectedFilter ==
-                                        MerchantTimeframeFilter.custom
-                                    ? Colors.white
-                                    : AppColors.textSecondaryLight,
-                              ),
-                              const Gap(6),
-                              Text(
-                                _selectedFilter ==
-                                            MerchantTimeframeFilter.custom &&
-                                        _customSelectedDate != null
-                                    ? DateFormat(
-                                        'MM/dd',
-                                      ).format(_customSelectedDate!)
-                                    : 'merchant.filter_custom'.tr(),
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color:
-                                      _selectedFilter ==
-                                          MerchantTimeframeFilter.custom
-                                      ? Colors.white
-                                      : AppColors.textPrimaryLight,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                // ── 1. Timeframe Filter Selector Bar ──
+                MerchantHistoryTimeframeSelector(
+                  selectedFilter: _selectedFilter,
+                  customSelectedDate: _customSelectedDate,
+                  onFilterChanged: (filter) =>
+                      setState(() => _selectedFilter = filter),
+                  onSelectCustomDate: () => _selectCustomDate(context),
                 ),
 
                 const Gap(16),
 
-                // ── 2. Hero Cash Card (Imperial Emerald Theme) ──
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [
-                        Color(0xFF063A28),
-                        Color(0xFF0A734D),
-                        Color(0xFF0F8A5D),
-                      ],
-                      begin: Alignment.topRight,
-                      end: Alignment.bottomLeft,
-                    ),
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(
-                      color: const Color(0xFFF59E0B).withValues(alpha: 0.35),
-                      width: 1.5,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF0A734D).withValues(alpha: 0.25),
-                        blurRadius: 16,
-                        offset: const Offset(0, 6),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Header Row
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.15),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: Colors.white.withValues(alpha: 0.25),
-                                  ),
-                                ),
-                                child: const Icon(
-                                  Icons.payments_rounded,
-                                  color: Color(0xFFFDE68A),
-                                  size: 18,
-                                ),
-                              ),
-                              const Gap(10),
-                              Text(
-                                'merchant.stats_total_amount'.tr(),
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  letterSpacing: 0.2,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.25),
-                              ),
-                            ),
-                            child: Text(
-                              _getTimeframeLabel(),
-                              style: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      const Gap(14),
-
-                      // Main Amount Value
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.baseline,
-                        textBaseline: TextBaseline.alphabetic,
-                        children: [
-                          Text(
-                            currencyFormatter.format(totalDisbursed),
-                            style: const TextStyle(
-                              fontSize: 30,
-                              fontWeight: FontWeight.w900,
-                              color: Colors.white,
-                              letterSpacing: -0.5,
-                            ),
-                          ),
-                          const Gap(6),
-                          Text(
-                            'common.currency'.tr(),
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white.withValues(alpha: 0.85),
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      const Gap(16),
-
-                      // Bottom Sub-metric Bar
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 10,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                const Icon(
-                                  Icons.check_circle_outline_rounded,
-                                  size: 15,
-                                  color: Color(0xFFFDE68A),
-                                ),
-                                const Gap(6),
-                                Text(
-                                  '$opsCount عملية صرف معتمدة بالمنفذ',
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: const Color(
-                                  0xFFFDE68A,
-                                ).withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: const Text(
-                                'محدّث لحظياً',
-                                style: TextStyle(
-                                  fontSize: 10.5,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFFFDE68A),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const Gap(12),
-
-                // ── 3. Secondary KPI Metric Grid (Beneficiaries & Operations) ──
-                Row(
-                  children: [
-                    // Beneficiaries Card
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF0F9FF),
-                          borderRadius: BorderRadius.circular(18),
-                          border: Border.all(color: const Color(0xFFBAE6FD)),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(7),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFE0F2FE),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: const Icon(
-                                    Icons.groups_rounded,
-                                    color: Color(0xFF0284C7),
-                                    size: 18,
-                                  ),
-                                ),
-                                Text(
-                                  'merchant.stats_beneficiaries'.tr(),
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF0369A1),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const Gap(8),
-                            Text(
-                              '$uniqueBeneficiaries ${'merchant.beneficiaries_cases_label'.tr()}',
-                              style: const TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w900,
-                                color: Color(0xFF0369A1),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    const Gap(10),
-
-                    // Total Operations Card
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF5F3FF),
-                          borderRadius: BorderRadius.circular(18),
-                          border: Border.all(color: const Color(0xFFDDD6FE)),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(7),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFEDE9FE),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: const Icon(
-                                    Icons.receipt_long_rounded,
-                                    color: Color(0xFF7C3AED),
-                                    size: 18,
-                                  ),
-                                ),
-                                Text(
-                                  'merchant.stats_operations'.tr(),
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF5B21B6),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const Gap(8),
-                            Text(
-                              '$opsCount ${'merchant.txns_unit_label'.tr()}',
-                              style: const TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w900,
-                                color: Color(0xFF5B21B6),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+                // ── 2. Revenue & Operations Metrics Card ──
+                MerchantHistoryMetricsCard(
+                  totalDisbursed: totalDisbursed,
+                  opsCount: opsCount,
+                  uniqueBeneficiaries: uniqueBeneficiaries,
+                  timeframeLabel: _getTimeframeLabel(),
                 ),
 
                 const Gap(18),
 
-                // ── 4. Search Bar ──
+                // ── 3. Search Bar ──
                 TextField(
                   controller: _searchController,
                   onChanged: (val) => setState(() => _searchQuery = val),
@@ -772,13 +210,13 @@ class _MerchantHistoryTabState extends State<MerchantHistoryTab> {
                       fontWeight: FontWeight.w500,
                     ),
                     prefixIcon: const Icon(
-                      Icons.search_rounded,
+                      AppIcons.search,
                       size: 20,
                       color: AppColors.primary,
                     ),
                     suffixIcon: _searchQuery.isNotEmpty
                         ? IconButton(
-                            icon: const Icon(Icons.clear_rounded, size: 18),
+                            icon: const Icon(AppIcons.close, size: 18),
                             onPressed: () {
                               _searchController.clear();
                               setState(() => _searchQuery = '');
@@ -841,7 +279,7 @@ class _MerchantHistoryTabState extends State<MerchantHistoryTab> {
                           child: const Row(
                             children: [
                               Icon(
-                                Icons.refresh_rounded,
+                                AppIcons.refresh,
                                 size: 13,
                                 color: AppColors.error,
                               ),
@@ -864,7 +302,7 @@ class _MerchantHistoryTabState extends State<MerchantHistoryTab> {
 
                 const Gap(14),
 
-                // ── 5. Transactions List ──
+                // ── 4. Transactions List / Empty State ──
                 if (filteredList.isEmpty)
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 36),
@@ -885,7 +323,8 @@ class _MerchantHistoryTabState extends State<MerchantHistoryTab> {
                         foodBaskets: 0,
                         timestamp: item.timestamp,
                         showPrintButton: true,
-                        onTap: () => _showTransactionDetails(context, item),
+                        onTap: () =>
+                            MerchantTransactionDetailModal.show(context, item),
                       ),
                     );
                   }),
@@ -894,56 +333,6 @@ class _MerchantHistoryTabState extends State<MerchantHistoryTab> {
           ),
         );
       },
-    );
-  }
-
-  Widget _buildFilterChip(
-    MerchantTimeframeFilter filter,
-    String label,
-    IconData icon,
-  ) {
-    final isSelected = _selectedFilter == filter;
-    return InkWell(
-      onTap: () => setState(() => _selectedFilter = filter),
-      borderRadius: BorderRadius.circular(14),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : Colors.white,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.borderLight,
-          ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.22),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
-              : null,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: 15,
-              color: isSelected ? Colors.white : AppColors.textSecondaryLight,
-            ),
-            const Gap(6),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: isSelected ? Colors.white : AppColors.textPrimaryLight,
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

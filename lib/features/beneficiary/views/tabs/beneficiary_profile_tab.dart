@@ -5,6 +5,7 @@ import 'package:gap/gap.dart';
 
 import '../../../../app/service_locator.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/utils/app_formatters.dart';
 import '../../../../core/widgets/dialogs/logout_confirm_dialog.dart';
 import '../../../../core/widgets/profile/profile_info_content_links.dart';
 import '../../../../core/widgets/profile/profile_info_row.dart';
@@ -23,7 +24,6 @@ class BeneficiaryProfileTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final authState = getIt<AuthCubit>().state;
     final user = authState is Authenticated ? authState.user : null;
-    final dateFormatter = DateFormat('yyyy/MM/dd');
 
     final displayName =
         user?.name.isNotEmpty == true ? user!.name : 'auth.role_beneficiary'.tr();
@@ -103,7 +103,7 @@ class BeneficiaryProfileTab extends StatelessWidget {
                     ProfileInfoRow(
                       label: 'profile.expires_at_label'.tr(),
                       value: card != null
-                          ? dateFormatter.format(card.expiresAt)
+                          ? AppFormatters.formatDate(card.expiresAt, context: context)
                           : '-',
                       showDivider: false,
                     ),
