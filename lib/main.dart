@@ -1,16 +1,17 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'app/service_locator.dart';
 import 'core/constants/app_constants.dart';
 import 'core/routes/app_router.dart';
+import 'core/services/notification_service.dart';
 import 'core/theme/app_theme.dart';
-import 'firebase_options.dart';
-
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'features/auth/view_models/auth_cubit.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,8 +22,14 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+
+    // Register Background Notification Handler
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+
+    // Initialize Push & Local Notifications
+    await NotificationService.instance.initialize();
   } catch (e) {
-    debugPrint('Firebase initialization notice: $e');
+    debugPrint('Firebase & Notification initialization notice: $e');
   }
 
   await initServiceLocator();
