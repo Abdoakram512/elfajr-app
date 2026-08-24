@@ -1,6 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -23,10 +22,7 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
 
-    // Register Background Notification Handler
-    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
-
-    // Initialize Push & Local Notifications
+    // Initialize Push & Local Notifications (encapsulates background & foreground handlers)
     await NotificationService.instance.initialize();
   } catch (e) {
     debugPrint('Firebase & Notification initialization notice: $e');

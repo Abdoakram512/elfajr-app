@@ -45,7 +45,10 @@ class NotificationService {
     if (_isInitialized) return;
 
     try {
-      // 1. Request Notification Permissions
+      // 1. Register Background Notification Handler cleanly inside the service
+      FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+
+      // 2. Request Notification Permissions
       final settings = await _fcm.requestPermission(
         alert: true,
         announcement: false,
@@ -60,7 +63,7 @@ class NotificationService {
         'FCM Permission status: ${settings.authorizationStatus}',
       );
 
-      // 2. Initialize Local Notifications Plugin
+      // 3. Initialize Local Notifications Plugin
       const androidInitSettings = AndroidInitializationSettings(
         '@mipmap/ic_launcher',
       );
@@ -82,21 +85,21 @@ class NotificationService {
         },
       );
 
-      // 3. Create Android Notification Channel
+      // 4. Create Android Notification Channel
       await _localNotifications
           .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin
           >()
           ?.createNotificationChannel(_androidChannel);
 
-      // 4. Set Foreground Notification Presentation Options for iOS
+      // 5. Set Foreground Notification Presentation Options for iOS
       await _fcm.setForegroundNotificationPresentationOptions(
         alert: true,
         badge: true,
         sound: true,
       );
 
-      // 5. Listen to Foreground Messages
+      // 6. Listen to Foreground Messages
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
         debugPrint(
           'FCM Foreground message received: ${message.notification?.title}',
@@ -104,7 +107,7 @@ class NotificationService {
         _handleForegroundMessage(message);
       });
 
-      // 6. Handle notification click when app is opened from background
+      // 7. Handle notification click when app is opened from background
       FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
         debugPrint('FCM onMessageOpenedApp clicked: ${message.data}');
       });
