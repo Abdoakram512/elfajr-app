@@ -30,7 +30,6 @@ class _RedemptionConfirmationSheetState
   @override
   void initState() {
     super.initState();
-    // Default to 30 EGP automatically as per organization policy
     _amountController.text = '30';
   }
 

@@ -14,8 +14,8 @@ class BeneficiaryCubit extends Cubit<BeneficiaryState> {
   StreamSubscription<List<BeneficiaryRedemptionItem>>? _redemptionsSubscription;
 
   BeneficiaryCubit({BeneficiaryRepository? repository})
-    : _repository = repository ?? getIt<BeneficiaryRepository>(),
-      super(const BeneficiaryState()) {
+      : _repository = repository ?? getIt<BeneficiaryRepository>(),
+        super(const BeneficiaryState()) {
     initDataStreams();
   }
 
@@ -24,36 +24,81 @@ class BeneficiaryCubit extends Cubit<BeneficiaryState> {
     final user = authState is Authenticated ? authState.user : null;
 
     if (user == null) {
-      debugPrint('[BeneficiaryCubit] ⚠️ No authenticated user - skipping streams');
+      debugPrint(
+        '[BeneficiaryCubit] ⚠️ No authenticated user - skipping streams',
+      );
       return;
     }
 
     final beneficiaryId = user.uid;
+    final nationalId = user.nationalId;
+    final beneficiaryName = user.name;
+    final phone = user.phone;
     final cardId = user.activeCardId?.isNotEmpty == true
         ? user.activeCardId!
-        : beneficiaryId.replaceFirst('usr_ben_case_', 'FAJR-CARD-');
+        : (beneficiaryId.startsWith('FAJR-CARD-')
+            ? beneficiaryId
+            : beneficiaryId.replaceFirst('usr_ben_case_', 'FAJR-CARD-'));
 
-    debugPrint('[BeneficiaryCubit] 🔍 user.uid       = $beneficiaryId');
-    debugPrint('[BeneficiaryCubit] 🔍 user.activeCardId = ${user.activeCardId}');
-    debugPrint('[BeneficiaryCubit] 🔍 derived cardId = $cardId');
+    debugPrint('[BeneficiaryCubit] 🔍 user.uid        = $beneficiaryId');
+    debugPrint('[BeneficiaryCubit] 🔍 user.name       = $beneficiaryName');
+    debugPrint('[BeneficiaryCubit] 🔍 user.nationalId = $nationalId');
+    debugPrint('[BeneficiaryCubit] 🔍 derived cardId  = $cardId');
 
-    // 1. Subscribe to Live Aid Card from Firestore
+    // 1. Subscribe to Live Aid Card from Firestore across all keys
     _cardSubscription?.cancel();
     _cardSubscription = _repository
-        .getActiveAidCard(beneficiaryId: beneficiaryId, cardId: cardId)
+        .getActiveAidCard(
+          beneficiaryId: beneficiaryId,
+          cardId: cardId,
+          nationalId: nationalId,
+          beneficiaryName: beneficiaryName,
+          phone: phone,
+        )
         .listen((card) {
-          debugPrint('[BeneficiaryCubit] 📥 card received = ${card?.cardId} (null=${card == null})');
+          debugPrint(
+            '[BeneficiaryCubit] 📥 LIVE card received = ${card?.cardId} (balance=${card?.totalBalance}, baskets=${card?.foodBasketsQuota})',
+          );
           if (card != null) {
             emit(state.copyWith(activeCard: card));
+            final effectiveCardId =
+                card.cardId.isNotEmpty ? card.cardId : cardId;
+            final effectiveNatId =
+                card.nationalId.isNotEmpty ? card.nationalId : nationalId;
+            if (effectiveCardId != cardId) {
+              _startRedemptionsSubscription(
+                beneficiaryId: beneficiaryId,
+                cardId: effectiveCardId,
+                nationalId: effectiveNatId,
+              );
+            }
           }
         });
 
-    // 2. Subscribe to Live Redemptions from Firestore
+    // 2. Subscribe to Live Redemptions & Basket Distributions from Firestore
+    _startRedemptionsSubscription(
+      beneficiaryId: beneficiaryId,
+      cardId: cardId,
+      nationalId: nationalId,
+    );
+  }
+
+  void _startRedemptionsSubscription({
+    required String beneficiaryId,
+    String? cardId,
+    String? nationalId,
+  }) {
     _redemptionsSubscription?.cancel();
     _redemptionsSubscription = _repository
-        .getRedemptionsHistory(beneficiaryId: beneficiaryId, cardId: cardId)
+        .getRedemptionsHistory(
+          beneficiaryId: beneficiaryId,
+          cardId: cardId,
+          nationalId: nationalId,
+        )
         .listen((redemptions) {
-          debugPrint('[BeneficiaryCubit] 📥 redemptions count = ${redemptions.length}');
+          debugPrint(
+            '[BeneficiaryCubit] 📥 redemptions/baskets count = ${redemptions.length}',
+          );
           emit(state.copyWith(redemptions: redemptions));
         });
   }

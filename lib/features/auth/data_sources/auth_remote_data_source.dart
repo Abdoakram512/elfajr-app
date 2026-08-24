@@ -25,8 +25,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   AuthRemoteDataSourceImpl({
     FirebaseAuth? firebaseAuth,
     FirebaseFirestore? firestore,
-  })  : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
-        _firestore = firestore ?? FirebaseFirestore.instance;
+  }) : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
+       _firestore = firestore ?? FirebaseFirestore.instance;
 
   @override
   Stream<List<String>> streamNationalities() {
@@ -45,7 +45,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     if (currentUser == null) return null;
 
     try {
-      final doc = await _firestore.collection('users').doc(currentUser.uid).get();
+      final doc = await _firestore
+          .collection('users')
+          .doc(currentUser.uid)
+          .get();
       if (doc.exists && doc.data() != null) {
         return UserModel.fromMap(doc.data()!, documentId: doc.id);
       }
@@ -164,7 +167,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           password: password,
         );
         if (credential.user != null) {
-          final userDoc = await _firestore.collection('users').doc(credential.user!.uid).get();
+          final userDoc = await _firestore
+              .collection('users')
+              .doc(credential.user!.uid)
+              .get();
           if (userDoc.exists && userDoc.data() != null) {
             return UserModel.fromMap(userDoc.data()!, documentId: userDoc.id);
           }
@@ -186,7 +192,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<UserModel> registerWithEmailAndPassword(RegisterParams params) async {
     final cleanPhone = params.phone?.trim();
-    final cleanNationalId = (params.nationalId != null && params.nationalId!.trim().isNotEmpty)
+    final cleanNationalId =
+        (params.nationalId != null && params.nationalId!.trim().isNotEmpty)
         ? params.nationalId!.trim().replaceAll(RegExp(r'\s+'), '').toUpperCase()
         : null;
 
@@ -205,7 +212,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       }
 
       // 2. UNIQUE CHECK: National ID / Passport for Beneficiaries
-      if (params.isBeneficiary && cleanNationalId != null && cleanNationalId.isNotEmpty) {
+      if (params.isBeneficiary &&
+          cleanNationalId != null &&
+          cleanNationalId.isNotEmpty) {
         final existingNatId = await _firestore
             .collection('users')
             .where('nationalId', isEqualTo: cleanNationalId)
@@ -219,8 +228,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       // Technical email for Firebase Auth
       String normalizedEmail = params.email.trim().toLowerCase();
-      if (params.isBeneficiary && (normalizedEmail.isEmpty || !normalizedEmail.contains('@'))) {
-        normalizedEmail = '${cleanNationalId?.toLowerCase() ?? 'usr_${DateTime.now().millisecondsSinceEpoch}'}@alfajr.app';
+      if (params.isBeneficiary &&
+          (normalizedEmail.isEmpty || !normalizedEmail.contains('@'))) {
+        normalizedEmail =
+            '${cleanNationalId?.toLowerCase() ?? 'usr_${DateTime.now().millisecondsSinceEpoch}'}@alfajr.app';
       }
 
       // Check email uniqueness
@@ -258,7 +269,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       // Automatically provision Aid Card for Beneficiaries
       if (params.isBeneficiary) {
-        final uniqueSuffix = '${DateTime.now().millisecondsSinceEpoch}'.substring(4);
+        final uniqueSuffix = '${DateTime.now().millisecondsSinceEpoch}'
+            .substring(4);
         activeCardId = 'FAJR-CARD-$uniqueSuffix';
         finalNationalId = cleanNationalId ?? 'N-$uniqueSuffix';
 
@@ -269,20 +281,29 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           'nationalId': finalNationalId,
           'familyCount': 4,
           'totalBalance': 600.0,
+          'balance': 600.0,
           'foodBasketsQuota': 2,
+          'quota': 2,
           'status': isAutoApproved ? 'active' : 'pending',
           'nationality': params.nationality ?? 'مصري',
           'residence': params.city ?? 'القاهرة',
           'securityHash': uniqueSuffix,
           'activatedAt': DateTime.now().toIso8601String(),
-          'expiresAt': DateTime.now().add(const Duration(days: 365)).toIso8601String(),
-          'fieldResearchStatus': isAutoApproved ? 'معتمد ومسجل حديثاً' : 'قيد مراجعة الإدارة',
+          'expiresAt': DateTime.now()
+              .add(const Duration(days: 365))
+              .toIso8601String(),
+          'fieldResearchStatus': isAutoApproved
+              ? 'معتمد ومسجل حديثاً'
+              : 'قيد مراجعة الإدارة',
           'totalBasketsDelivered': 0,
           'extraNotes': 'حساب مستفيد رسمي مسجل من التطبيق',
         };
 
         try {
-          await _firestore.collection('aid_cards').doc(activeCardId).set(aidCardData);
+          await _firestore
+              .collection('aid_cards')
+              .doc(activeCardId)
+              .set(aidCardData);
         } catch (_) {}
       }
 

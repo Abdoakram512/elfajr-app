@@ -22,7 +22,7 @@ class MerchantRedemptionProcessor {
   Future<RedemptionTransactionModel> executeRedemption({
     required String cardId,
     required double amount,
-    required int foodBaskets,
+    int foodBaskets = 0,
     required String merchantId,
     required String merchantStoreName,
     String? notes,
@@ -65,8 +65,10 @@ class MerchantRedemptionProcessor {
           throw const AppException('merchant.invalid_card');
         }
 
-        final currentBalance = (cardData['totalBalance'] as num?)?.toDouble() ?? 0.0;
-        final currentBaskets = (cardData['foodBasketsQuota'] as num?)?.toInt() ?? 0;
+        final currentBalance = (cardData['balance'] as num?)?.toDouble() ??
+            ((cardData['totalBalance'] as num?)?.toDouble() ?? 0.0);
+        final currentBaskets = (cardData['foodBasketsQuota'] as num?)?.toInt() ??
+            ((cardData['quota'] as num?)?.toInt() ?? 0);
 
         // Strict Balance & Quota Validation inside Transaction
         if (amount > currentBalance || foodBaskets > currentBaskets) {
@@ -75,15 +77,19 @@ class MerchantRedemptionProcessor {
 
         final remainingBalance = currentBalance - amount;
         final remainingBaskets = currentBaskets - foodBaskets;
+        final canonicalCardId = cardData['cardId'] as String? ?? cardSnapshot.id;
         final benId = cardData['beneficiaryId'] as String? ?? '';
         final benName = cardData['beneficiaryName'] as String? ?? 'مستفيد معتمد';
+        final benNationalId = cardData['nationalId'] as String? ?? '';
         final city = cardData['residence'] as String? ?? (cardData['city'] as String? ?? 'الرياض');
 
         // [WRITE PHASE] Atomic updates committed together
         // 1. Decrement balance on aid card
         transaction.update(cardRef, {
           'totalBalance': remainingBalance,
+          'balance': remainingBalance,
           'foodBasketsQuota': remainingBaskets,
+          'quota': remainingBaskets,
           'updatedAt': FieldValue.serverTimestamp(),
         });
 
@@ -104,9 +110,11 @@ class MerchantRedemptionProcessor {
         // 4. Create immutable audit record in redemptions collection
         transaction.set(txnDocRef, {
           'transactionId': txnId,
-          'cardId': cleanId,
+          'cardId': canonicalCardId,
+          'cardDocId': cardSnapshot.id,
           'beneficiaryId': benId,
           'beneficiaryName': benName,
+          'beneficiaryNationalId': benNationalId,
           'merchantId': cleanMerchantId,
           'merchantStoreName': cleanStoreName,
           'amountDeducted': amount,
@@ -120,7 +128,7 @@ class MerchantRedemptionProcessor {
 
         return RedemptionTransactionModel(
           transactionId: txnId,
-          cardId: cleanId,
+          cardId: canonicalCardId,
           beneficiaryId: benId,
           beneficiaryName: benName,
           merchantId: cleanMerchantId,

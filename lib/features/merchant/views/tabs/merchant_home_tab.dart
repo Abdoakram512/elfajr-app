@@ -293,7 +293,8 @@ class MerchantHomeTab extends StatelessWidget {
                         Expanded(
                           child: AppKpiCard(
                             label: 'dashboard.merchant.today_dispensed'.tr(),
-                            value: '${currencyFormatter.format(state.todayDispensedAmount)} ${'common.currency'.tr()}',
+                            value:
+                                '${currencyFormatter.format(state.todayDispensedAmount)} ${'common.currency'.tr()}',
                             icon: Icons.payments_rounded,
                             color: const Color(0xFF0A734D),
                             bgColor: const Color(0xFFECFDF5),

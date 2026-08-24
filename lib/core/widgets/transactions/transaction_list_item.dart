@@ -241,7 +241,7 @@ class TransactionListItem extends StatelessWidget {
                           ),
                           const Gap(4),
                           Text(
-                            'طباعة',
+                            'common.print'.tr(),
                             style: const TextStyle(
                               fontSize: 10.5,
                               fontWeight: FontWeight.bold,

@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
 import '../../../../core/constants/app_colors.dart';
 
@@ -10,6 +11,7 @@ class BeneficiaryMonthlyStatement extends StatelessWidget {
   final int foodBasketsQuota;
   final int thisMonthBasketsSpent;
   final DateTime now;
+  final VoidCallback? onOpenFullAnalytics;
 
   const BeneficiaryMonthlyStatement({
     super.key,
@@ -19,11 +21,15 @@ class BeneficiaryMonthlyStatement extends StatelessWidget {
     required this.foodBasketsQuota,
     required this.thisMonthBasketsSpent,
     required this.now,
+    this.onOpenFullAnalytics,
   });
 
   @override
   Widget build(BuildContext context) {
     final currencyFormatter = NumberFormat('#,##0', 'ar');
+    final totalBudget = initialMonthEstimate > 0 ? initialMonthEstimate : (availableBalance + thisMonthSpent);
+    final consumptionRatio = totalBudget > 0 ? (thisMonthSpent / totalBudget).clamp(0.0, 1.0) : 0.0;
+    final isLowBalance = availableBalance > 0 && totalBudget > 0 && ((availableBalance / totalBudget) <= 0.20);
 
     return Container(
       width: double.infinity,
@@ -152,9 +158,66 @@ class BeneficiaryMonthlyStatement extends StatelessWidget {
               ),
             ],
           ),
+
+          const Gap(14),
+
+          // Progress Bar & Consumption Rate
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '${'dashboard.beneficiary.consumption_rate'.tr()}: ${(consumptionRatio * 100).toStringAsFixed(0)}%',
+                    style: TextStyle(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.bold,
+                      color: isLowBalance ? AppColors.error : AppColors.textSecondaryLight,
+                    ),
+                  ),
+                  if (onOpenFullAnalytics != null)
+                    InkWell(
+                      onTap: onOpenFullAnalytics,
+                      borderRadius: BorderRadius.circular(6),
+                      child: Row(
+                        children: [
+                          Text(
+                            'dashboard.beneficiary.analytics_title'.tr(),
+                            style: const TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                          const Gap(2),
+                          const Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            size: 10,
+                            color: AppColors.primary,
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+              const Gap(6),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: LinearProgressIndicator(
+                  value: consumptionRatio,
+                  minHeight: 7,
+                  backgroundColor: Colors.grey.shade100,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    isLowBalance ? AppColors.error : AppColors.primary,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
-    );
+    ).animate().fadeIn(duration: 350.ms);
   }
 
   Widget _buildStatementBox({

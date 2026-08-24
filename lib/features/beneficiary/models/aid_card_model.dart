@@ -126,7 +126,9 @@ class AidCardModel extends Equatable {
       'familyCount': familyCount,
       'residence': residence,
       'totalBalance': totalBalance,
+      'balance': totalBalance,
       'foodBasketsQuota': foodBasketsQuota,
+      'quota': foodBasketsQuota,
       'status': status.nameString,
       'socialStatus': socialStatus,
       'nationality': nationality,
@@ -141,12 +143,29 @@ class AidCardModel extends Equatable {
   static DateTime _parseDate(dynamic value) {
     if (value == null) return DateTime.now().add(const Duration(days: 365));
     if (value is DateTime) return value;
-    if (value is String) return DateTime.tryParse(value) ?? DateTime.now().add(const Duration(days: 365));
+    if (value is String) {
+      return DateTime.tryParse(value) ??
+          DateTime.now().add(const Duration(days: 365));
+    }
     try {
       return (value as dynamic).toDate();
     } catch (_) {
       return DateTime.now().add(const Duration(days: 365));
     }
+  }
+
+  static double _parseDouble(dynamic value, {double fallback = 0.0}) {
+    if (value == null) return fallback;
+    if (value is num) return value.toDouble();
+    if (value is String) return double.tryParse(value.trim()) ?? fallback;
+    return fallback;
+  }
+
+  static int _parseInt(dynamic value, {int fallback = 0}) {
+    if (value == null) return fallback;
+    if (value is num) return value.toInt();
+    if (value is String) return int.tryParse(value.trim()) ?? fallback;
+    return fallback;
   }
 
   factory AidCardModel.fromMap(Map<String, dynamic> map, {String? documentId}) {
@@ -155,38 +174,49 @@ class AidCardModel extends Equatable {
       beneficiaryId: map['beneficiaryId'] as String? ?? '',
       beneficiaryName: map['beneficiaryName'] as String? ?? 'مستفيد',
       nationalId: map['nationalId'] as String? ?? '',
-      familyCount: map['familyCount'] as int? ?? 4,
+      familyCount: _parseInt(map['familyCount'], fallback: 4),
       residence: map['residence'] as String?,
-      totalBalance: (map['totalBalance'] as num?)?.toDouble() ?? 600.0,
-      foodBasketsQuota: map['foodBasketsQuota'] as int? ?? 2,
+      totalBalance: _parseDouble(
+        map['balance'] ??
+            (map['totalBalance'] ?? (map['currentBalance'] ?? map['amount'])),
+        fallback: 600.0,
+      ),
+      foodBasketsQuota: _parseInt(
+        map['foodBasketsQuota'] ??
+            (map['quota'] ?? (map['basketsQuota'] ?? map['basketsCount'])),
+        fallback: 2,
+      ),
       status: AidCardStatus.fromString(map['status'] as String?),
       socialStatus: map['socialStatus'] as String?,
       nationality: map['nationality'] as String?,
       fieldResearchStatus: map['fieldResearchStatus'] as String?,
       issuedByVolunteerId: map['issuedByVolunteerId'] as String?,
-      activatedAt: map['activatedAt'] != null ? _parseDate(map['activatedAt']) : null,
+      activatedAt: map['activatedAt'] != null
+          ? _parseDate(map['activatedAt'])
+          : null,
       expiresAt: _parseDate(map['expiresAt']),
-      securityHash: map['securityHash'] as String? ?? 'sha256_secure_card_token',
+      securityHash:
+          map['securityHash'] as String? ?? 'sha256_secure_card_token',
     );
   }
 
   @override
   List<Object?> get props => [
-        cardId,
-        beneficiaryId,
-        beneficiaryName,
-        nationalId,
-        familyCount,
-        residence,
-        totalBalance,
-        foodBasketsQuota,
-        status,
-        socialStatus,
-        nationality,
-        fieldResearchStatus,
-        issuedByVolunteerId,
-        activatedAt,
-        expiresAt,
-        securityHash,
-      ];
+    cardId,
+    beneficiaryId,
+    beneficiaryName,
+    nationalId,
+    familyCount,
+    residence,
+    totalBalance,
+    foodBasketsQuota,
+    status,
+    socialStatus,
+    nationality,
+    fieldResearchStatus,
+    issuedByVolunteerId,
+    activatedAt,
+    expiresAt,
+    securityHash,
+  ];
 }

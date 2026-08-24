@@ -14,10 +14,16 @@ class BeneficiaryRepositoryImpl implements BeneficiaryRepository {
   Stream<AidCardModel?> getActiveAidCard({
     required String beneficiaryId,
     String? cardId,
+    String? nationalId,
+    String? beneficiaryName,
+    String? phone,
   }) {
     return _remoteDataSource.getActiveAidCardStream(
       beneficiaryId: beneficiaryId,
       cardId: cardId,
+      nationalId: nationalId,
+      beneficiaryName: beneficiaryName,
+      phone: phone,
     );
   }
 
@@ -25,10 +31,12 @@ class BeneficiaryRepositoryImpl implements BeneficiaryRepository {
   Stream<List<BeneficiaryRedemptionItem>> getRedemptionsHistory({
     required String beneficiaryId,
     String? cardId,
+    String? nationalId,
   }) {
     return _remoteDataSource.getRedemptionsStream(
       beneficiaryId: beneficiaryId,
       cardId: cardId,
+      nationalId: nationalId,
     );
   }
 }

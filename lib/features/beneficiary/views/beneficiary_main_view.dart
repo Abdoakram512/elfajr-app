@@ -54,8 +54,8 @@ class _BeneficiaryMainViewBodyState extends State<_BeneficiaryMainViewBody> {
             label: 'dashboard.tabs.home'.tr(),
           ),
           CustomBottomNavBarItem(
-            icon: Icons.receipt_long_outlined,
-            activeIcon: Icons.receipt_long_rounded,
+            icon: Icons.analytics_outlined,
+            activeIcon: Icons.analytics_rounded,
             label: 'dashboard.tabs.history'.tr(),
           ),
           CustomBottomNavBarItem(

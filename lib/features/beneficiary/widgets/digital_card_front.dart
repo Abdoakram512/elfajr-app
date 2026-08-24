@@ -121,7 +121,9 @@ class DigitalCardFront extends StatelessWidget {
                     ),
                     const Gap(5),
                     Text(
-                      card.isActive ? 'نشطة' : 'معلقة',
+                      card.isActive
+                          ? 'digital_card.status_active_short'.tr()
+                          : 'digital_card.status_pending_short'.tr(),
                       style: const TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w900,
@@ -297,9 +299,9 @@ class DigitalCardFront extends StatelessWidget {
                             color: AppColors.primary,
                           ),
                           const Gap(2),
-                          const Text(
-                            'اضغط للتكبير',
-                            style: TextStyle(
+                          Text(
+                            'digital_card.tap_to_enlarge_short'.tr(),
+                            style: const TextStyle(
                               fontSize: 9,
                               fontWeight: FontWeight.w900,
                               color: AppColors.primary,
@@ -463,7 +465,7 @@ class DigitalCardFront extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'كود الكارت: ',
+                      '${'digital_card.card_id_prefix'.tr()} ',
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
@@ -502,7 +504,7 @@ class DigitalCardFront extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        'الرقم القومي: ',
+                        '${'digital_card.national_id_prefix'.tr()} ',
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,

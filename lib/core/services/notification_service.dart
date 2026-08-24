@@ -23,7 +23,7 @@ class NotificationService {
       FlutterLocalNotificationsPlugin();
 
   static const String channelId = 'qout_high_importance_channel';
-  static const String channelName = 'إشعارات منظومة قوت';
+  static const String channelName = 'إشعارات مؤسسة الفجر';
   static const String channelDescription =
       'إشعارات وصولات التحويل وشحن العهدة وعمليات الصرف';
 

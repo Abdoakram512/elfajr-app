@@ -143,7 +143,7 @@ class _MerchantHistoryTabState extends State<MerchantHistoryTab> {
       backgroundColor: Colors.transparent,
       builder: (ctx) {
         return AppSheetScaffold(
-          title: 'تفاصيل عملية الصرف النقدي',
+          title: 'merchant.history_detail_title'.tr(),
           subtitle: tx.cardId,
           icon: Icons.payments_rounded,
           iconColor: AppColors.primary,
@@ -169,7 +169,7 @@ class _MerchantHistoryTabState extends State<MerchantHistoryTab> {
                 child: Column(
                   children: [
                     Text(
-                      'المبلغ المصروف نقداً',
+                      'merchant.cash_amount_disbursed'.tr(),
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
@@ -202,37 +202,37 @@ class _MerchantHistoryTabState extends State<MerchantHistoryTab> {
                 child: Column(
                   children: [
                     InfoKeyValueRow(
-                      label: 'اسم المستفيد',
+                      label: 'merchant.beneficiary_name_label'.tr(),
                       value: tx.beneficiaryName,
                       isBold: true,
                     ),
                     const Gap(10),
                     InfoKeyValueRow(
-                      label: 'كود الكارت',
+                      label: 'merchant.card_id_label'.tr(),
                       value: tx.cardId,
                       isBold: true,
                     ),
                     const Gap(10),
                     InfoKeyValueRow(
-                      label: 'تاريخ وتوقيت العملية',
+                      label: 'merchant.txn_time_label'.tr(),
                       value: AppFormatters.fullDate.format(tx.timestamp),
                     ),
                     if (tx.merchantStoreName.isNotEmpty) ...[
                       const Gap(10),
                       InfoKeyValueRow(
-                        label: 'منفذ الصرف',
+                        label: 'merchant.outlet_name_label'.tr(),
                         value: tx.merchantStoreName,
                       ),
                     ],
                     const Gap(10),
                     InfoKeyValueRow(
-                      label: 'رقم المرجع',
+                      label: 'merchant.ref_number_label'.tr(),
                       value: tx.transactionId,
                     ),
                     if (tx.notes != null && tx.notes!.isNotEmpty) ...[
                       const Gap(10),
                       InfoKeyValueRow(
-                        label: 'ملاحظات العملية',
+                        label: 'merchant.notes_label'.tr(),
                         value: tx.notes!,
                       ),
                     ],
@@ -244,7 +244,7 @@ class _MerchantHistoryTabState extends State<MerchantHistoryTab> {
 
               // Print / Export Button
               PrimaryButton(
-                text: 'طباعة الإيصال / الكارت',
+                text: 'merchant.redemption_receipt.print_receipt_btn'.tr(),
                 leadingIcon: Icons.print_rounded,
                 onPressed: () {
                   Navigator.pop(ctx);

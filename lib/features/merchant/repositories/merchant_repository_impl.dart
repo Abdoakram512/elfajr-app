@@ -24,7 +24,7 @@ class MerchantRepositoryImpl implements MerchantRepository {
   Future<RedemptionTransactionModel> processRedemption({
     required String cardId,
     required double amount,
-    required int foodBaskets,
+    int foodBaskets = 0,
     required String merchantId,
     required String merchantStoreName,
     String? notes,

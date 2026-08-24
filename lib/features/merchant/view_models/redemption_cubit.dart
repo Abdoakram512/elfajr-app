@@ -12,8 +12,8 @@ class RedemptionCubit extends Cubit<RedemptionState> {
   final MerchantRepository _repository;
 
   RedemptionCubit({MerchantRepository? repository})
-      : _repository = repository ?? getIt<MerchantRepository>(),
-        super(const RedemptionInitial());
+    : _repository = repository ?? getIt<MerchantRepository>(),
+      super(const RedemptionInitial());
 
   Future<void> onQrCodeScanned(String rawQrCode) async {
     final cardId = rawQrCode.trim();
@@ -63,7 +63,7 @@ class RedemptionCubit extends Cubit<RedemptionState> {
 
   Future<bool> confirmRedemption({
     required double amount,
-    required int foodBaskets,
+    int foodBaskets = 0,
     required String enteredPin,
     String? notes,
   }) async {
@@ -82,18 +82,22 @@ class RedemptionCubit extends Cubit<RedemptionState> {
     }
 
     if (amount <= 0) {
-      emit(RedemptionCardLoaded(
-        card: currentCard,
-        amountError: 'merchant.enter_deduction_amount',
-      ));
+      emit(
+        RedemptionCardLoaded(
+          card: currentCard,
+          amountError: 'merchant.enter_deduction_amount',
+        ),
+      );
       return false;
     }
 
     if (amount > currentCard.totalBalance) {
-      emit(RedemptionCardLoaded(
-        card: currentCard,
-        amountError: 'merchant.insufficient_balance',
-      ));
+      emit(
+        RedemptionCardLoaded(
+          card: currentCard,
+          amountError: 'merchant.insufficient_balance',
+        ),
+      );
       return false;
     }
 
@@ -104,10 +108,7 @@ class RedemptionCubit extends Cubit<RedemptionState> {
         actualNationalId: currentCard.nationalId,
       );
     } on AppException catch (e) {
-      emit(RedemptionCardLoaded(
-        card: currentCard,
-        pinError: e.message,
-      ));
+      emit(RedemptionCardLoaded(card: currentCard, pinError: e.message));
       return false;
     }
 
@@ -131,10 +132,12 @@ class RedemptionCubit extends Cubit<RedemptionState> {
       emit(RedemptionSuccess(transaction: txn, card: currentCard));
       return true;
     } catch (e) {
-      emit(RedemptionFailure(
-        e.toString().replaceAll('AppException: ', ''),
-        card: currentCard,
-      ));
+      emit(
+        RedemptionFailure(
+          e.toString().replaceAll('AppException: ', ''),
+          card: currentCard,
+        ),
+      );
       return false;
     }
   }
