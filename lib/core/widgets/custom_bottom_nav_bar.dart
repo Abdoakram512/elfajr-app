@@ -56,7 +56,8 @@ class CustomBottomNavBar extends StatelessWidget {
             children: List.generate(items.length, (index) {
               final item = items[index];
               final isSelected = currentIndex == index;
-              final hasBadge = item.badgeCount != null && item.badgeCount! > 0;
+              final count = item.badgeCount ?? 0;
+              final hasBadge = count > 0;
 
               return InkWell(
                 onTap: () => onTap(index),
@@ -70,8 +71,8 @@ class CustomBottomNavBar extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: isSelected
                         ? (isDark
-                            ? AppColors.primary.withValues(alpha: 0.2)
-                            : AppColors.primarySubtle)
+                              ? AppColors.primary.withValues(alpha: 0.2)
+                              : AppColors.primarySubtle)
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(16),
                   ),
@@ -81,7 +82,7 @@ class CustomBottomNavBar extends StatelessWidget {
                       Badge(
                         isLabelVisible: hasBadge,
                         label: Text(
-                          item.badgeCount! > 9 ? '9+' : item.badgeCount.toString(),
+                          count > 9 ? '9+' : count.toString(),
                           style: const TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
@@ -95,8 +96,8 @@ class CustomBottomNavBar extends StatelessWidget {
                           color: isSelected
                               ? AppColors.primary
                               : (isDark
-                                  ? AppColors.textMutedDark
-                                  : AppColors.textMutedLight),
+                                    ? AppColors.textMutedDark
+                                    : AppColors.textMutedLight),
                         ),
                       ),
                       if (isSelected) ...[
