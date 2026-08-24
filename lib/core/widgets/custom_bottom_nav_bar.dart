@@ -5,11 +5,13 @@ class CustomBottomNavBarItem {
   final IconData icon;
   final IconData activeIcon;
   final String label;
+  final int? badgeCount;
 
   const CustomBottomNavBarItem({
     required this.icon,
     required this.activeIcon,
     required this.label,
+    this.badgeCount,
   });
 }
 
@@ -54,6 +56,7 @@ class CustomBottomNavBar extends StatelessWidget {
             children: List.generate(items.length, (index) {
               final item = items[index];
               final isSelected = currentIndex == index;
+              final hasBadge = item.badgeCount != null && item.badgeCount! > 0;
 
               return InkWell(
                 onTap: () => onTap(index),
@@ -75,20 +78,32 @@ class CustomBottomNavBar extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
-                        isSelected ? item.activeIcon : item.icon,
-                        size: 22,
-                        color: isSelected
-                            ? AppColors.primary
-                            : (isDark
-                                ? AppColors.textMutedDark
-                                : AppColors.textMutedLight),
+                      Badge(
+                        isLabelVisible: hasBadge,
+                        label: Text(
+                          item.badgeCount! > 9 ? '9+' : item.badgeCount.toString(),
+                          style: const TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        backgroundColor: AppColors.warning,
+                        child: Icon(
+                          isSelected ? item.activeIcon : item.icon,
+                          size: 22,
+                          color: isSelected
+                              ? AppColors.primary
+                              : (isDark
+                                  ? AppColors.textMutedDark
+                                  : AppColors.textMutedLight),
+                        ),
                       ),
                       if (isSelected) ...[
                         const SizedBox(width: 8),
                         Text(
                           item.label,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
                             color: AppColors.primary,
