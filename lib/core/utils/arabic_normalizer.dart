@@ -1,6 +1,19 @@
 class ArabicNormalizer {
   ArabicNormalizer._();
 
+  static const String _arabicIndicDigits = '٠١٢٣٤٥٦٧٨٩';
+  static const String _asciiDigits = '0123456789';
+
+  /// Converts Arabic-Indic digits (٠١٢٣٤٥٦٧٨٩) to standard ASCII digits (0123456789)
+  static String convertDigits(String? text) {
+    if (text == null || text.trim().isEmpty) return '';
+    var result = text.trim();
+    for (int i = 0; i < _arabicIndicDigits.length; i++) {
+      result = result.replaceAll(_arabicIndicDigits[i], _asciiDigits[i]);
+    }
+    return result;
+  }
+
   /// Normalizes Arabic text for smart, accent-insensitive and spelling-variation-insensitive searching.
   ///
   /// - Unifies all Alef variants: [أ, إ, آ, ٱ] -> ا
@@ -14,31 +27,24 @@ class ArabicNormalizer {
   static String normalize(String? text) {
     if (text == null || text.trim().isEmpty) return '';
 
-    var normalized = text.trim().toLowerCase();
+    var normalized = convertDigits(text).toLowerCase();
 
-    // 1. Convert Arabic-Indic numerals to ASCII digits
-    const arabicIndicDigits = '٠١٢٣٤٥٦٧٨٩';
-    const asciiDigits = '0123456789';
-    for (int i = 0; i < arabicIndicDigits.length; i++) {
-      normalized = normalized.replaceAll(arabicIndicDigits[i], asciiDigits[i]);
-    }
-
-    // 2. Remove all Arabic diacritics / tashkeel and tatweel
+    // 1. Remove all Arabic diacritics / tashkeel and tatweel
     normalized = normalized.replaceAll(RegExp(r'[\u064B-\u065F\u0670\u0640]'), '');
 
-    // 3. Normalize all Alef variants to bare Alef (ا)
+    // 2. Normalize all Alef variants to bare Alef (ا)
     normalized = normalized.replaceAll(RegExp(r'[أإآٱ]'), 'ا');
 
-    // 4. Normalize Taa Marbuta (ة) to Haa (ه)
+    // 3. Normalize Taa Marbuta (ة) to Haa (ه)
     normalized = normalized.replaceAll('ة', 'ه');
 
-    // 5. Normalize Alef Maqsura (ى) and Hamza on Yaa (ئ) to Yaa (ي)
+    // 4. Normalize Alef Maqsura (ى) and Hamza on Yaa (ئ) to Yaa (ي)
     normalized = normalized.replaceAll(RegExp(r'[ىئ]'), 'ي');
 
-    // 6. Normalize Waw with Hamza (ؤ) to Waw (و)
+    // 5. Normalize Waw with Hamza (ؤ) to Waw (و)
     normalized = normalized.replaceAll('ؤ', 'و');
 
-    // 7. Remove any extra multiple spaces
+    // 6. Remove any extra multiple spaces
     normalized = normalized.replaceAll(RegExp(r'\s+'), ' ');
 
     return normalized;
@@ -53,5 +59,42 @@ class ArabicNormalizer {
     final normalizedQuery = normalize(query);
 
     return normalizedTarget.contains(normalizedQuery);
+  }
+
+  /// Generates common Egyptian phone number format variations for flexible querying
+  static Set<String> generatePhoneVariations(String raw) {
+    final normalized = convertDigits(raw);
+    final digits = normalized.replaceAll(RegExp(r'\D'), '');
+    final variations = <String>{normalized, digits};
+
+    if (digits.isEmpty) return variations;
+
+    if (digits.length == 11 && digits.startsWith('01')) {
+      final withoutZero = digits.substring(1);
+      variations.addAll([
+        digits,
+        '+20$withoutZero',
+        '20$withoutZero',
+        '0020$withoutZero',
+        withoutZero,
+      ]);
+    } else if (digits.length == 12 && digits.startsWith('201')) {
+      final local = '0${digits.substring(2)}';
+      variations.addAll([
+        local,
+        '+$digits',
+        digits,
+        digits.substring(2),
+      ]);
+    } else if (digits.length == 10 && digits.startsWith('1')) {
+      variations.addAll([
+        '0$digits',
+        '+20$digits',
+        '20$digits',
+        digits,
+      ]);
+    }
+
+    return variations;
   }
 }

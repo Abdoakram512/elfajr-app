@@ -27,7 +27,9 @@
     "logout": "Log Out",
     "pull_to_refresh": "Pull to refresh",
     "release_to_refresh": "Release to refresh",
-    "refreshing": "Refreshing..."
+    "refreshing": "Refreshing...",
+    "error_occurred": "An error occurred while loading data",
+    "no_results": "No matching results found"
   },
   "onboarding": {
     "title_1": "Absolute Transparency in Aid Delivery",
@@ -108,7 +110,28 @@
     "nationality": "Nationality",
     "select_nationality": "Select Nationality",
     "search_nationalities": "Search nationalities...",
-    "validation_nationality_required": "Please select your nationality"
+    "validation_nationality_required": "Please select your nationality",
+    "field_required": "This field is required",
+    "email_required": "Email address is required",
+    "invalid_email": "Please enter a valid email address",
+    "phone_required": "Phone number is required",
+    "invalid_phone": "Please enter a valid phone number (e.g. 01012345678)",
+    "national_id_required": "National ID is required (14 digits)",
+    "invalid_national_id": "Invalid National ID, must be 14 digits",
+    "password_required": "Password is required",
+    "password_too_short": "Password is too short (min {count} characters)",
+    "confirm_password_required": "Please confirm your password",
+    "passwords_do_not_match": "Passwords do not match",
+    "register_title": "Create New Account",
+    "register_subtitle": "Join Qout ecosystem for aid distribution",
+    "store_name": "Store / Commercial Outlet Name",
+    "commercial_registration": "Commercial Registration No.",
+    "commercial_registration_hint": "Enter approved commercial registration number",
+    "validation_cr_required": "Commercial registration number is required",
+    "validation_password_length": "Password must be at least 6 characters",
+    "validation_password_mismatch": "Passwords do not match",
+    "register_button": "Register Account",
+    "login_now": "Log in now"
   },
   "auth_errors": {
     "user_not_found": "Invalid login credentials. Please check your National ID / email and password",
@@ -135,30 +158,36 @@
     "print_guidance": "Present this digital or printed card at any authorized merchant",
     "national_id_label": "National ID / Card",
     "share_save_button": "Share / Save",
-    "family_members_count": "{count} members"
+    "family_members_count": "{count} members",
+    "foundation_name": "Qout Foundation for Social Development",
+    "official_card": "Smart Electronic Aid Card",
+    "usage_instructions_title": "Card Usage Instructions & Terms",
+    "instruction_1": "This card is personal and non-transferable to other individuals.",
+    "instruction_2": "Used exclusively at authorized merchant outlets within Qout network.",
+    "instruction_3": "Security PIN (last 4 digits of National ID) required for each redemption."
   },
   "merchant": {
     "scan_title": "Scan Beneficiary QR",
     "scan_instruction": "Point the camera at the QR code on the beneficiary's card",
     "search_manual_title": "Manual Beneficiary Search",
-    "search_manual_label": "Card ID, National ID, or Phone",
-    "search_manual_hint": "e.g. FAJR-CARD-001 or N  005365643",
+    "search_manual_label": "National ID, Card ID, or Phone",
+    "search_manual_hint": "National ID, Card ID, or Phone...",
     "search_manual_button": "Manual Search",
-    "beneficiary_details": "Beneficiary Details",
+    "beneficiary_details": "Verified Beneficiary Details",
     "beneficiary_label": "Beneficiary",
     "national_id": "National ID",
     "enter_deduction_amount": "Deduction Amount (EGP)",
-    "deduct_food_basket": "Disburse 1 Full Food Basket",
+    "deduct_food_basket": "Redeem Full Food Basket Quota",
     "security_verification_title": "Security Verification",
-    "security_verification_desc": "Enter security PIN (last 4 digits of beneficiary ID) to confirm",
+    "security_verification_desc": "Please enter Security PIN (last 4 digits of beneficiary National ID)",
     "security_pin_label": "Security PIN",
     "security_pin_hint": "••••",
-    "security_pin_error_empty": "Please enter the security PIN (last 4 digits of ID)",
-    "security_pin_error_mismatch": "Security PIN does not match the last 4 digits of National ID",
+    "security_pin_error_empty": "Please enter Security PIN (last 4 digits of National ID)",
+    "security_pin_error_mismatch": "Security PIN does not match last 4 digits of National ID",
     "card_not_registered": "This card is not registered in the system",
-    "card_not_found": "No matching card found for query",
-    "invalid_card": "Invalid or expired aid card data",
-    "search_query_empty": "Please enter card or ID number to search",
+    "card_not_found": "No aid card found matching the entered National ID, Card ID, or Phone",
+    "invalid_card": "Invalid or expired card details",
+    "search_query_empty": "Please enter National ID, Card ID, or Phone number",
     "insufficient_balance": "Available card balance is insufficient for this deduction",
     "fixed_amount_badge": "Auto Approved Disbursement Amount (30 EGP)",
     "notes_label": "Transaction Notes (Optional)",
@@ -216,7 +245,7 @@
     "manual_search_ext": {
       "verified_receipt": "Verified Redemption Receipt",
       "another_search": "Another Search",
-      "search_guidance": "If the beneficiary has no smartphone, enter National ID or Card Number:",
+      "search_guidance": "You can search by National ID (14 digits), Card ID (QOUT-CARD-XXX), or registered Phone Number:",
       "available_baskets": "Available: {count} baskets"
     },
     "extra_disbursement_ext": {
@@ -238,7 +267,9 @@
     "no_matching_txns_title": "No transactions found",
     "no_matching_txns_desc": "No transactions match the selected timeframe or search keyword",
     "txns_unit_label": "txns",
-    "beneficiaries_cases_label": "cases"
+    "beneficiaries_cases_label": "cases",
+    "invalid_merchant": "Invalid merchant or store credentials",
+    "role_merchant": "Authorized Merchant"
   },
   "extra_disbursement": {
     "title": "Emergency Aid Request",
@@ -275,7 +306,9 @@
       "no_redemptions_desc": "Your purchases and basket distributions will appear here",
       "txn_number": "Txn #",
       "notes": "Notes",
-      "no_active_card": "No active aid card found currently"
+      "no_active_card": "No active aid card found currently",
+      "monthly_baskets": "Food Baskets Received",
+      "baskets_spent_sub": "Food baskets quota redeemed this month"
     },
     "merchant": {
       "scan_to_redeem": "Scan Beneficiary QR",
@@ -288,7 +321,9 @@
       "remaining_liquidity": "Remaining Liquidity",
       "low_liquidity_alert": "⚠️ Alert: Remaining liquidity under 15% - request top-up from admin",
       "request_extra_disbursement": "Request Emergency Disbursement",
-      "payment_receipts": "Received Payment Receipts"
+      "payment_receipts": "Received Payment Receipts",
+      "scan_card_cta": "Scan Beneficiary Code",
+      "scan_card_sub": "Point camera at QR code or search manually"
     },
     "admin": {
       "merchants_tab_title": "Authorized Merchants & Outlets",

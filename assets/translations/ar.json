@@ -27,7 +27,9 @@
     "logout": "تسجيل الخروج",
     "pull_to_refresh": "اسحب للتحديث",
     "release_to_refresh": "أفلت للتحديث",
-    "refreshing": "جاري التحديث..."
+    "refreshing": "جاري التحديث...",
+    "error_occurred": "حدث خطأ أثناء تحميل البيانات",
+    "no_results": "لا توجد نتائج مطابقة"
   },
   "onboarding": {
     "title_1": "شفافية مطلقة في إيصال المساعدات",
@@ -108,7 +110,28 @@
     "nationality": "الجنسية",
     "select_nationality": "اختر الجنسية",
     "search_nationalities": "بحث في الجنسيات...",
-    "validation_nationality_required": "يرجى اختيار الجنسية"
+    "validation_nationality_required": "يرجى اختيار الجنسية",
+    "field_required": "هذا الحقل مطلوب",
+    "email_required": "يرجى إدخال البريد الإلكتروني",
+    "invalid_email": "يرجى إدخال بريد إلكتروني صالح",
+    "phone_required": "يرجى إدخال رقم الهاتف",
+    "invalid_phone": "يرجى إدخال رقم هاتف صالح (مثال: 01012345678)",
+    "national_id_required": "يرجى إدخال الرقم القومي (14 رقم)",
+    "invalid_national_id": "الرقم القومي غير صالح، يجب أن يتكون من 14 رقماً",
+    "password_required": "يرجى إدخال كلمة المرور",
+    "password_too_short": "كلمة المرور قصيرة جداً (الحد الأدنى {count} أحرف)",
+    "confirm_password_required": "يرجى تأكيد كلمة المرور",
+    "passwords_do_not_match": "كلمتا المرور غير متطابقتين",
+    "register_title": "إنشاء حساب جديد",
+    "register_subtitle": "انضم إلى منظومة قوت لإدارة وصرف المساعدات",
+    "store_name": "اسم المنفذ التجاري / المتجر",
+    "commercial_registration": "رقم السجل التجاري",
+    "commercial_registration_hint": "أدخل رقم السجل التجاري المعتمد",
+    "validation_cr_required": "يرجى إدخال رقم السجل التجاري",
+    "validation_password_length": "يجب ألا تقل كلمة المرور عن 6 أحرف",
+    "validation_password_mismatch": "كلمتا المرور غير متطابقتين",
+    "register_button": "تسجيل الحساب",
+    "login_now": "تسجيل الدخول الآن"
   },
   "auth_errors": {
     "user_not_found": "بيانات الدخول غير صحيحة، يرجى التأكد من رقم البطاقة أو الإيميل وكلمة المرور",
@@ -135,14 +158,20 @@
     "print_guidance": "يمكنك إبراز هذه البطاقة الرقمية أو المطبوعة لدى أي منفذ صرف معتمد",
     "national_id_label": "رقم البطاقة / الهوية",
     "share_save_button": "مشاركة / حفظ",
-    "family_members_count": "{count} أفراد"
+    "family_members_count": "{count} أفراد",
+    "foundation_name": "مؤسسة قوت للتكافل والتنمية",
+    "official_card": "بطاقة الدعم الإلكترونية الذكية",
+    "usage_instructions_title": "تعليمات وضوابط استخدام البطاقة",
+    "instruction_1": "هذه البطاقة شخصية وخاصة بالمستفيد المعتمد ولا يجوز التنازل عنها للغير.",
+    "instruction_2": "تستخدم البطاقة حصرياً لدى المنافذ والمتاجر التموينية المعتمدة في شبكة قوت.",
+    "instruction_3": "يلزم إدخال رمز الأمان (آخر 4 أرقام من الرقم القومي) عند كل عملية صرف."
   },
   "merchant": {
     "scan_title": "مسح كود المستفيد",
     "scan_instruction": "وجه الكاميرا نحو رمز الاستجابة السريعة (QR) على بطاقة المستفيد",
     "search_manual_title": "البحث اليدوي عن مستفيد",
-    "search_manual_label": "رقم الكارت أو الهوية الوطنية أو الهاتف",
-    "search_manual_hint": "مثال: FAJR-CARD-001 أو N  005365643",
+    "search_manual_label": "رقم الهوية الوطنية أو الكارت أو الهاتف",
+    "search_manual_hint": "رقم الهوية الوطنية أو الكارت أو الهاتف...",
     "search_manual_button": "بحث يدوي",
     "beneficiary_details": "بيانات المستفيد المعتمد",
     "beneficiary_label": "المستفيد",
@@ -156,9 +185,9 @@
     "security_pin_error_empty": "يرجى إدخال رمز الأمان (آخر 4 أرقام من الهوية)",
     "security_pin_error_mismatch": "رمز الأمان غير مطابق لآخر 4 أرقام من هوية المستفيد",
     "card_not_registered": "هذا الكارت غير مسجل في منظومة مؤسسة الفجر",
-    "card_not_found": "لم يتم العثور على كارت مطابق لبيانات البحث",
+    "card_not_found": "لم يتم العثور على بطاقة مطابقة لرقم الهوية أو الكارت أو الهاتف المدخل",
     "invalid_card": "بيانات الكارت غير صالحة أو منتهية الصلاحية",
-    "search_query_empty": "يرجى إدخال رقم الكارت أو الهوية للبحث",
+    "search_query_empty": "يرجى إدخال رقم الهوية الوطنية، رقم الكارت، أو الهاتف للبحث",
     "insufficient_balance": "رصيد الكارت المتاح غير كافٍ لإتمام عملية الخصم",
     "fixed_amount_badge": "مبلغ الصرف المعتمد تلقائياً (30 ج.م)",
     "notes_label": "ملاحظات العملية (اختياري)",
@@ -216,7 +245,7 @@
     "manual_search_ext": {
       "verified_receipt": "إيصال الصرف الموثق",
       "another_search": "بحث آخر",
-      "search_guidance": "إذا كان المستفيد لا يحمل هاتفاً ذكياً، أدخل رقم الهوية الوطنية أو رقم الكارت:",
+      "search_guidance": "يمكنك البحث برقم الهوية الوطنية (14 رقم)، أو رقم الكارت (QOUT-CARD-XXX)، أو رقم الهاتف المسجل:",
       "available_baskets": "المتاح: {count} سلة"
     },
     "extra_disbursement_ext": {
@@ -238,7 +267,9 @@
     "no_matching_txns_title": "لا توجد معاملات مطابقة",
     "no_matching_txns_desc": "لا توجد عمليات صرف مسجلة تطابق الفلترة الزمنية أو كلمة البحث المحددة",
     "txns_unit_label": "عملية",
-    "beneficiaries_cases_label": "حالة"
+    "beneficiaries_cases_label": "حالة",
+    "invalid_merchant": "بيانات التاجر أو المنفذ غير صالحة",
+    "role_merchant": "منفذ صرف معتمد (تاجر)"
   },
   "extra_disbursement": {
     "title": "طلب صرف استثنائي / طارئ",
@@ -275,7 +306,9 @@
       "no_redemptions_desc": "ستظهر هنا كافة عمليات الشراء وصرف السلال الغذائية",
       "txn_number": "رقم العملية",
       "notes": "ملاحظات",
-      "no_active_card": "لا توجد بطاقة دعم نشطة حالياً"
+      "no_active_card": "لا توجد بطاقة دعم نشطة حالياً",
+      "monthly_baskets": "السلال الغذائية المستلمة",
+      "baskets_spent_sub": "حصة السلال المصروفة خلال هذا الشهر"
     },
     "merchant": {
       "scan_to_redeem": "مسح كود المستفيد (QR)",
@@ -288,7 +321,9 @@
       "remaining_liquidity": "السيولة المتبقية بالعهدة",
       "low_liquidity_alert": "⚠️ تنبيه: السيولة المتبقية أقل من 15% - يرجى طلب تغذية من الإدارة",
       "request_extra_disbursement": "طلب صرف استثنائي لحالة طارئة",
-      "payment_receipts": "وصولات وإيصالات التحويل المستلمة"
+      "payment_receipts": "وصولات وإيصالات التحويل المستلمة",
+      "scan_card_cta": "مسح كود المستفيد",
+      "scan_card_sub": "وجه الكاميرا نحو كود QR أو ابحث يدوياً"
     },
     "admin": {
       "merchants_tab_title": "المنافذ والصرافين المعتمدين",

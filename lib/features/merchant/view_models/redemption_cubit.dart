@@ -1,5 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../app/service_locator.dart';
+import '../../../../core/errors/failure.dart';
+import '../../../../core/utils/app_validators.dart';
 import '../../auth/view_models/auth_cubit.dart';
 import '../../auth/view_models/auth_state.dart';
 import '../../beneficiary/models/aid_card_model.dart';
@@ -95,24 +97,16 @@ class RedemptionCubit extends Cubit<RedemptionState> {
       return false;
     }
 
-    // Security PIN Verification
-    final pin = enteredPin.trim();
-    final actualLast4 = currentCard.nationalId.length >= 4
-        ? currentCard.nationalId.substring(currentCard.nationalId.length - 4)
-        : currentCard.nationalId;
-
-    if (pin.isEmpty) {
+    // Security PIN Verification (Guard Pattern)
+    try {
+      AppValidators.guardSecurityPin(
+        enteredPin: enteredPin,
+        actualNationalId: currentCard.nationalId,
+      );
+    } on AppException catch (e) {
       emit(RedemptionCardLoaded(
         card: currentCard,
-        pinError: 'merchant.security_pin_error_empty',
-      ));
-      return false;
-    }
-
-    if (pin != actualLast4) {
-      emit(RedemptionCardLoaded(
-        card: currentCard,
-        pinError: 'merchant.security_pin_error_mismatch',
+        pinError: e.message,
       ));
       return false;
     }

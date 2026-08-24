@@ -33,14 +33,21 @@ service cloud.firestore {
     // 👥 users Collection
     // ──────────────────────────────────────────────
     match /users/{userId} {
-      // Allow read so users can perform email/role lookup during sign-in
+      // Allow read so users can perform email/role/profile lookup
       allow read: if true;
 
-      allow create: if isAdmin();
+      // Allow signup creation or admin creation (prevent privilege escalation)
+      allow create: if isAdmin()
+                    || (isOwner(userId)
+                        && request.resource.data.role in ['beneficiary', 'merchant']
+                        && (!request.resource.data.keys().hasAny(['role']) || request.resource.data.role != 'admin'));
+
+      // Users can update their profile / stats but CANNOT self-promote role or approve themselves
       allow update: if isAdmin()
                     || (isOwner(userId)
                         && !request.resource.data.diff(resource.data).affectedKeys()
                             .hasAny(['role', 'isActive', 'isApproved']));
+
       allow delete: if isAdmin();
     }
 
@@ -53,16 +60,25 @@ service cloud.firestore {
                   || (isAuthenticated()
                       && resource.data.beneficiaryId == request.auth.uid);
 
-      allow create: if isAdmin();
+      allow create: if isAdmin()
+                    || (isAuthenticated() && request.resource.data.beneficiaryId == request.auth.uid);
+
+      // Hardened Update Rule:
+      // Active Merchant can ONLY decrement balance & quota, and must NOT make them negative
       allow update: if isAdmin()
                     || (isActiveMerchant()
                         && request.resource.data.diff(resource.data).affectedKeys()
-                            .hasOnly(['totalBalance', 'foodBasketsQuota', 'status']));
+                            .hasOnly(['totalBalance', 'foodBasketsQuota', 'status', 'updatedAt'])
+                        && request.resource.data.totalBalance >= 0
+                        && request.resource.data.foodBasketsQuota >= 0
+                        && request.resource.data.totalBalance <= resource.data.totalBalance
+                        && request.resource.data.foodBasketsQuota <= resource.data.foodBasketsQuota);
+
       allow delete: if isAdmin();
     }
 
     // ──────────────────────────────────────────────
-    // 🧾 redemptions Collection
+    // 🧾 redemptions Collection (Immutable Audit Trail)
     // ──────────────────────────────────────────────
     match /redemptions/{transactionId} {
       allow read: if isAdmin()
@@ -71,9 +87,67 @@ service cloud.firestore {
                   || (isAuthenticated()
                       && resource.data.beneficiaryId == request.auth.uid);
 
+      // Active merchant can only create valid, non-negative redemptions for themselves
+      allow create: if isActiveMerchant()
+                    && request.resource.data.merchantId == request.auth.uid
+                    && request.resource.data.amountDeducted >= 0
+                    && request.resource.data.foodBasketsDeducted >= 0
+                    && (request.resource.data.amountDeducted > 0 || request.resource.data.foodBasketsDeducted > 0);
+
+      // Strictly immutable: once written, redemption transactions cannot be altered or deleted
+      allow update, delete: if false;
+    }
+
+    // ──────────────────────────────────────────────
+    // 📑 payment_receipts Collection
+    // ──────────────────────────────────────────────
+    match /payment_receipts/{receiptId} {
+      allow read: if isAdmin()
+                  || (isActiveMerchant() && resource.data.merchantId == request.auth.uid);
+
+      allow create: if isAdmin();
+
+      // Merchants can only confirm their own assigned receipts
+      allow update: if isAdmin()
+                    || (isActiveMerchant()
+                        && resource.data.merchantId == request.auth.uid
+                        && request.resource.data.diff(resource.data).affectedKeys()
+                            .hasOnly(['status', 'isConfirmed', 'confirmedAt']));
+
+      allow delete: if isAdmin();
+    }
+
+    // ──────────────────────────────────────────────
+    // 📦 extra_disbursement_requests Collection
+    // ──────────────────────────────────────────────
+    match /extra_disbursement_requests/{requestId} {
+      allow read: if isAdmin()
+                  || (isActiveMerchant() && resource.data.merchantId == request.auth.uid);
+
       allow create: if isActiveMerchant()
                     && request.resource.data.merchantId == request.auth.uid;
-      allow update, delete: if isAdmin();
+
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ──────────────────────────────────────────────
+    // 📋 audit_logs & audit_log Collections
+    // ──────────────────────────────────────────────
+    match /audit_logs/{logId} {
+      allow read: if isAdmin()
+                  || (isActiveMerchant() && resource.data.performedBy == request.auth.uid);
+
+      allow create: if isAdmin()
+                    || (isActiveMerchant() && request.resource.data.performedBy == request.auth.uid);
+
+      allow update, delete: if false;
+    }
+
+    match /audit_log/{logId} {
+      allow read: if isAdmin();
+      allow create: if isAdmin();
+      allow update, delete: if false;
     }
 
     // ──────────────────────────────────────────────
@@ -85,20 +159,16 @@ service cloud.firestore {
     }
 
     // ──────────────────────────────────────────────
-    // 📄 content Collection
+    // 📄 content & nationalities Collections
     // ──────────────────────────────────────────────
     match /content/{docId} {
       allow read: if true;
       allow write: if isAdmin();
     }
 
-    // ──────────────────────────────────────────────
-    // 📋 audit_log Collection
-    // ──────────────────────────────────────────────
-    match /audit_log/{logId} {
-      allow read: if isAdmin();
-      allow create: if isAdmin();
-      allow update, delete: if false;
+    match /nationalities/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
     }
 
     // ──────────────────────────────────────────────
