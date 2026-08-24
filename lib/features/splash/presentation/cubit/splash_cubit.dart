@@ -1,21 +1,21 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/services/cache_helper.dart';
 import '../../../auth/repositories/auth_repository.dart';
 import '../../../auth/view_models/auth_cubit.dart';
 import '../../../auth/view_models/auth_state.dart';
 import 'splash_state.dart';
 
 class SplashCubit extends Cubit<SplashState> {
-  final SharedPreferences _prefs;
+  final CacheHelper _cacheHelper;
   final AuthRepository _authRepository;
   final AuthCubit _authCubit;
 
   SplashCubit({
-    required SharedPreferences prefs,
+    required CacheHelper cacheHelper,
     required AuthRepository authRepository,
     required AuthCubit authCubit,
-  })  : _prefs = prefs,
+  })  : _cacheHelper = cacheHelper,
         _authRepository = authRepository,
         _authCubit = authCubit,
         super(SplashInitial());
@@ -26,8 +26,7 @@ class SplashCubit extends Cubit<SplashState> {
     // Allow splash animation to display smoothly
     await Future.delayed(AppConstants.splashDuration);
 
-    final isOnboardingCompleted =
-        _prefs.getBool(AppConstants.prefsKeyOnboardingCompleted) ?? false;
+    final isOnboardingCompleted = _cacheHelper.isOnboardingCompleted();
 
     if (!isOnboardingCompleted) {
       emit(SplashNavigateToOnboarding());
@@ -52,4 +51,3 @@ class SplashCubit extends Cubit<SplashState> {
     }
   }
 }
-

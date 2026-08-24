@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // Core Services
+import '../core/services/cache_helper.dart';
 import '../core/services/notification_service.dart';
 
 // Auth Feature
@@ -50,6 +51,11 @@ Future<void> initServiceLocator() async {
   // 1. Core External Infrastructure & Services Singletons
   final sharedPreferences = await SharedPreferences.getInstance();
   getIt.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
+  
+  // CacheHelper Singleton Initialization
+  await CacheHelper.instance.init(sharedPreferences);
+  getIt.registerLazySingleton<CacheHelper>(() => CacheHelper.instance);
+
   getIt.registerLazySingleton<FirebaseFirestore>(
     () => FirebaseFirestore.instance,
   );
@@ -66,7 +72,7 @@ Future<void> initServiceLocator() async {
     ),
   );
   getIt.registerLazySingleton<AuthLocalDataSource>(
-    () => AuthLocalDataSourceImpl(getIt<SharedPreferences>()),
+    () => AuthLocalDataSourceImpl(getIt<CacheHelper>()),
   );
   getIt.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(
@@ -136,12 +142,12 @@ Future<void> initServiceLocator() async {
   // 7. Splash & Onboarding Feature Factories
   getIt.registerFactory<SplashCubit>(
     () => SplashCubit(
-      prefs: getIt<SharedPreferences>(),
+      cacheHelper: getIt<CacheHelper>(),
       authRepository: getIt<AuthRepository>(),
       authCubit: getIt<AuthCubit>(),
     ),
   );
   getIt.registerFactory<OnboardingCubit>(
-    () => OnboardingCubit(prefs: getIt<SharedPreferences>()),
+    () => OnboardingCubit(cacheHelper: getIt<CacheHelper>()),
   );
 }

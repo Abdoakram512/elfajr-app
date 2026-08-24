@@ -1,6 +1,4 @@
-import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../../core/constants/app_constants.dart';
+import '../../../core/services/cache_helper.dart';
 import '../models/user_model.dart';
 
 abstract class AuthLocalDataSource {
@@ -12,32 +10,30 @@ abstract class AuthLocalDataSource {
 }
 
 class AuthLocalDataSourceImpl implements AuthLocalDataSource {
-  final SharedPreferences _prefs;
+  final CacheHelper _cacheHelper;
 
-  AuthLocalDataSourceImpl(this._prefs);
+  AuthLocalDataSourceImpl(this._cacheHelper);
 
   @override
   Future<void> setRememberMe(bool enabled) async {
-    await _prefs.setBool(AppConstants.prefsKeyRememberMe, enabled);
+    await _cacheHelper.setRememberMe(enabled);
   }
 
   @override
   bool getRememberMe() {
-    return _prefs.getBool(AppConstants.prefsKeyRememberMe) ?? false;
+    return _cacheHelper.getRememberMe();
   }
 
   @override
   Future<void> saveUserSession(UserModel user) async {
-    final rawJson = jsonEncode(user.toMap());
-    await _prefs.setString(AppConstants.prefsKeyUserSession, rawJson);
+    await _cacheHelper.saveUserSession(user.toMap());
   }
 
   @override
   UserModel? getCachedUserSession() {
-    final rawJson = _prefs.getString(AppConstants.prefsKeyUserSession);
-    if (rawJson != null && rawJson.isNotEmpty) {
+    final map = _cacheHelper.getCachedUserSession();
+    if (map != null) {
       try {
-        final map = jsonDecode(rawJson) as Map<String, dynamic>;
         return UserModel.fromMap(map);
       } catch (_) {
         return null;
@@ -48,6 +44,6 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
 
   @override
   Future<void> clearUserSession() async {
-    await _prefs.remove(AppConstants.prefsKeyUserSession);
+    await _cacheHelper.clearUserSession();
   }
 }

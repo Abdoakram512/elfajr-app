@@ -1,13 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../../../core/constants/app_constants.dart';
+import '../../../../core/services/cache_helper.dart';
 import 'onboarding_state.dart';
 
 class OnboardingCubit extends Cubit<OnboardingState> {
-  final SharedPreferences _prefs;
+  final CacheHelper _cacheHelper;
 
-  OnboardingCubit({required SharedPreferences prefs})
-      : _prefs = prefs,
+  OnboardingCubit({required CacheHelper cacheHelper})
+      : _cacheHelper = cacheHelper,
         super(const OnboardingInitial(currentPage: 0));
 
   void onPageChanged(int index) {
@@ -15,7 +14,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
   }
 
   Future<void> completeOnboarding() async {
-    await _prefs.setBool(AppConstants.prefsKeyOnboardingCompleted, true);
+    await _cacheHelper.setOnboardingCompleted(true);
     emit(OnboardingCompleted(currentPage: state.currentPage));
   }
 }
