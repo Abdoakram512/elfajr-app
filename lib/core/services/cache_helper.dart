@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../constants/app_constants.dart';
 
 class CacheHelper {
   CacheHelper._();
@@ -20,7 +18,6 @@ class CacheHelper {
     if (value is int) return _prefs.setInt(key, value);
     if (value is double) return _prefs.setDouble(key, value);
     if (value is List<String>) return _prefs.setStringList(key, value);
-    if (value is Map || value is List) return _prefs.setString(key, jsonEncode(value));
     return false;
   }
 
@@ -35,34 +32,4 @@ class CacheHelper {
   bool containsKey(String key) => _prefs.containsKey(key);
   Future<bool> removeData({required String key}) => _prefs.remove(key);
   Future<bool> clearAll() => _prefs.clear();
-
-  // ── App Specific Convenience Helpers ───────────────────────────────────────
-
-  bool isOnboardingCompleted() =>
-      _prefs.getBool(AppConstants.prefsKeyOnboardingCompleted) ?? false;
-
-  Future<bool> setOnboardingCompleted([bool value = true]) =>
-      saveData(key: AppConstants.prefsKeyOnboardingCompleted, value: value);
-
-  bool getRememberMe() =>
-      _prefs.getBool(AppConstants.prefsKeyRememberMe) ?? false;
-
-  Future<bool> setRememberMe(bool value) =>
-      saveData(key: AppConstants.prefsKeyRememberMe, value: value);
-
-  Future<bool> saveUserSession(Map<String, dynamic> userMap) =>
-      saveData(key: AppConstants.prefsKeyUserSession, value: jsonEncode(userMap));
-
-  Map<String, dynamic>? getCachedUserSession() {
-    final raw = getString(AppConstants.prefsKeyUserSession);
-    if (raw == null || raw.isEmpty) return null;
-    try {
-      return jsonDecode(raw) as Map<String, dynamic>;
-    } catch (_) {
-      return null;
-    }
-  }
-
-  Future<bool> clearUserSession() =>
-      removeData(key: AppConstants.prefsKeyUserSession);
 }

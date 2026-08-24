@@ -26,7 +26,8 @@ class SplashCubit extends Cubit<SplashState> {
     // Allow splash animation to display smoothly
     await Future.delayed(AppConstants.splashDuration);
 
-    final isOnboardingCompleted = _cacheHelper.isOnboardingCompleted();
+    final isOnboardingCompleted =
+        _cacheHelper.getBool(AppConstants.prefsKeyOnboardingCompleted) ?? false;
 
     if (!isOnboardingCompleted) {
       emit(SplashNavigateToOnboarding());

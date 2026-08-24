@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/constants/app_constants.dart';
 import '../../../../core/services/cache_helper.dart';
 import 'onboarding_state.dart';
 
@@ -14,7 +15,10 @@ class OnboardingCubit extends Cubit<OnboardingState> {
   }
 
   Future<void> completeOnboarding() async {
-    await _cacheHelper.setOnboardingCompleted(true);
+    await _cacheHelper.saveData(
+      key: AppConstants.prefsKeyOnboardingCompleted,
+      value: true,
+    );
     emit(OnboardingCompleted(currentPage: state.currentPage));
   }
 }

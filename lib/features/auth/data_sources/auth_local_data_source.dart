@@ -1,3 +1,5 @@
+import 'dart:convert';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/services/cache_helper.dart';
 import '../models/user_model.dart';
 
@@ -16,24 +18,32 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
 
   @override
   Future<void> setRememberMe(bool enabled) async {
-    await _cacheHelper.setRememberMe(enabled);
+    await _cacheHelper.saveData(
+      key: AppConstants.prefsKeyRememberMe,
+      value: enabled,
+    );
   }
 
   @override
   bool getRememberMe() {
-    return _cacheHelper.getRememberMe();
+    return _cacheHelper.getBool(AppConstants.prefsKeyRememberMe) ?? false;
   }
 
   @override
   Future<void> saveUserSession(UserModel user) async {
-    await _cacheHelper.saveUserSession(user.toMap());
+    final jsonString = jsonEncode(user.toMap());
+    await _cacheHelper.saveData(
+      key: AppConstants.prefsKeyUserSession,
+      value: jsonString,
+    );
   }
 
   @override
   UserModel? getCachedUserSession() {
-    final map = _cacheHelper.getCachedUserSession();
-    if (map != null) {
+    final jsonString = _cacheHelper.getString(AppConstants.prefsKeyUserSession);
+    if (jsonString != null && jsonString.isNotEmpty) {
       try {
+        final map = jsonDecode(jsonString) as Map<String, dynamic>;
         return UserModel.fromMap(map);
       } catch (_) {
         return null;
@@ -44,6 +54,6 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
 
   @override
   Future<void> clearUserSession() async {
-    await _cacheHelper.clearUserSession();
+    await _cacheHelper.removeData(key: AppConstants.prefsKeyUserSession);
   }
 }
