@@ -18,4 +18,5 @@ abstract class RouteNames {
   static const String contactSupport = '/contact-support';
   static const String accountSuspended = '/account-suspended';
   static const String merchantPaymentReceipts = '/merchant-payment-receipts';
+  static const String notifications = '/notifications';
 }

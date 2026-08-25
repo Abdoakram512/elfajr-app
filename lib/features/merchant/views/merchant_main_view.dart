@@ -10,6 +10,9 @@ import '../view_models/merchant_receipts_state.dart';
 import 'merchant_payment_receipts_view.dart';
 import 'tabs/merchant_history_tab.dart';
 import 'tabs/merchant_home_tab.dart';
+import '../../auth/view_models/auth_cubit.dart';
+import '../../auth/view_models/auth_state.dart';
+import '../../notifications/view_models/notifications_cubit.dart';
 import 'tabs/merchant_profile_tab.dart';
 
 class MerchantMainView extends StatelessWidget {
@@ -40,6 +43,15 @@ class _MerchantMainViewBody extends StatefulWidget {
 
 class _MerchantMainViewBodyState extends State<_MerchantMainViewBody> {
   int _currentTabIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    final authState = context.read<AuthCubit>().state;
+    if (authState is Authenticated) {
+      getIt<NotificationsCubit>().startListening(authState.user.uid);
+    }
+  }
 
   void _onSwitchTab(int index) {
     setState(() => _currentTabIndex = index);

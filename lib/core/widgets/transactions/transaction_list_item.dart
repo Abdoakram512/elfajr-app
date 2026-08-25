@@ -15,6 +15,7 @@ class TransactionListItem extends StatelessWidget {
   final String? city;
   final DateTime timestamp;
   final bool showPrintButton;
+  final bool isMinimalStyle;
   final VoidCallback? onTap;
 
   const TransactionListItem({
@@ -27,12 +28,107 @@ class TransactionListItem extends StatelessWidget {
     this.city,
     required this.timestamp,
     this.showPrintButton = true,
+    this.isMinimalStyle = false,
     this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     final currencyFormatter = NumberFormat('#,##0', 'ar');
+
+    if (isMinimalStyle) {
+      return InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: const Color(0xFFF1F5F9), width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.02),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              // 1. Receipt Icon in pale green container (Far right in RTL)
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE8F5E9),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: const Icon(
+                  Icons.receipt_long_outlined,
+                  color: Color(0xFF0A734D),
+                  size: 22,
+                ),
+              ),
+              const Gap(12),
+
+              // 2. Beneficiary Info + Date (Middle)
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      beneficiaryName,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.textPrimaryLight,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const Gap(4),
+                    Text(
+                      AppFormatters.formatDateTime(timestamp, context: context),
+                      style: const TextStyle(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.textMutedLight,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Gap(12),
+
+              // 3. Negative Red Amount (Far left in RTL)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    '-${currencyFormatter.format(amount)}',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w900,
+                      color: Color(0xFFDC2626),
+                    ),
+                  ),
+                  const Gap(2),
+                  Text(
+                    'common.currency'.tr(),
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textMutedLight,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    }
 
     return InkWell(
       onTap: onTap,

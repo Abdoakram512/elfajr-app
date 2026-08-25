@@ -7,6 +7,9 @@ import '../../../../core/widgets/custom_bottom_nav_bar.dart';
 import '../view_models/beneficiary_cubit.dart';
 import 'tabs/beneficiary_home_tab.dart';
 import 'tabs/beneficiary_profile_tab.dart';
+import '../../auth/view_models/auth_cubit.dart';
+import '../../auth/view_models/auth_state.dart';
+import '../../notifications/view_models/notifications_cubit.dart';
 import 'tabs/beneficiary_redemptions_tab.dart';
 
 class BeneficiaryMainView extends StatelessWidget {
@@ -31,6 +34,15 @@ class _BeneficiaryMainViewBody extends StatefulWidget {
 
 class _BeneficiaryMainViewBodyState extends State<_BeneficiaryMainViewBody> {
   int _currentTabIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    final authState = context.read<AuthCubit>().state;
+    if (authState is Authenticated) {
+      getIt<NotificationsCubit>().startListening(authState.user.uid);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

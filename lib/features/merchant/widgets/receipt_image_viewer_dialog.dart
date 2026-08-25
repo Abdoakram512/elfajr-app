@@ -63,24 +63,50 @@ class ReceiptImageViewerDialog extends StatelessWidget {
 
   Widget _buildFallback() {
     return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(
-            Icons.broken_image_rounded,
-            size: 48,
-            color: AppColors.textMutedLight,
-          ),
-          const Gap(8),
-          Text(
-            'merchant.receipt_viewer.error_loading'.tr(),
-            style: const TextStyle(
-              color: AppColors.textSecondaryLight,
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: const Color(0xFFE8F5E9),
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: const Color(0xFFC8E6C9),
+                  width: 2,
+                ),
+              ),
+              child: const Center(
+                child: Icon(
+                  Icons.receipt_long_rounded,
+                  size: 42,
+                  color: Color(0xFF0A734D),
+                ),
+              ),
             ),
-          ),
-        ],
+            const Gap(14),
+            Text(
+              'merchant.receipts.sheet_title'.tr(),
+              style: const TextStyle(
+                color: AppColors.textPrimaryLight,
+                fontSize: 15,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const Gap(4),
+            Text(
+              'merchant.receipts.sheet_subtitle'.tr(),
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: AppColors.textSecondaryLight,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

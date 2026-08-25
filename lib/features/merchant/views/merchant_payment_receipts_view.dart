@@ -10,6 +10,7 @@ import '../../auth/models/user_model.dart';
 import '../view_models/merchant_receipts_cubit.dart';
 import '../view_models/merchant_receipts_state.dart';
 import '../widgets/payment_receipt_card_item.dart';
+import '../widgets/pending_receipts_voucher_swiper_deck.dart';
 import '../widgets/receipts_filter_bar.dart';
 import '../widgets/receipts_summary_header.dart';
 
@@ -149,6 +150,22 @@ class _MerchantPaymentReceiptsViewState
                   ),
 
                   const Gap(16),
+
+                  // ── 🌟 Interactive 3D Cash Voucher Deck for Pending Receipts ──
+                  if (pendingReceipts.isNotEmpty &&
+                      _selectedFilter != ReceiptFilter.confirmed) ...[
+                    PendingReceiptsVoucherSwiperDeck(
+                      pendingReceipts: pendingReceipts,
+                      confirmingReceiptId: state.confirmingReceiptId,
+                      onConfirmReceipt: (receipt) {
+                        context.read<MerchantReceiptsCubit>().confirmReceipt(
+                              receiptId: receipt.id,
+                              adminId: receipt.sentByAdminId ?? '',
+                            );
+                      },
+                    ),
+                    const Gap(16),
+                  ],
 
                   // ── 2. Filter Tabs Bar ──
                   ReceiptsFilterBar(

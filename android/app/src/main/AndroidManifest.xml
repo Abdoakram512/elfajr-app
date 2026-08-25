@@ -4,16 +4,17 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:label="مؤسسة الفجر"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 
-        <!-- Default Notification Channel for FCM -->
+        <!-- Default Notification Channel for FCM (Al-Fajr) -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="qout_high_importance_channel" />
+            android:value="alfajr_high_importance_channel" />
 
         <activity
             android:name=".MainActivity"

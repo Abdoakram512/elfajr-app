@@ -17,30 +17,67 @@ import '../../../auth/view_models/auth_state.dart';
 import '../../view_models/beneficiary_cubit.dart';
 import '../../view_models/beneficiary_state.dart';
 
+import '../../../beneficiary/models/aid_card_model.dart';
+
 class BeneficiaryProfileTab extends StatelessWidget {
   const BeneficiaryProfileTab({super.key});
+
+  String _resolveEligibilityText(AidCardModel? card) {
+    if (card == null) {
+      return 'profile.eligibility_pending'.tr();
+    }
+    switch (card.status) {
+      case AidCardStatus.active:
+        return 'profile.eligibility_eligible'.tr();
+      case AidCardStatus.pendingActivation:
+        return 'profile.eligibility_pending'.tr();
+      case AidCardStatus.frozen:
+        return 'profile.eligibility_frozen'.tr();
+      case AidCardStatus.depleted:
+        return 'digital_card.status_active_short'.tr();
+      case AidCardStatus.expired:
+        return 'profile.eligibility_expired'.tr();
+    }
+  }
+
+  Color _resolveEligibilityColor(AidCardModel? card) {
+    if (card == null) return AppColors.warning;
+    switch (card.status) {
+      case AidCardStatus.active:
+        return AppColors.success;
+      case AidCardStatus.pendingActivation:
+        return AppColors.warning;
+      case AidCardStatus.frozen:
+      case AidCardStatus.expired:
+        return AppColors.error;
+      case AidCardStatus.depleted:
+        return AppColors.textSecondaryLight;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final authState = getIt<AuthCubit>().state;
     final user = authState is Authenticated ? authState.user : null;
 
-    final displayName =
-        user?.name.isNotEmpty == true ? user!.name : 'auth.role_beneficiary'.tr();
+    final displayName = user?.name.isNotEmpty == true
+        ? user!.name
+        : 'auth.role_beneficiary'.tr();
     final rawEmail = user?.email.isNotEmpty == true ? user!.email : '-';
     final displayEmail = rawEmail.endsWith('@alfajr.app')
         ? (user?.phone?.isNotEmpty == true ? user!.phone! : rawEmail)
         : rawEmail;
     final displayPhone = user?.phone?.isNotEmpty == true ? user!.phone! : '-';
-    final displayCity =
-        user?.city?.isNotEmpty == true ? user!.city! : '';
+    final displayCity = user?.city?.isNotEmpty == true ? user!.city! : '';
 
     return BlocBuilder<BeneficiaryCubit, BeneficiaryState>(
       builder: (context, state) {
         final card = state.activeCard;
         final rawNat = (user?.nationality?.isNotEmpty == true)
             ? user!.nationality!
-            : (card?.nationality?.isNotEmpty == true ? card!.nationality! : '-');
+            : (card?.nationality?.isNotEmpty == true
+                  ? card!.nationality!
+                  : '-');
         final displayNat = rawNat;
 
         return Scaffold(
@@ -88,22 +125,24 @@ class BeneficiaryProfileTab extends StatelessWidget {
                     ),
                     ProfileInfoRow(
                       label: 'profile.field_research_label'.tr(),
-                      value: user?.fieldResearchStatus ?? card?.fieldResearchStatus ?? 'digital_card.status_active'.tr(),
+                      value:
+                          user?.fieldResearchStatus ??
+                          card?.fieldResearchStatus ??
+                          'profile.field_research_completed'.tr(),
                       valueColor: AppColors.success,
                     ),
                     ProfileInfoRow(
                       label: 'profile.eligibility_status_label'.tr(),
-                      value: card != null && card.isActive
-                          ? 'digital_card.status_active'.tr()
-                          : 'digital_card.status_pending'.tr(),
-                      valueColor: card != null && card.isActive
-                          ? AppColors.success
-                          : AppColors.warning,
+                      value: _resolveEligibilityText(card),
+                      valueColor: _resolveEligibilityColor(card),
                     ),
                     ProfileInfoRow(
                       label: 'profile.expires_at_label'.tr(),
                       value: card != null
-                          ? AppFormatters.formatDate(card.expiresAt, context: context)
+                          ? AppFormatters.formatDate(
+                              card.expiresAt,
+                              context: context,
+                            )
                           : '-',
                       showDivider: false,
                     ),

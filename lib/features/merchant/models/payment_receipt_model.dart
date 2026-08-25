@@ -70,13 +70,15 @@ class PaymentReceiptModel extends Equatable {
       amount: FirebaseParserUtils.parseDouble(map['amount']),
       paymentMethod: map['paymentMethod'] as String? ?? 'instapay',
       referenceNumber: map['referenceNumber'] as String? ?? '',
-      senderAccountOrPhone: map['senderAccountOrPhone'] as String?,
-      receiverAccountOrPhone: map['receiverAccountOrPhone'] as String?,
+      senderAccountOrPhone: (map['senderAccountOrPhone'] as String?) ??
+          (map['senderAccount'] as String?),
+      receiverAccountOrPhone: (map['receiverAccountOrPhone'] as String?) ??
+          (map['receiverAccount'] as String?),
       receiptImageUrl: map['receiptImageUrl'] as String?,
       status: map['status'] as String? ?? 'sent',
       sentByAdminId: map['sentByAdminId'] as String?,
       sentByAdminEmail: map['sentByAdminEmail'] as String?,
-      adminName: admin ?? map['adminName'] as String?,
+      adminName: admin ?? (map['adminName'] as String?),
       notes: map['notes'] as String?,
       timestamp: FirebaseParserUtils.parseDate(map['timestamp']),
       confirmedAt: FirebaseParserUtils.parseNullableDate(map['confirmedAt']),

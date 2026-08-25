@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:qout/core/widgets/notifications/notification_bell_button.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/widgets/feedback/alfajr_refresh_indicator.dart';
 import '../../../../core/widgets/feedback/alfajr_shimmer.dart';
@@ -34,6 +35,10 @@ class BeneficiaryHomeTab extends StatelessWidget {
           appBar: AppBar(
             title: Text('app_name'.tr()),
             automaticallyImplyLeading: false,
+            actions: const [
+              NotificationBellButton(),
+              Gap(16),
+            ],
           ),
           body: AlfajrRefreshIndicator(
             onRefresh: () => context.read<BeneficiaryCubit>().refreshData(),

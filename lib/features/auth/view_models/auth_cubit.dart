@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../app/service_locator.dart';
 import '../../../core/services/notification_service.dart';
+import '../../notifications/view_models/notifications_cubit.dart';
 import '../models/register_params.dart';
 import '../repositories/auth_repository.dart';
 import 'auth_state.dart';
@@ -22,11 +23,14 @@ class AuthCubit extends Cubit<AuthState> {
       final user = await _authRepository.getCurrentUser();
       if (user != null) {
         getIt<NotificationService>().syncFCMToken(user.uid);
+        getIt<NotificationsCubit>().startListening(user.uid);
         emit(Authenticated(user));
       } else {
+        getIt<NotificationsCubit>().stopListening();
         emit(Unauthenticated());
       }
     } catch (_) {
+      getIt<NotificationsCubit>().stopListening();
       emit(Unauthenticated());
     }
   }
@@ -36,6 +40,7 @@ class AuthCubit extends Cubit<AuthState> {
       final user = await _authRepository.refreshCurrentUser();
       if (user != null) {
         getIt<NotificationService>().syncFCMToken(user.uid);
+        getIt<NotificationsCubit>().startListening(user.uid);
         emit(Authenticated(user));
       }
     } catch (_) {}
@@ -54,6 +59,7 @@ class AuthCubit extends Cubit<AuthState> {
         rememberMe: rememberMe,
       );
       getIt<NotificationService>().syncFCMToken(user.uid);
+      getIt<NotificationsCubit>().startListening(user.uid);
       emit(Authenticated(user));
     } catch (e) {
       final messageKey = _normalizeError(e);
@@ -66,6 +72,7 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       final user = await _authRepository.register(params);
       getIt<NotificationService>().syncFCMToken(user.uid);
+      getIt<NotificationsCubit>().startListening(user.uid);
       emit(Authenticated(user));
     } catch (e) {
       final messageKey = _normalizeError(e);
@@ -87,6 +94,7 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> signOut() async {
     emit(AuthLoading());
     try {
+      getIt<NotificationsCubit>().stopListening();
       await _authRepository.signOut();
       emit(Unauthenticated());
     } catch (e) {

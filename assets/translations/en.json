@@ -236,7 +236,11 @@
       "admin_notes_label": "Admin Note: {notes}",
       "receipt_image_title": "Transfer Receipt ({amount} EGP)",
       "tap_to_preview": "Tap here to preview receipt image",
-      "confirm_button": "Confirm Fund Receipt"
+      "confirm_button": "Confirm Fund Receipt",
+      "confirm_btn": "Confirm Received Amount",
+      "confirming_btn": "Confirming...",
+      "image_attached_title": "Attached Transfer Receipt Image",
+      "image_attached_hint": "Tap to preview and enlarge receipt"
     },
     "redemption_receipt": {
       "success_title": "Redemption Completed Successfully!",
@@ -273,11 +277,13 @@
     },
     "critical_liquidity": "⚠️ Critical Liquidity",
     "payment_receipts_action": "Payment Receipts Ledger (Preview Images)",
-    "recent_redemptions_title": "Recent Redemptions",
-    "full_history_btn": "View Full History",
+    "recent_redemptions_title": "Recent Redemptions Log",
+    "full_history_btn": "History",
+    "home_welcome": "Welcome, Authorized Cashier 🏪",
     "empty_today_title": "No redemptions recorded today",
     "empty_today_desc": "All aid deductions and redemptions will appear here once processed",
     "history_page_title": "Store Redemptions & Stats",
+    "history_app_bar_title": "Disbursement Log & History",
     "search_placeholder": "Search by beneficiary name or card ID...",
     "no_matching_txns_title": "No transactions found",
     "no_matching_txns_desc": "No transactions match the selected timeframe or search keyword",
@@ -363,10 +369,10 @@
       "baskets_count_label": "{count} Baskets"
     },
     "merchant": {
-      "scan_to_redeem": "Scan Beneficiary QR",
+      "scan_to_redeem": "Scan Beneficiary Card (QR)",
       "manual_search": "Search Card / National ID",
-      "today_dispensed": "Total Dispensed Today",
-      "today_txns": "Today's Transactions",
+      "today_dispensed": "Total Dispensed",
+      "today_txns": "Today's Dispenses",
       "wallet_title": "Merchant Liquidity & Budget",
       "allocated_budget": "Allocated Budget",
       "disbursed_amount": "Total Disbursed to Beneficiaries",
@@ -374,8 +380,8 @@
       "low_liquidity_alert": "⚠️ Alert: Remaining liquidity under 15% - request top-up from admin",
       "request_extra_disbursement": "Request Emergency Disbursement",
       "payment_receipts": "Received Payment Receipts",
-      "scan_card_cta": "Scan Beneficiary Code",
-      "scan_card_sub": "Point camera at QR code or search manually"
+      "scan_card_cta": "Scan Beneficiary Card (QR)",
+      "scan_card_sub": "Point camera at the QR code in the beneficiary app"
     },
     "admin": {
       "merchants_tab_title": "Authorized Merchants & Outlets",
@@ -424,6 +430,12 @@
     "transactions_count_label": "Completed Transactions",
     "total_baskets_label": "Food Baskets Disbursed",
     "eligibility_status_label": "Eligibility Status",
+    "eligibility_eligible": "Eligible & Approved",
+    "eligibility_pending": "Pending Field Verification",
+    "eligibility_frozen": "Temporarily Suspended",
+    "eligibility_expired": "Expired",
+    "field_research_completed": "Completed & Verified",
+    "field_research_pending": "Field Review in Progress",
     "expires_at_label": "Card Expiry Date",
     "admin_role_label": "Administrative Level",
     "admin_role_value": "General Administration (Full Access)",
@@ -517,5 +529,13 @@
     "pending_review": "Under Review ⏳",
     "card_label": "Card: {cardId}",
     "show_all": "View All"
+  },
+  "notifications": {
+    "title": "Notification Center",
+    "mark_all_read": "Mark All as Read",
+    "empty_title": "No New Notifications",
+    "empty_desc": "All payment receipts, budget allocations, and aid card updates will appear here",
+    "view_receipt": "View Receipt",
+    "view_details": "View Details"
   }
 }

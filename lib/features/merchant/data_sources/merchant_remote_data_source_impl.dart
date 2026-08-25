@@ -174,7 +174,8 @@ class MerchantRemoteDataSourceImpl implements MerchantRemoteDataSource {
     final receiptRef = _firestore.collection('payment_receipts').doc(receiptId);
 
     batch.update(receiptRef, {
-      'status': 'confirmed',
+      'status': 'confirmed_by_merchant',
+      'isConfirmed': true,
       'confirmedAt': FieldValue.serverTimestamp(),
     });
 
@@ -183,7 +184,22 @@ class MerchantRemoteDataSourceImpl implements MerchantRemoteDataSource {
       'action': 'CONFIRM_PAYMENT_RECEIPT',
       'receiptId': receiptId,
       'merchantId': merchantId,
+      'performedBy': merchantId,
       'adminId': adminId,
+      'timestamp': FieldValue.serverTimestamp(),
+    });
+
+    // Dispatch real-time notification document
+    final notifRef = _firestore.collection('notifications').doc();
+    batch.set(notifRef, {
+      'id': notifRef.id,
+      'userId': merchantId,
+      'recipientRole': 'merchant',
+      'title': 'تم تأكيد استلام الحوالة بنجاح ✅',
+      'body': 'تم توثيق وتأكيد استلام الحوالة المالية ونقلها إلى سجل المعاملات المؤكدة',
+      'type': 'payment_receipt',
+      'referenceId': receiptId,
+      'isRead': false,
       'timestamp': FieldValue.serverTimestamp(),
     });
 

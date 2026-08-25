@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'audio_feedback_service.dart';
 
 /// Top-level background message handler required by Firebase Messaging
 @pragma('vm:entry-point')
@@ -22,10 +23,10 @@ class NotificationService {
   final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();
 
-  static const String channelId = 'qout_high_importance_channel';
-  static const String channelName = 'إشعارات مؤسسة الفجر';
+  static const String channelId = 'alfajr_high_importance_channel';
+  static const String channelName = 'Al-Fajr Notifications';
   static const String channelDescription =
-      'إشعارات وصولات التحويل وشحن العهدة وعمليات الصرف';
+      'Notifications for payment receipts, budget allocations, and aid disbursements';
 
   static const AndroidNotificationChannel _androidChannel =
       AndroidNotificationChannel(
@@ -40,15 +41,21 @@ class NotificationService {
   bool _isInitialized = false;
   StreamSubscription<String>? _tokenRefreshSub;
 
+  /// Callback when a notification is tapped by the user
+  void Function(String? payload)? onNotificationTapped;
+
   /// Initialize Push Notifications & Local Notifications
   Future<void> initialize() async {
     if (_isInitialized) return;
 
     try {
+      // 0. Initialize Audio Feedback Service
+      await AudioFeedbackService.instance.initialize();
+
       // 1. Register Background Notification Handler cleanly inside the service
       FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
-      // 2. Request Notification Permissions
+      // 2. Request Notification Permissions (Firebase FCM)
       final settings = await _fcm.requestPermission(
         alert: true,
         announcement: false,
@@ -59,9 +66,7 @@ class NotificationService {
         sound: true,
       );
 
-      debugPrint(
-        'FCM Permission status: ${settings.authorizationStatus}',
-      );
+      debugPrint('FCM Permission status: ${settings.authorizationStatus}');
 
       // 3. Initialize Local Notifications Plugin
       const androidInitSettings = AndroidInitializationSettings(
@@ -82,15 +87,20 @@ class NotificationService {
         settings: initSettings,
         onDidReceiveNotificationResponse: (response) {
           debugPrint('Notification clicked with payload: ${response.payload}');
+          onNotificationTapped?.call(response.payload);
         },
       );
 
-      // 4. Create Android Notification Channel
-      await _localNotifications
+      // 4. Request Android 13+ Notification Permission & Create Android Notification Channel
+      final androidPlugin = _localNotifications
           .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin
-          >()
-          ?.createNotificationChannel(_androidChannel);
+          >();
+
+      if (androidPlugin != null) {
+        await androidPlugin.requestNotificationsPermission();
+        await androidPlugin.createNotificationChannel(_androidChannel);
+      }
 
       // 5. Set Foreground Notification Presentation Options for iOS
       await _fcm.setForegroundNotificationPresentationOptions(
@@ -110,6 +120,7 @@ class NotificationService {
       // 7. Handle notification click when app is opened from background
       FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
         debugPrint('FCM onMessageOpenedApp clicked: ${message.data}');
+        onNotificationTapped?.call(message.data.toString());
       });
 
       _isInitialized = true;
@@ -126,6 +137,9 @@ class NotificationService {
 
     final title = notification?.title ?? message.data['title'] ?? 'إشعار جديد';
     final body = notification?.body ?? message.data['body'] ?? '';
+
+    // Play pleasant audio chime
+    AudioFeedbackService.instance.playNotificationSound();
 
     _localNotifications.show(
       id: notification.hashCode,
@@ -152,12 +166,18 @@ class NotificationService {
     );
   }
 
-  /// Show a manual custom local notification banner
+  /// Show a manual custom local notification banner with audio chime
   Future<void> showLocalNotification({
     required String title,
     required String body,
     String? payload,
+    AudioFeedbackType audioType = AudioFeedbackType.notification,
+    bool playSound = true,
   }) async {
+    if (playSound) {
+      AudioFeedbackService.instance.playNotificationSound(type: audioType);
+    }
+
     await _localNotifications.show(
       id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
       title: title,

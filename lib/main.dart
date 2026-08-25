@@ -10,6 +10,7 @@ import 'core/routes/app_router.dart';
 import 'core/services/notification_service.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/view_models/auth_cubit.dart';
+import 'features/notifications/view_models/notifications_cubit.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -54,8 +55,13 @@ class AlFajrApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<AuthCubit>.value(
-      value: getIt<AuthCubit>(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthCubit>.value(value: getIt<AuthCubit>()),
+        BlocProvider<NotificationsCubit>.value(
+          value: getIt<NotificationsCubit>(),
+        ),
+      ],
       child: ScreenUtilInit(
         designSize: const Size(390, 844),
         minTextAdapt: true,

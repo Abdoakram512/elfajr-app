@@ -236,7 +236,11 @@
       "admin_notes_label": "ملاحظة الإدارة: {notes}",
       "receipt_image_title": "صورة إيصال تحويل {amount} ج.م",
       "tap_to_preview": "اضغط لمعاينة وتكبير صورة الوصل",
-      "confirm_button": "تأكيد استلام المبلغ"
+      "confirm_button": "تأكيد استلام المبلغ",
+      "confirm_btn": "تأكيد استلام المبلغ",
+      "confirming_btn": "جاري التأكيد...",
+      "image_attached_title": "صورة إيصال التحويل المرفق",
+      "image_attached_hint": "اضغط لمعاينة وتكبير الإيصال"
     },
     "redemption_receipt": {
       "success_title": "تمت عملية الصرف بنجاح!",
@@ -273,11 +277,13 @@
     },
     "critical_liquidity": "⚠️ سيولة حرجة",
     "payment_receipts_action": "سجل وصولات الدفع والحوالات (معاينة الصور)",
-    "recent_redemptions_title": "آخر عمليات الصرف",
-    "full_history_btn": "عرض السجل الكامل",
+    "recent_redemptions_title": "سجل عمليات الصرف الأخيرة",
+    "full_history_btn": "السجل",
+    "home_welcome": "أهلاً بك، منفذ الصرف المعتمد 🏪",
     "empty_today_title": "لا توجد عمليات صرف مسجلة اليوم",
     "empty_today_desc": "ستظهر هنا كافة عمليات الخصم وسحب الإعانات فور تنفيذها",
     "history_page_title": "إحصائيات وسجل عمليات الصراف",
+    "history_app_bar_title": "سجل وإحصائيات عمليات الصرف",
     "search_placeholder": "بحث باسم المستفيد أو رقم الكارت...",
     "no_matching_txns_title": "لا توجد معاملات مطابقة",
     "no_matching_txns_desc": "لا توجد عمليات صرف مسجلة تطابق الفلترة الزمنية أو كلمة البحث المحددة",
@@ -363,10 +369,10 @@
       "baskets_count_label": "{count} سلال"
     },
     "merchant": {
-      "scan_to_redeem": "مسح كود المستفيد (QR)",
+      "scan_to_redeem": "مسح كارت المستفيد (QR)",
       "manual_search": "بحث برقم البطاقة أو الجواز",
-      "today_dispensed": "إجمالي المصروف اليوم",
-      "today_txns": "عدد عمليات اليوم",
+      "today_dispensed": "إجمالي المصروف",
+      "today_txns": "صرف اليوم",
       "wallet_title": "محفظة وعهدة الصراف المالية",
       "allocated_budget": "الميزانية المخصصة",
       "disbursed_amount": "إجمالي المصروف للمستفيدين",
@@ -374,8 +380,8 @@
       "low_liquidity_alert": "⚠️ تنبيه: السيولة المتبقية أقل من 15% - يرجى طلب تغذية من الإدارة",
       "request_extra_disbursement": "طلب صرف استثنائي لحالة طارئة",
       "payment_receipts": "وصولات وإيصالات التحويل المستلمة",
-      "scan_card_cta": "مسح كود المستفيد",
-      "scan_card_sub": "وجه الكاميرا نحو كود QR أو ابحث يدوياً"
+      "scan_card_cta": "مسح كارت المستفيد (QR)",
+      "scan_card_sub": "وجّه الكاميرا نحو رمز الـ QR الموجود في تطبيق المستفيد"
     },
     "admin": {
       "merchants_tab_title": "المنافذ والصرافين المعتمدين",
@@ -424,6 +430,12 @@
     "transactions_count_label": "عدد العمليات المنجزة",
     "total_baskets_label": "السلال الغذائية المصروفة",
     "eligibility_status_label": "حالة الأهلية",
+    "eligibility_eligible": "مستحق ومعتمد للدعم",
+    "eligibility_pending": "بانتظار التحقق الميداني",
+    "eligibility_frozen": "موقوف مؤقتاً",
+    "eligibility_expired": "منتهي الصلاحية",
+    "field_research_completed": "مكتمل ومعتمد",
+    "field_research_pending": "قيد المراجعة الميدانية",
     "expires_at_label": "صلاحية البطاقة",
     "admin_role_label": "المستوى الإداري",
     "admin_role_value": "إدارة عامة مع صلاحيات كاملة",
@@ -517,5 +529,13 @@
     "pending_review": "قيد المراجعة ⏳",
     "card_label": "البطاقة: {cardId}",
     "show_all": "عرض الكل"
+  },
+  "notifications": {
+    "title": "مركز الإشعارات",
+    "mark_all_read": "تحديد الكل كمقروء",
+    "empty_title": "لا توجد إشعارات جديدة",
+    "empty_desc": "ستظهر هنا كافة إشعارات التحويلات المالية وشحن العهدة وتحديثات البطاقات فور وصولها",
+    "view_receipt": "عرض الإيصال",
+    "view_details": "عرض التفاصيل"
   }
 }

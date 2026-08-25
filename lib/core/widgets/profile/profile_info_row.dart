@@ -23,9 +23,9 @@ class ProfileInfoRow extends StatelessWidget {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          padding: const EdgeInsets.symmetric(vertical: 9),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               if (icon != null) ...[
                 Icon(icon, size: 16, color: AppColors.textMutedLight),
@@ -37,6 +37,7 @@ class ProfileInfoRow extends StatelessWidget {
                   label,
                   style: const TextStyle(
                     fontSize: 13,
+                    fontWeight: FontWeight.w500,
                     color: AppColors.textSecondaryLight,
                   ),
                 ),

@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
@@ -22,6 +25,77 @@ class PaymentReceiptCardItem extends StatelessWidget {
     required this.onConfirm,
   });
 
+  Widget _buildReceiptThumbnail(String imageUrl) {
+    if (imageUrl.startsWith('data:image')) {
+      try {
+        final commaIdx = imageUrl.indexOf(',');
+        final base64Str =
+            commaIdx != -1 ? imageUrl.substring(commaIdx + 1) : imageUrl;
+        final Uint8List bytes = base64Decode(base64Str);
+        return Image.memory(
+          bytes,
+          width: 58,
+          height: 58,
+          fit: BoxFit.cover,
+          errorBuilder: (ctx, err, stack) => _buildPlaceholder(),
+        );
+      } catch (_) {
+        return _buildPlaceholder();
+      }
+    }
+
+    return Image.network(
+      imageUrl,
+      width: 58,
+      height: 58,
+      fit: BoxFit.cover,
+      loadingBuilder: (ctx, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return Container(
+          width: 58,
+          height: 58,
+          decoration: BoxDecoration(
+            color: AppColors.slate100,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: const Center(
+            child: SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: AppColors.primary,
+              ),
+            ),
+          ),
+        );
+      },
+      errorBuilder: (ctx, err, stack) => _buildPlaceholder(),
+    );
+  }
+
+  Widget _buildPlaceholder() {
+    return Container(
+      width: 58,
+      height: 58,
+      decoration: BoxDecoration(
+        color: const Color(0xFFE8F5E9),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: const Color(0xFFC8E6C9),
+          width: 1.2,
+        ),
+      ),
+      child: const Center(
+        child: Icon(
+          Icons.receipt_long_rounded,
+          color: Color(0xFF0A734D),
+          size: 28,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final currencyFormatter = NumberFormat('#,##0', 'ar');
@@ -34,14 +108,14 @@ class PaymentReceiptCardItem extends StatelessWidget {
         border: Border.all(
           color: receipt.isConfirmed
               ? AppColors.borderLight
-              : AppColors.accentLight,
-          width: receipt.isConfirmed ? 1.0 : 1.5,
+              : const Color(0xFFFDE68A),
+          width: receipt.isConfirmed ? 1 : 1.5,
         ),
         boxShadow: [
           BoxShadow(
             color: receipt.isConfirmed
                 ? Colors.black.withValues(alpha: 0.02)
-                : AppColors.accentDark.withValues(alpha: 0.06),
+                : const Color(0xFFF59E0B).withValues(alpha: 0.06),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -50,74 +124,45 @@ class PaymentReceiptCardItem extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Row 1: Method Badge + Amount ──
+          // ── Row 1: Amount & Status Badge ──
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              ReceiptPaymentMethodChip(method: receipt.paymentMethod),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.baseline,
                 textBaseline: TextBaseline.alphabetic,
                 children: [
                   Text(
                     '+${currencyFormatter.format(receipt.amount)}',
-                    style: const TextStyle(
-                      fontSize: 24,
+                    style: TextStyle(
+                      fontSize: 22,
                       fontWeight: FontWeight.w900,
-                      color: AppColors.primary,
+                      color: receipt.isConfirmed
+                          ? AppColors.primary
+                          : const Color(0xFFD97706),
                     ),
                   ),
                   const Gap(4),
                   Text(
                     'common.currency'.tr(),
                     style: const TextStyle(
-                      fontSize: 14,
+                      fontSize: 13,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textSecondaryLight,
                     ),
                   ),
                 ],
               ),
-            ],
-          ),
-
-          const Gap(14),
-
-          // ── Row 2: Status Badge & Formatted Date ──
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
               ReceiptStatusBadge(isConfirmed: receipt.isConfirmed),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    AppIcons.schedule,
-                    size: 15,
-                    color: AppColors.textMutedLight,
-                  ),
-                  const Gap(5),
-                  Text(
-                    AppFormatters.formatDateTime(
-                      receipt.timestamp,
-                      context: context,
-                    ),
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textSecondaryLight,
-                    ),
-                  ),
-                ],
-              ),
             ],
           ),
 
-          const Gap(14),
+          const Gap(12),
           const Divider(height: 1, color: AppColors.slate100),
           const Gap(12),
 
-          // ── Row 3: Reference Number with Copy Action ──
+          // ── Row 2: Reference Number & Copy Button ──
           if (receipt.referenceNumber.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(bottom: 10),
@@ -126,67 +171,105 @@ class PaymentReceiptCardItem extends StatelessWidget {
               ),
             ),
 
-          // ── Row 4: Sender / Receiver Account Info ──
-          if (receipt.senderAccountOrPhone != null &&
-              receipt.senderAccountOrPhone!.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+          // ── Row 3: Payment Method Chip ──
+          ReceiptPaymentMethodChip(method: receipt.paymentMethod),
+
+          // ── Row 4: Account Details (Sender / Receiver) ──
+          if (receipt.senderAccountOrPhone != null ||
+              receipt.receiverAccountOrPhone != null) ...[
+            const Gap(10),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: AppColors.slate50,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: AppColors.slate200),
+              ),
+              child: Column(
                 children: [
-                  const Icon(
-                    Icons.account_balance_wallet_outlined,
-                    size: 16,
-                    color: AppColors.textMutedLight,
-                  ),
-                  const Gap(8),
-                  Expanded(
-                    child: Text(
-                      'الحساب المحول منه: ${receipt.senderAccountOrPhone}',
-                      style: const TextStyle(
-                        fontSize: 13.5,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.textSecondaryLight,
-                      ),
+                  if (receipt.senderAccountOrPhone != null &&
+                      receipt.senderAccountOrPhone!.isNotEmpty)
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.account_balance_outlined,
+                          size: 13,
+                          color: AppColors.slate400,
+                        ),
+                        const Gap(6),
+                        Expanded(
+                          child: Text(
+                            'الحساب المحول منه: ${receipt.senderAccountOrPhone}',
+                            style: const TextStyle(
+                              fontSize: 11.5,
+                              color: AppColors.slate600,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
+                  if (receipt.receiverAccountOrPhone != null &&
+                      receipt.receiverAccountOrPhone!.isNotEmpty) ...[
+                    if (receipt.senderAccountOrPhone != null) const Gap(4),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.person_pin_circle_outlined,
+                          size: 13,
+                          color: AppColors.slate400,
+                        ),
+                        const Gap(6),
+                        Expanded(
+                          child: Text(
+                            'الحساب المستلم: ${receipt.receiverAccountOrPhone}',
+                            style: const TextStyle(
+                              fontSize: 11.5,
+                              color: AppColors.slate600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ],
               ),
             ),
+          ],
 
-          // ── Row 5: Admin Notes ──
-          if (receipt.notes != null && receipt.notes!.isNotEmpty)
+          // ── Row 5: Admin Notes (if any) ──
+          if (receipt.notes != null && receipt.notes!.trim().isNotEmpty) ...[
+            const Gap(10),
             Container(
-              margin: const EdgeInsets.only(top: 2, bottom: 10),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: AppColors.slate50,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.slate200),
+                color: const Color(0xFFFFFBEB),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: const Color(0xFFFDE68A)),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Icon(
-                    Icons.article_rounded,
-                    size: 17,
-                    color: AppColors.slate500,
+                    Icons.info_outline_rounded,
+                    size: 14,
+                    color: Color(0xFFD97706),
                   ),
-                  const Gap(8),
+                  const Gap(6),
                   Expanded(
                     child: Text(
                       'merchant.receipts.admin_notes_label'
                           .tr(namedArgs: {'notes': receipt.notes!}),
                       style: const TextStyle(
-                        fontSize: 13.5,
-                        color: AppColors.slate600,
-                        height: 1.4,
+                        fontSize: 12,
+                        color: Color(0xFF92400E),
                       ),
                     ),
                   ),
                 ],
               ),
             ),
+          ],
 
           // ── Row 6: Image Attachment Preview Card ──
           if (receipt.receiptImageUrl != null &&
@@ -195,7 +278,7 @@ class PaymentReceiptCardItem extends StatelessWidget {
               onTap: () => ReceiptImageViewerDialog.show(context, receipt),
               borderRadius: BorderRadius.circular(14),
               child: Container(
-                margin: const EdgeInsets.only(top: 4, bottom: 10),
+                margin: const EdgeInsets.only(top: 10, bottom: 4),
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: AppColors.slate50,
@@ -206,21 +289,7 @@ class PaymentReceiptCardItem extends StatelessWidget {
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(12),
-                      child: Image.network(
-                        receipt.receiptImageUrl!,
-                        width: 58,
-                        height: 58,
-                        fit: BoxFit.cover,
-                        errorBuilder: (ctx, err, stack) => Container(
-                          width: 58,
-                          height: 58,
-                          color: AppColors.slate200,
-                          child: const Icon(
-                            Icons.broken_image_rounded,
-                            color: AppColors.textMutedLight,
-                          ),
-                        ),
-                      ),
+                      child: _buildReceiptThumbnail(receipt.receiptImageUrl!),
                     ),
                     const Gap(12),
                     Expanded(
@@ -262,38 +331,50 @@ class PaymentReceiptCardItem extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               height: 48,
-              child: ElevatedButton.icon(
+              child: ElevatedButton(
                 onPressed: isConfirming ? null : onConfirm,
-                icon: isConfirming
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  elevation: 0,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    if (isConfirming)
+                      const SizedBox(
+                        width: 18,
+                        height: 18,
                         child: CircularProgressIndicator(
                           strokeWidth: 2.2,
                           color: Colors.white,
                         ),
                       )
-                    : const Icon(
+                    else
+                      const Icon(
                         AppIcons.checkCircleOutline,
                         color: Colors.white,
                         size: 20,
                       ),
-                label: Text(
-                  isConfirming
-                      ? 'merchant.receipts.confirming_btn'.tr()
-                      : 'merchant.receipts.confirm_btn'.tr(),
-                  style: const TextStyle(
-                    fontSize: 14.5,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
+                    const Gap(8),
+                    Text(
+                      isConfirming
+                          ? 'merchant.receipts.confirming_btn'.tr()
+                          : 'merchant.receipts.confirm_btn'.tr(),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        height: 1.2,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

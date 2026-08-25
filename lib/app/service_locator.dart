@@ -46,6 +46,9 @@ import '../features/info_content/view_models/info_cubit.dart';
 import '../features/onboarding/presentation/cubit/onboarding_cubit.dart';
 import '../features/splash/presentation/cubit/splash_cubit.dart';
 
+// Notifications Feature
+import '../features/notifications/view_models/notifications_cubit.dart';
+
 final getIt = GetIt.instance;
 
 Future<void> initServiceLocator() async {
@@ -63,6 +66,9 @@ Future<void> initServiceLocator() async {
   getIt.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
   getIt.registerLazySingleton<NotificationService>(
     () => NotificationService.instance,
+  );
+  getIt.registerLazySingleton<NotificationsCubit>(
+    () => NotificationsCubit(firestore: getIt<FirebaseFirestore>()),
   );
 
   // 2. Auth Feature Singletons

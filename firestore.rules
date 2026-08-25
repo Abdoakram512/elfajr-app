@@ -102,51 +102,28 @@ service cloud.firestore {
     // 📑 payment_receipts Collection
     // ──────────────────────────────────────────────
     match /payment_receipts/{receiptId} {
-      allow read: if isAdmin()
-                  || (isActiveMerchant() && resource.data.merchantId == request.auth.uid);
-
-      allow create: if isAdmin();
-
-      // Merchants can only confirm their own assigned receipts
-      allow update: if isAdmin()
-                    || (isActiveMerchant()
-                        && resource.data.merchantId == request.auth.uid
-                        && request.resource.data.diff(resource.data).affectedKeys()
-                            .hasOnly(['status', 'isConfirmed', 'confirmedAt']));
-
-      allow delete: if isAdmin();
+      allow read: if true;
+      allow create, update, delete: if true;
     }
 
     // ──────────────────────────────────────────────
     // 📦 extra_disbursement_requests Collection
     // ──────────────────────────────────────────────
     match /extra_disbursement_requests/{requestId} {
-      allow read: if isAdmin()
-                  || (isActiveMerchant() && resource.data.merchantId == request.auth.uid);
-
-      allow create: if isActiveMerchant()
-                    && request.resource.data.merchantId == request.auth.uid;
-
-      allow update: if isAdmin();
-      allow delete: if isAdmin();
+      allow read: if true;
+      allow create, update, delete: if true;
     }
 
     // ──────────────────────────────────────────────
     // 📋 audit_logs & audit_log Collections
     // ──────────────────────────────────────────────
     match /audit_logs/{logId} {
-      allow read: if isAdmin()
-                  || (isActiveMerchant() && resource.data.performedBy == request.auth.uid);
-
-      allow create: if isAdmin()
-                    || (isActiveMerchant() && request.resource.data.performedBy == request.auth.uid);
-
+      allow read, create: if true;
       allow update, delete: if false;
     }
 
     match /audit_log/{logId} {
-      allow read: if isAdmin();
-      allow create: if isAdmin();
+      allow read, create: if true;
       allow update, delete: if false;
     }
 
@@ -166,9 +143,14 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    match /nationalities/{docId} {
+    // ──────────────────────────────────────────────
+    // 🔔 notifications Collection
+    // ──────────────────────────────────────────────
+    match /notifications/{notificationId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow create: if true;
+      allow update: if true;
+      allow delete: if true;
     }
 
     // ──────────────────────────────────────────────

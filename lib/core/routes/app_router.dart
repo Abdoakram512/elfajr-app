@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:qout/features/merchant/views/merchant_payment_receipts_view.dart';
+import 'package:qout/features/notifications/views/notifications_view.dart';
 
 import '../../features/admin/views/admin_main_view.dart';
 import '../../features/auth/models/user_role.dart';
@@ -101,6 +102,10 @@ class AppRouter {
               : null;
           return MerchantPaymentReceiptsView(merchant: merchant);
         },
+      ),
+      GoRoute(
+        path: RouteNames.notifications,
+        builder: (context, state) => const NotificationsView(),
       ),
     ],
   );
