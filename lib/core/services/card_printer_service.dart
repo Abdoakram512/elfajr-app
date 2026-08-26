@@ -213,17 +213,17 @@ class CardPrinterService {
                         ),
                       ),
                       pw.SizedBox(width: 10),
-                      // ── Official Round Seal ──
+                      // ── Official Round Stamp (Royal Blue Ink) ──
                       pw.Transform.rotateBox(
-                        angle: -0.08,
+                        angle: -0.07,
                         child: pw.Container(
-                          width: 80,
-                          height: 80,
+                          width: 82,
+                          height: 82,
                           padding: const pw.EdgeInsets.all(3),
                           decoration: pw.BoxDecoration(
                             shape: pw.BoxShape.circle,
                             border: pw.Border.all(
-                              color: PdfColors.green900,
+                              color: PdfColors.indigo900,
                               width: 1.8,
                             ),
                           ),
@@ -231,7 +231,7 @@ class CardPrinterService {
                             decoration: pw.BoxDecoration(
                               shape: pw.BoxShape.circle,
                               border: pw.Border.all(
-                                color: PdfColors.green900,
+                                color: PdfColors.indigo900,
                                 width: 0.8,
                               ),
                             ),
@@ -240,11 +240,11 @@ class CardPrinterService {
                                 mainAxisAlignment: pw.MainAxisAlignment.center,
                                 children: [
                                   pw.Text(
-                                    '★ مؤسسة الفجر ★',
+                                    'مؤسسة الفجر الخيرية',
                                     style: pw.TextStyle(
                                       font: font,
-                                      fontSize: 6.5,
-                                      color: PdfColors.green900,
+                                      fontSize: 6.2,
+                                      color: PdfColors.indigo900,
                                     ),
                                   ),
                                   pw.SizedBox(height: 2),
@@ -253,24 +253,24 @@ class CardPrinterService {
                                     style: pw.TextStyle(
                                       font: font,
                                       fontSize: 8,
-                                      color: PdfColors.green900,
+                                      color: PdfColors.indigo900,
                                     ),
                                   ),
                                   pw.Text(
-                                    'منظومة قُوت',
+                                    'المساعدات الاجتماعية',
                                     style: pw.TextStyle(
                                       font: fontRegular,
-                                      fontSize: 6.5,
-                                      color: PdfColors.green800,
+                                      fontSize: 5.8,
+                                      color: PdfColors.indigo800,
                                     ),
                                   ),
                                   pw.SizedBox(height: 1),
                                   pw.Text(
-                                    '2026',
+                                    'قيد ٢٠٢٦ / فجر',
                                     style: pw.TextStyle(
                                       font: font,
-                                      fontSize: 6.5,
-                                      color: PdfColors.green900,
+                                      fontSize: 5.8,
+                                      color: PdfColors.indigo900,
                                     ),
                                   ),
                                 ],
