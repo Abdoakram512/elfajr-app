@@ -31,10 +31,6 @@ class _CashVoucherCardState extends State<CashVoucherCard>
     with SingleTickerProviderStateMixin {
   late AnimationController _shimmer;
 
-  static const double _notchY = 222.0;
-  static const double _notchRadius = 13.0;
-  static const double _cardRadius = 22.0;
-
   @override
   void initState() {
     super.initState();
@@ -61,8 +57,8 @@ class _CashVoucherCardState extends State<CashVoucherCard>
         final Uint8List bytes = base64Decode(base64Str);
         imageWidget = Image.memory(
           bytes,
-          width: 52,
-          height: 52,
+          width: 50,
+          height: 50,
           fit: BoxFit.cover,
         );
       } catch (_) {
@@ -71,8 +67,8 @@ class _CashVoucherCardState extends State<CashVoucherCard>
     } else {
       imageWidget = Image.network(
         imageUrl,
-        width: 52,
-        height: 52,
+        width: 50,
+        height: 50,
         fit: BoxFit.cover,
         errorBuilder: (ctx, err, stack) => _placeholder(),
       );
@@ -85,11 +81,11 @@ class _CashVoucherCardState extends State<CashVoucherCard>
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: Colors.white.withValues(alpha: 0.35),
-            width: 1.5,
+            width: 1.4,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.3),
+              color: Colors.black.withValues(alpha: 0.35),
               blurRadius: 6,
               offset: const Offset(0, 2),
             ),
@@ -102,8 +98,8 @@ class _CashVoucherCardState extends State<CashVoucherCard>
             children: [
               imageWidget,
               Container(
-                width: 52,
-                height: 52,
+                width: 50,
+                height: 50,
                 color: Colors.black.withValues(alpha: 0.28),
                 child: const Icon(
                   Icons.zoom_in_rounded,
@@ -119,11 +115,35 @@ class _CashVoucherCardState extends State<CashVoucherCard>
   }
 
   Widget _placeholder() => Container(
-    width: 52,
-    height: 52,
+    width: 50,
+    height: 50,
     color: Colors.white.withValues(alpha: 0.1),
     child: const Icon(Icons.receipt_rounded, color: Colors.white70, size: 24),
   );
+
+  Widget _buildEmvChip() {
+    return Container(
+      width: 38,
+      height: 28,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFFFDE68A), Color(0xFFD97706), Color(0xFFF59E0B)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: const Color(0xFFFEF3C7), width: 0.8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 4,
+            offset: const Offset(0, 1.5),
+          ),
+        ],
+      ),
+      child: CustomPaint(painter: _EmvChipLinesPainter()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -131,52 +151,58 @@ class _CashVoucherCardState extends State<CashVoucherCard>
     final p = widget.palette;
     final currencyFormatter = intl.NumberFormat('#,##0', 'ar');
 
-    return CustomPaint(
-      painter: _VoucherShadowAndBorderPainter(
-        palette: p,
-        isTopCard: widget.isTopCard,
-        notchY: _notchY,
-        notchRadius: _notchRadius,
-        cardRadius: _cardRadius,
+    return Container(
+      height: 350,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: p.shadowColor.withValues(
+              alpha: widget.isTopCard ? 0.45 : 0.20,
+            ),
+            blurRadius: widget.isTopCard ? 18 : 8,
+            offset: Offset(0, widget.isTopCard ? 8 : 4),
+          ),
+        ],
       ),
-      child: ClipPath(
-        clipper: _VoucherCardClipper(
-          notchY: _notchY,
-          notchRadius: _notchRadius,
-          cardRadius: _cardRadius,
-        ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
         child: Container(
-          height: 350,
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [p.gradientStart, p.gradientEnd],
               begin: Alignment.topRight,
               end: Alignment.bottomLeft,
             ),
+            border: Border.all(
+              color: p.accent.withValues(alpha: 0.40),
+              width: 1.5,
+            ),
+            borderRadius: BorderRadius.circular(24),
           ),
           child: Stack(
             children: [
-              // 1. Bank Security Guilloche Wave Pattern
+              // 1. Subtle Bank Guilloche Curves Background
               Positioned.fill(
                 child: CustomPaint(
                   painter: _GuillocheSecurityPatternPainter(
-                    strokeColor: p.lightAccent.withValues(alpha: 0.04),
+                    strokeColor: p.lightAccent.withValues(alpha: 0.035),
                   ),
                 ),
               ),
 
-              // 2. Large Watermark Bank Seal
+              // 2. Large Watermark Bank Crest
               Positioned(
-                left: -25,
-                bottom: 30,
+                left: -20,
+                bottom: -20,
                 child: Icon(
                   Icons.account_balance_rounded,
-                  size: 180,
-                  color: Colors.white.withValues(alpha: 0.032),
+                  size: 175,
+                  color: Colors.white.withValues(alpha: 0.035),
                 ),
               ),
 
-              // 3. Holographic Security Foil Shimmer Beam
+              // 3. Diagonal Holographic Metallic Sheen
               AnimatedBuilder(
                 animation: _shimmer,
                 builder: (context, child) => Positioned.fill(
@@ -189,11 +215,11 @@ class _CashVoucherCardState extends State<CashVoucherCard>
                           colors: [
                             Colors.transparent,
                             Colors.white.withValues(alpha: 0.0),
-                            p.lightAccent.withValues(alpha: 0.10),
-                            Colors.white.withValues(alpha: 0.15),
+                            p.lightAccent.withValues(alpha: 0.09),
+                            Colors.white.withValues(alpha: 0.16),
                             Colors.transparent,
                           ],
-                          transform: const GradientRotation(0.38),
+                          transform: const GradientRotation(0.42),
                         ),
                       ),
                     ),
@@ -201,64 +227,53 @@ class _CashVoucherCardState extends State<CashVoucherCard>
                 ),
               ),
 
-              // 4. Perforated Security Tear Line across the notches
-              Positioned(
-                top: _notchY,
-                left: _notchRadius + 4,
-                right: _notchRadius + 4,
-                child: CustomPaint(
-                  size: const Size(double.infinity, 1),
-                  painter: _DashedPerforationPainter(
-                    color: Colors.white.withValues(alpha: 0.22),
-                  ),
-                ),
-              ),
-
-              // 5. Card Content
+              // 4. Main Financial Card Content
               Padding(
                 padding: const EdgeInsets.fromLTRB(18, 16, 18, 14),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Header Row: Foundation Name & Payment Method Badge
+                    // Top Bar: Foundation Crest + EMV Chip + Payment Method
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Row(
                           children: [
-                            Container(
-                              width: 8,
-                              height: 8,
-                              decoration: BoxDecoration(
-                                color: p.accent,
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: p.accent.withValues(alpha: 0.6),
-                                    blurRadius: 6,
+                            _buildEmvChip(),
+                            const Gap(10),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'مؤسسة الفجر الخيرية',
+                                  style: TextStyle(
+                                    color: p.lightAccent,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: -0.2,
                                   ),
-                                ],
-                              ),
-                            ),
-                            const Gap(6),
-                            Text(
-                              'مؤسسة الفجر الخيرية',
-                              style: TextStyle(
-                                color: p.lightAccent,
-                                fontSize: 12.5,
-                                fontWeight: FontWeight.w900,
-                              ),
+                                ),
+                                Text(
+                                  'سند إيداع مصرفي إلكتروني',
+                                  style: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.65),
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 10,
-                            vertical: 4,
+                            vertical: 4.5,
                           ),
                           decoration: BoxDecoration(
                             color: p.badgeBg,
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(10),
                             border: Border.all(color: p.badgeBorder),
                           ),
                           child: Text(
@@ -272,21 +287,21 @@ class _CashVoucherCardState extends State<CashVoucherCard>
                         ),
                       ],
                     ),
-                    const Gap(10),
+                    const Gap(12),
 
-                    // Amount Display
+                    // Amount Hero Section
                     Center(
                       child: Column(
                         children: [
                           Text(
                             'المبلغ المستحق للصرف',
                             style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.72),
-                              fontSize: 12,
+                              color: Colors.white.withValues(alpha: 0.70),
+                              fontSize: 11.5,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
-                          const Gap(2),
+                          const Gap(1),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.baseline,
@@ -296,7 +311,7 @@ class _CashVoucherCardState extends State<CashVoucherCard>
                                 currencyFormatter.format(r.amount),
                                 style: const TextStyle(
                                   color: Colors.white,
-                                  fontSize: 31,
+                                  fontSize: 32,
                                   fontWeight: FontWeight.w900,
                                   letterSpacing: -0.5,
                                 ),
@@ -306,7 +321,7 @@ class _CashVoucherCardState extends State<CashVoucherCard>
                                 'ج.م',
                                 style: TextStyle(
                                   color: p.lightAccent,
-                                  fontSize: 15.5,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.w900,
                                 ),
                               ),
@@ -317,17 +332,17 @@ class _CashVoucherCardState extends State<CashVoucherCard>
                     ),
                     const Gap(10),
 
-                    // Info Container
+                    // Frosted Glass Info Module
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12,
                         vertical: 9,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.24),
+                        color: Colors.black.withValues(alpha: 0.25),
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.09),
+                          color: Colors.white.withValues(alpha: 0.10),
                         ),
                       ),
                       child: Row(
@@ -351,7 +366,7 @@ class _CashVoucherCardState extends State<CashVoucherCard>
                                     const Gap(4),
                                     Expanded(
                                       child: Text(
-                                        'مرجع: ${r.referenceNumber}',
+                                        'رقم المرجع: ${r.referenceNumber}',
                                         style: const TextStyle(
                                           color: Colors.white,
                                           fontSize: 12,
@@ -401,7 +416,7 @@ class _CashVoucherCardState extends State<CashVoucherCard>
 
                     const Spacer(),
 
-                    // Action Button on the lower stub
+                    // Primary Confirmation Action Button
                     SizedBox(
                       height: 46,
                       child: ElevatedButton(
@@ -469,176 +484,40 @@ class _CashVoucherCardState extends State<CashVoucherCard>
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ✂️ _VoucherCardClipper: Custom Financial Slip Path with Side Punch Notches
+// 💳 _EmvChipLinesPainter: Metallic Smart Chip Circuit Micro-Patterns
 // ─────────────────────────────────────────────────────────────────────────────
 
-class _VoucherCardClipper extends CustomClipper<Path> {
-  final double notchY;
-  final double notchRadius;
-  final double cardRadius;
-
-  const _VoucherCardClipper({
-    required this.notchY,
-    required this.notchRadius,
-    required this.cardRadius,
-  });
-
-  @override
-  Path getClip(Size size) {
-    return _buildVoucherPath(size, notchY, notchRadius, cardRadius);
-  }
-
-  @override
-  bool shouldReclip(covariant _VoucherCardClipper oldClipper) {
-    return oldClipper.notchY != notchY ||
-        oldClipper.notchRadius != notchRadius ||
-        oldClipper.cardRadius != cardRadius;
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// 🎨 _VoucherShadowAndBorderPainter: Renders 3D Elevation & Precise Outline
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _VoucherShadowAndBorderPainter extends CustomPainter {
-  final CashVoucherPalette palette;
-  final bool isTopCard;
-  final double notchY;
-  final double notchRadius;
-  final double cardRadius;
-
-  const _VoucherShadowAndBorderPainter({
-    required this.palette,
-    required this.isTopCard,
-    required this.notchY,
-    required this.notchRadius,
-    required this.cardRadius,
-  });
-
+class _EmvChipLinesPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final path = _buildVoucherPath(size, notchY, notchRadius, cardRadius);
-
-    // 1. Draw 3D Depth Shadow
-    final shadowPaint = Paint()
-      ..color = palette.shadowColor.withValues(alpha: isTopCard ? 0.45 : 0.20)
-      ..maskFilter = MaskFilter.blur(BlurStyle.normal, isTopCard ? 14 : 7);
-
-    canvas.save();
-    canvas.translate(0, isTopCard ? 6 : 3);
-    canvas.drawPath(path, shadowPaint);
-    canvas.restore();
-
-    // 2. Draw Luxury Metallic Contour Border
-    final borderPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.6
-      ..color = palette.accent.withValues(alpha: 0.45);
-
-    canvas.drawPath(path, borderPaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant _VoucherShadowAndBorderPainter oldDelegate) {
-    return oldDelegate.palette != palette || oldDelegate.isTopCard != isTopCard;
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// 📐 Helper: Constructs the Financial Voucher Contour Geometry
-// ─────────────────────────────────────────────────────────────────────────────
-
-Path _buildVoucherPath(
-  Size size,
-  double notchY,
-  double notchRadius,
-  double cardRadius,
-) {
-  final path = Path();
-  final w = size.width;
-  final h = size.height;
-
-  // Top-Left Corner
-  path.moveTo(0, cardRadius);
-  path.quadraticBezierTo(0, 0, cardRadius, 0);
-
-  // Top Edge
-  path.lineTo(w - cardRadius, 0);
-
-  // Top-Right Corner
-  path.quadraticBezierTo(w, 0, w, cardRadius);
-
-  // Right Edge down to Right Notch
-  path.lineTo(w, notchY - notchRadius);
-
-  // Right Semi-Circular Notch (Inward arc)
-  path.arcToPoint(
-    Offset(w, notchY + notchRadius),
-    radius: Radius.circular(notchRadius),
-    clockwise: false,
-  );
-
-  // Right Edge down to Bottom-Right Corner
-  path.lineTo(w, h - cardRadius);
-  path.quadraticBezierTo(w, h, w - cardRadius, h);
-
-  // Bottom Edge
-  path.lineTo(cardRadius, h);
-
-  // Bottom-Left Corner
-  path.quadraticBezierTo(0, h, 0, h - cardRadius);
-
-  // Left Edge up to Left Notch
-  path.lineTo(0, notchY + notchRadius);
-
-  // Left Semi-Circular Notch (Inward arc)
-  path.arcToPoint(
-    Offset(0, notchY - notchRadius),
-    radius: Radius.circular(notchRadius),
-    clockwise: false,
-  );
-
-  // Left Edge back to start
-  path.lineTo(0, cardRadius);
-  path.close();
-
-  return path;
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// ✂️ _DashedPerforationPainter: Dashed Financial Tear-Line
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _DashedPerforationPainter extends CustomPainter {
-  final Color color;
-
-  const _DashedPerforationPainter({required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = 1.5
+    final linePaint = Paint()
+      ..color = const Color(0xFF78350F).withValues(alpha: 0.55)
+      ..strokeWidth = 0.8
       ..style = PaintingStyle.stroke;
 
-    const dashWidth = 5.0;
-    const dashSpace = 4.5;
-    double currentX = 0.0;
+    final w = size.width;
+    final h = size.height;
 
-    while (currentX < size.width) {
-      canvas.drawLine(
-        Offset(currentX, 0),
-        Offset(currentX + dashWidth, 0),
-        paint,
-      );
-      currentX += dashWidth + dashSpace;
-    }
+    // Horizontal divider
+    canvas.drawLine(Offset(0, h * 0.5), Offset(w, h * 0.5), linePaint);
+    // Vertical left & right lines
+    canvas.drawLine(Offset(w * 0.35, 0), Offset(w * 0.35, h), linePaint);
+    canvas.drawLine(Offset(w * 0.65, 0), Offset(w * 0.65, h), linePaint);
+
+    // Inner rounded center contact
+    final centerRect = RRect.fromRectAndRadius(
+      Rect.fromCenter(
+        center: Offset(w * 0.5, h * 0.5),
+        width: w * 0.3,
+        height: h * 0.45,
+      ),
+      const Radius.circular(2),
+    );
+    canvas.drawRRect(centerRect, linePaint);
   }
 
   @override
-  bool shouldRepaint(covariant _DashedPerforationPainter oldDelegate) {
-    return oldDelegate.color != color;
-  }
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
