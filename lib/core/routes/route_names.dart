@@ -11,7 +11,7 @@ abstract class RouteNames {
   static const String merchantDashboard = '/merchant-dashboard';
   static const String adminDashboard = '/admin-dashboard';
 
-  // Informational & Support Pages (Dynamic from Firestore)
+  // Informational & Support Pages 
   static const String aboutUs = '/about-us';
   static const String faq = '/faq';
   static const String termsPrivacy = '/terms-privacy';
