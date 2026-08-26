@@ -1,10 +1,12 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
+import '../../../../core/constants/app_colors.dart';
 import '../models/payment_receipt_model.dart';
 import 'cash_voucher_card.dart';
 
-/// Internal receipt swiper inside the vault interior.
-/// Cards are displayed in a **fan-spread** layout with rotation and offset.
+/// Interactive 3D fan-spread swiper deck for pending payment receipts.
+/// Cards are displayed with layered rotation and offset, creating a rich physical stack effect.
 class PendingReceiptsVoucherSwiperDeck extends StatefulWidget {
   final List<PaymentReceiptModel> pendingReceipts;
   final String? confirmingReceiptId;
@@ -111,13 +113,12 @@ class _PendingReceiptsVoucherSwiperDeckState
     _offsetXAnimation = Tween<double>(begin: startX, end: targetX).animate(
       CurvedAnimation(parent: _animController, curve: Curves.easeOutCubic),
     );
-    _angleAnimation =
-        Tween<double>(
-          begin: (startX / 240) * 0.22,
-          end: targetX > 0 ? 0.35 : -0.35,
-        ).animate(
-          CurvedAnimation(parent: _animController, curve: Curves.easeOutCubic),
-        );
+    _angleAnimation = Tween<double>(
+      begin: (startX / 240) * 0.22,
+      end: targetX > 0 ? 0.35 : -0.35,
+    ).animate(
+      CurvedAnimation(parent: _animController, curve: Curves.easeOutCubic),
+    );
 
     _animController.forward(from: 0).then((_) {
       if (!mounted) return;
@@ -136,10 +137,12 @@ class _PendingReceiptsVoucherSwiperDeckState
     _offsetXAnimation = Tween<double>(begin: startX, end: 0.0).animate(
       CurvedAnimation(parent: _animController, curve: Curves.easeOutBack),
     );
-    _angleAnimation = Tween<double>(begin: (startX / 240) * 0.22, end: 0.0)
-        .animate(
-          CurvedAnimation(parent: _animController, curve: Curves.easeOutBack),
-        );
+    _angleAnimation = Tween<double>(
+      begin: (startX / 240) * 0.22,
+      end: 0.0,
+    ).animate(
+      CurvedAnimation(parent: _animController, curve: Curves.easeOutBack),
+    );
 
     _animController.forward(from: 0).then((_) {
       if (!mounted) return;
@@ -152,101 +155,203 @@ class _PendingReceiptsVoucherSwiperDeckState
     });
   }
 
+  void _nextCard() {
+    if (_cards.length <= 1 || _animController.isAnimating) return;
+    _cycleTopCardToBack(-MediaQuery.of(context).size.width * 1.3);
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_cards.isEmpty) return const SizedBox.shrink();
 
     final visibleCount = math.min(3, _cards.length);
 
-    return AnimatedBuilder(
-      animation: _animController,
-      builder: (context, child) {
-        final currentX = _animController.isAnimating
-            ? _offsetXAnimation.value
-            : _dragX;
-        final currentAngle = _animController.isAnimating
-            ? _angleAnimation.value
-            : ((_dragX / 240) * 0.22);
-        final dragProgress = (_dragX.abs() / 350).clamp(0.0, 1.0);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // ── Header Bar ──
+        _buildHeader(),
+        const Gap(6),
 
-        return SizedBox(
-          height: 290,
-          child: Stack(
-            clipBehavior: Clip.none,
-            alignment: Alignment.center,
-            children: List.generate(visibleCount, (i) {
-              final indexInDeck = visibleCount - 1 - i;
-              final receipt = _cards[indexInDeck];
-              final isTop = indexInDeck == 0;
-              final palette = VoucherPalette.forReceipt(receipt);
+        // ── 3D Fan-Spread Stack ──
+        AnimatedBuilder(
+          animation: _animController,
+          builder: (context, child) {
+            final currentX = _animController.isAnimating
+                ? _offsetXAnimation.value
+                : _dragX;
+            final currentAngle = _animController.isAnimating
+                ? _angleAnimation.value
+                : ((_dragX / 240) * 0.22);
+            final dragProgress = (_dragX.abs() / 350).clamp(0.0, 1.0);
 
-              // ── Fan-spread layout ──
-              // Each card behind gets: more rotation + horizontal offset + vertical offset
-              final fanRotation = isTop
-                  ? 0.0
-                  : (-0.035 * indexInDeck); // -2° per card behind
-              final fanOffsetX = isTop
-                  ? 0.0
-                  : (10.0 * indexInDeck); // 10px right per card behind
-              final fanOffsetY = isTop
-                  ? 0.0
-                  : (14.0 * indexInDeck -
-                        (dragProgress * 14.0)); // 14px down, compresses on drag
+            return SizedBox(
+              height: 295,
+              child: Stack(
+                clipBehavior: Clip.none,
+                alignment: Alignment.center,
+                children: List.generate(visibleCount, (i) {
+                  final indexInDeck = visibleCount - 1 - i;
+                  final receipt = _cards[indexInDeck];
+                  final isTop = indexInDeck == 0;
+                  final palette = VoucherPalette.forReceipt(receipt);
 
-              final scale = isTop
-                  ? 1.0
-                  : (1.0 - (indexInDeck * 0.04) + (dragProgress * 0.04)).clamp(
-                      0.88,
-                      1.0,
+                  // ── Fan-spread layout ──
+                  final fanRotation = isTop
+                      ? 0.0
+                      : (-0.035 * indexInDeck); // -2° per card behind
+                  final fanOffsetX = isTop
+                      ? 0.0
+                      : (8.0 * indexInDeck); // 8px right per card behind
+                  final fanOffsetY = isTop
+                      ? 0.0
+                      : (12.0 * indexInDeck - (dragProgress * 12.0));
+
+                  final scale = isTop
+                      ? 1.0
+                      : (1.0 - (indexInDeck * 0.04) + (dragProgress * 0.04)).clamp(
+                          0.88,
+                          1.0,
+                        );
+                  final opacity = isTop
+                      ? 1.0
+                      : (1.0 - (indexInDeck * 0.12)).clamp(0.0, 1.0);
+
+                  Widget card = CashVoucherCard(
+                    receipt: receipt,
+                    palette: palette,
+                    isTopCard: isTop,
+                    isConfirming: widget.confirmingReceiptId == receipt.id,
+                    onConfirm: () => widget.onConfirmReceipt(receipt),
+                  );
+
+                  if (isTop) {
+                    card = GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onHorizontalDragStart: _onHorizontalDragStart,
+                      onHorizontalDragUpdate: _onHorizontalDragUpdate,
+                      onHorizontalDragEnd: _onHorizontalDragEnd,
+                      onHorizontalDragCancel: _onHorizontalDragCancel,
+                      child: card,
                     );
-              final opacity = isTop
-                  ? 1.0
-                  : (1.0 - (indexInDeck * 0.12)).clamp(0.0, 1.0);
+                  }
 
-              Widget card = CashVoucherCard(
-                receipt: receipt,
-                palette: palette,
-                isTopCard: isTop,
-                isConfirming: widget.confirmingReceiptId == receipt.id,
-                onConfirm: () => widget.onConfirmReceipt(receipt),
-              );
-
-              if (isTop) {
-                card = GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onHorizontalDragStart: _onHorizontalDragStart,
-                  onHorizontalDragUpdate: _onHorizontalDragUpdate,
-                  onHorizontalDragEnd: _onHorizontalDragEnd,
-                  onHorizontalDragCancel: _onHorizontalDragCancel,
-                  child: card,
-                );
-              }
-
-              return Positioned(
-                key: ValueKey(receipt.id),
-                top: 8 + fanOffsetY,
-                child: Transform.translate(
-                  offset: Offset(isTop ? currentX : fanOffsetX, 0),
-                  child: Transform.rotate(
-                    angle: isTop ? currentAngle : fanRotation,
-                    alignment: Alignment.bottomCenter,
-                    child: Transform.scale(
-                      scale: scale,
-                      child: Opacity(
-                        opacity: opacity,
-                        child: SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.76,
-                          child: card,
+                  return Positioned(
+                    key: ValueKey(receipt.id),
+                    top: 6 + fanOffsetY,
+                    child: Transform.translate(
+                      offset: Offset(isTop ? currentX : fanOffsetX, 0),
+                      child: Transform.rotate(
+                        angle: isTop ? currentAngle : fanRotation,
+                        alignment: Alignment.bottomCenter,
+                        child: Transform.scale(
+                          scale: scale,
+                          child: Opacity(
+                            opacity: opacity,
+                            child: SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.88,
+                              child: card,
+                            ),
+                          ),
                         ),
                       ),
                     ),
+                  );
+                }),
+              ),
+            );
+          },
+        ),
+
+        // ── Next Voucher / Swipe Helper CTA ──
+        if (_cards.length > 1) _buildNextButton(),
+      ],
+    );
+  }
+
+  Widget _buildHeader() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 4,
+                height: 18,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFD97706),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const Gap(8),
+              const Text(
+                'وصولات بانتظار تأكيد الاستلام',
+                style: TextStyle(
+                  fontSize: 15.5,
+                  fontWeight: FontWeight.w900,
+                  color: AppColors.textPrimaryLight,
+                ),
+              ),
+            ],
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFFBEB),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFFCD34D)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.pending_actions_rounded,
+                  size: 14,
+                  color: Color(0xFFD97706),
+                ),
+                const Gap(5),
+                Text(
+                  '${_cards.length} معلقة',
+                  style: const TextStyle(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w900,
+                    color: Color(0xFFD97706),
                   ),
                 ),
-              );
-            }),
+              ],
+            ),
           ),
-        );
-      },
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNextButton() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          TextButton.icon(
+            onPressed: _nextCard,
+            icon: const Icon(Icons.swipe_rounded, size: 16),
+            label: const Text(
+              'اسحب أو اضغط لعرض الوصل التالي',
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+            ),
+            style: TextButton.styleFrom(
+              foregroundColor: const Color(0xFF64748B),
+              backgroundColor: const Color(0xFFF1F5F9),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
