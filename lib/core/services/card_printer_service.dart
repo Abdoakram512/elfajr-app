@@ -175,36 +175,111 @@ class CardPrinterService {
 
                   pw.SizedBox(height: 12),
 
-                  // 5. Accessible Visual Guidelines for Elderly & Illiterate
-                  pw.Container(
-                    padding: const pw.EdgeInsets.all(10),
-                    decoration: const pw.BoxDecoration(
-                      color: PdfColors.grey100,
-                      borderRadius:
-                          pw.BorderRadius.all(pw.Radius.circular(10)),
-                    ),
-                    child: pw.Column(
-                      children: [
-                        pw.Text(
-                          'إرشادات استخدام البطاقة الورقية عند منفذ الصرف:',
-                          style: pw.TextStyle(
-                            font: font,
-                            fontSize: 10,
-                            color: PdfColors.grey800,
+                  // 5. Accessible Visual Guidelines with Official Stamp
+                  pw.Row(
+                    crossAxisAlignment: pw.CrossAxisAlignment.center,
+                    children: [
+                      pw.Expanded(
+                        child: pw.Container(
+                          padding: const pw.EdgeInsets.all(10),
+                          decoration: const pw.BoxDecoration(
+                            color: PdfColors.grey100,
+                            borderRadius:
+                                pw.BorderRadius.all(pw.Radius.circular(10)),
+                          ),
+                          child: pw.Column(
+                            crossAxisAlignment: pw.CrossAxisAlignment.start,
+                            children: [
+                              pw.Text(
+                                'إرشادات استخدام البطاقة عند منفذ الصرف:',
+                                style: pw.TextStyle(
+                                  font: font,
+                                  fontSize: 9.5,
+                                  color: PdfColors.grey800,
+                                ),
+                              ),
+                              pw.SizedBox(height: 3),
+                              pw.Text(
+                                '1. أظهر رمز الـ QR مباشرة لمنفذ الصرف المعتمد.\n2. يتم تأكيد استحقاقك للمساعدات والسلال فوراً.\n3. للاستفسار والدعم: اتصل بالرقم الموحد للإدارة.',
+                                style: pw.TextStyle(
+                                  font: fontRegular,
+                                  fontSize: 8.5,
+                                  color: PdfColors.grey700,
+                                  lineSpacing: 1.3,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        pw.SizedBox(height: 4),
-                        pw.Text(
-                          '1. أظهر هذه الورقة أو رمز الـ QR مباشرة للكاشير في التموينات أو الصيدلية المعتمدة.\n2. يتم مسح الرمز وتأكيد استحقاقك للمواد التموينية والسلال الغذائية فوراً بدون هاتف.\n3. في حال الفقدان، اتصل فوراً بالرقم الموحد المجاني: 8001234567',
-                          style: pw.TextStyle(
-                            font: fontRegular,
-                            fontSize: 9,
-                            color: PdfColors.grey700,
-                            lineSpacing: 1.4,
+                      ),
+                      pw.SizedBox(width: 10),
+                      // ── Official Round Seal ──
+                      pw.Transform.rotateBox(
+                        angle: -0.08,
+                        child: pw.Container(
+                          width: 80,
+                          height: 80,
+                          padding: const pw.EdgeInsets.all(3),
+                          decoration: pw.BoxDecoration(
+                            shape: pw.BoxShape.circle,
+                            border: pw.Border.all(
+                              color: PdfColors.green900,
+                              width: 1.8,
+                            ),
+                          ),
+                          child: pw.Container(
+                            decoration: pw.BoxDecoration(
+                              shape: pw.BoxShape.circle,
+                              border: pw.Border.all(
+                                color: PdfColors.green900,
+                                width: 0.8,
+                              ),
+                            ),
+                            child: pw.Center(
+                              child: pw.Column(
+                                mainAxisAlignment: pw.MainAxisAlignment.center,
+                                children: [
+                                  pw.Text(
+                                    '★ مؤسسة الفجر ★',
+                                    style: pw.TextStyle(
+                                      font: font,
+                                      fontSize: 6.5,
+                                      color: PdfColors.green900,
+                                    ),
+                                  ),
+                                  pw.SizedBox(height: 2),
+                                  pw.Text(
+                                    'معتمد رسمياً',
+                                    style: pw.TextStyle(
+                                      font: font,
+                                      fontSize: 8,
+                                      color: PdfColors.green900,
+                                    ),
+                                  ),
+                                  pw.Text(
+                                    'منظومة قُوت',
+                                    style: pw.TextStyle(
+                                      font: fontRegular,
+                                      fontSize: 6.5,
+                                      color: PdfColors.green800,
+                                    ),
+                                  ),
+                                  pw.SizedBox(height: 1),
+                                  pw.Text(
+                                    '2026',
+                                    style: pw.TextStyle(
+                                      font: font,
+                                      fontSize: 6.5,
+                                      color: PdfColors.green900,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ],
               ),
