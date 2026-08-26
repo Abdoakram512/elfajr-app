@@ -10,7 +10,7 @@ import '../../auth/models/user_model.dart';
 import '../view_models/merchant_receipts_cubit.dart';
 import '../view_models/merchant_receipts_state.dart';
 import '../widgets/payment_receipt_card_item.dart';
-import '../widgets/pending_receipts_voucher_swiper_deck.dart';
+import '../widgets/vault_experience_widget.dart';
 import '../widgets/receipts_filter_bar.dart';
 import '../widgets/receipts_summary_header.dart';
 
@@ -68,7 +68,10 @@ class _MerchantPaymentReceiptsViewState
                 SnackBar(
                   content: Row(
                     children: [
-                      const Icon(Icons.error_outline_rounded, color: Colors.white),
+                      const Icon(
+                        Icons.error_outline_rounded,
+                        color: Colors.white,
+                      ),
                       const Gap(10),
                       Expanded(
                         child: Text(
@@ -91,7 +94,10 @@ class _MerchantPaymentReceiptsViewState
                 SnackBar(
                   content: Row(
                     children: [
-                      const Icon(Icons.check_circle_rounded, color: Colors.white),
+                      const Icon(
+                        Icons.check_circle_rounded,
+                        color: Colors.white,
+                      ),
                       const Gap(10),
                       Expanded(
                         child: Text(
@@ -119,10 +125,12 @@ class _MerchantPaymentReceiptsViewState
             }
 
             final allReceipts = state.receipts;
-            final confirmedReceipts =
-                allReceipts.where((r) => r.isConfirmed).toList();
-            final pendingReceipts =
-                allReceipts.where((r) => !r.isConfirmed).toList();
+            final confirmedReceipts = allReceipts
+                .where((r) => r.isConfirmed)
+                .toList();
+            final pendingReceipts = allReceipts
+                .where((r) => !r.isConfirmed)
+                .toList();
 
             final totalConfirmedAmount = state.totalConfirmed;
             final totalPendingAmount = state.totalPending;
@@ -131,8 +139,8 @@ class _MerchantPaymentReceiptsViewState
             final filteredReceipts = _selectedFilter == ReceiptFilter.pending
                 ? pendingReceipts
                 : _selectedFilter == ReceiptFilter.confirmed
-                    ? confirmedReceipts
-                    : allReceipts;
+                ? confirmedReceipts
+                : allReceipts;
 
             return AlfajrRefreshIndicator(
               onRefresh: () async {
@@ -140,7 +148,10 @@ class _MerchantPaymentReceiptsViewState
               },
               child: ListView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 18,
+                ),
                 children: [
                   // ── 1. Financial Overview Cards ──
                   ReceiptsSummaryHeader(
@@ -154,14 +165,14 @@ class _MerchantPaymentReceiptsViewState
                   // ── 🌟 Interactive 3D Cash Voucher Deck for Pending Receipts ──
                   if (pendingReceipts.isNotEmpty &&
                       _selectedFilter != ReceiptFilter.confirmed) ...[
-                    PendingReceiptsVoucherSwiperDeck(
+                    VaultExperienceWidget(
                       pendingReceipts: pendingReceipts,
                       confirmingReceiptId: state.confirmingReceiptId,
                       onConfirmReceipt: (receipt) {
                         context.read<MerchantReceiptsCubit>().confirmReceipt(
-                              receiptId: receipt.id,
-                              adminId: receipt.sentByAdminId ?? '',
-                            );
+                          receiptId: receipt.id,
+                          adminId: receipt.sentByAdminId ?? '',
+                        );
                       },
                     ),
                     const Gap(16),
@@ -199,10 +210,11 @@ class _MerchantPaymentReceiptsViewState
                         padding: const EdgeInsets.only(bottom: 14),
                         child: PaymentReceiptCardItem(
                           receipt: receipt,
-                          isConfirming:
-                              state.confirmingReceiptId == receipt.id,
+                          isConfirming: state.confirmingReceiptId == receipt.id,
                           onConfirm: () {
-                            context.read<MerchantReceiptsCubit>().confirmReceipt(
+                            context
+                                .read<MerchantReceiptsCubit>()
+                                .confirmReceipt(
                                   receiptId: receipt.id,
                                   adminId: receipt.sentByAdminId ?? '',
                                 );
