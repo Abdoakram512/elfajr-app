@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math' as math;
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
@@ -29,20 +30,20 @@ class CashVoucherCard extends StatefulWidget {
 
 class _CashVoucherCardState extends State<CashVoucherCard>
     with SingleTickerProviderStateMixin {
-  late AnimationController _shimmer;
+  late AnimationController _vaultAnimController;
 
   @override
   void initState() {
     super.initState();
-    _shimmer = AnimationController(
+    _vaultAnimController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 3500),
+      duration: const Duration(milliseconds: 4000),
     )..repeat();
   }
 
   @override
   void dispose() {
-    _shimmer.dispose();
+    _vaultAnimController.dispose();
     super.dispose();
   }
 
@@ -53,15 +54,15 @@ class _CashVoucherCardState extends State<CashVoucherCard>
         final commaIdx = imageUrl.indexOf(',');
         final base64Str = commaIdx != -1 ? imageUrl.substring(commaIdx + 1) : imageUrl;
         final Uint8List bytes = base64Decode(base64Str);
-        imageWidget = Image.memory(bytes, width: 54, height: 54, fit: BoxFit.cover);
+        imageWidget = Image.memory(bytes, width: 52, height: 52, fit: BoxFit.cover);
       } catch (_) {
         imageWidget = _placeholder();
       }
     } else {
       imageWidget = Image.network(
         imageUrl,
-        width: 54,
-        height: 54,
+        width: 52,
+        height: 52,
         fit: BoxFit.cover,
         errorBuilder: (ctx, err, stack) => _placeholder(),
       );
@@ -71,38 +72,29 @@ class _CashVoucherCardState extends State<CashVoucherCard>
       onTap: () => ReceiptImageViewerDialog.show(context, widget.receipt),
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: p.accent.withValues(alpha: 0.6),
+            color: p.accent.withValues(alpha: 0.8),
             width: 1.5,
           ),
           boxShadow: [
             BoxShadow(
-              color: p.accent.withValues(alpha: 0.25),
-              blurRadius: 10,
+              color: Colors.black.withValues(alpha: 0.5),
+              blurRadius: 6,
               offset: const Offset(0, 2),
             ),
           ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(10),
           child: Stack(
             alignment: Alignment.center,
             children: [
               imageWidget,
               Container(
-                width: 54,
-                height: 54,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.transparent,
-                      Colors.black.withValues(alpha: 0.4),
-                    ],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  ),
-                ),
+                width: 52,
+                height: 52,
+                color: Colors.black.withValues(alpha: 0.35),
                 child: const Icon(
                   Icons.zoom_in_rounded,
                   color: Colors.white,
@@ -117,9 +109,9 @@ class _CashVoucherCardState extends State<CashVoucherCard>
   }
 
   Widget _placeholder() => Container(
-        width: 54,
-        height: 54,
-        color: Colors.white.withValues(alpha: 0.1),
+        width: 52,
+        height: 52,
+        color: Colors.black.withValues(alpha: 0.3),
         child: const Icon(Icons.receipt_rounded, color: Colors.white70, size: 24),
       );
 
@@ -129,377 +121,375 @@ class _CashVoucherCardState extends State<CashVoucherCard>
     final p = widget.palette;
     final currencyFormatter = intl.NumberFormat('#,##0', 'ar');
 
-    return Container(
-      height: 350,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(26),
-        boxShadow: [
-          BoxShadow(
-            color: p.shadowColor.withValues(alpha: widget.isTopCard ? 0.50 : 0.22),
-            blurRadius: widget.isTopCard ? 20 : 9,
-            offset: Offset(0, widget.isTopCard ? 8 : 4),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(26),
-        child: Container(
+    return AnimatedBuilder(
+      animation: _vaultAnimController,
+      builder: (context, child) {
+        final shimmerValue = _vaultAnimController.value;
+        final wheelRotationAngle = widget.isConfirming
+            ? _vaultAnimController.value * 2 * math.pi
+            : math.sin(_vaultAnimController.value * 2 * math.pi) * 0.15;
+
+        return Container(
+          height: 350,
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [p.gradientStart, p.gradientEnd],
-              begin: Alignment.topRight,
-              end: Alignment.bottomLeft,
-            ),
-            border: Border.all(
-              color: p.accent.withValues(alpha: 0.45),
-              width: 1.6,
-            ),
-            borderRadius: BorderRadius.circular(26),
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: p.shadowColor.withValues(alpha: widget.isTopCard ? 0.60 : 0.25),
+                blurRadius: widget.isTopCard ? 22 : 10,
+                offset: Offset(0, widget.isTopCard ? 10 : 5),
+              ),
+            ],
           ),
-          child: Stack(
-            children: [
-              // 1. Bank Security Guilloche Wave Texture
-              Positioned.fill(
-                child: CustomPaint(
-                  painter: _GuillocheSecurityPatternPainter(
-                    strokeColor: p.lightAccent.withValues(alpha: 0.04),
-                  ),
-                ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: CustomPaint(
+              painter: _PhotorealisticVaultChassisPainter(
+                palette: p,
+                isTopCard: widget.isTopCard,
               ),
-
-              // 2. Large Watermark Bank Emblem
-              Positioned(
-                left: -20,
-                bottom: -20,
-                child: Icon(
-                  Icons.account_balance_rounded,
-                  size: 180,
-                  color: Colors.white.withValues(alpha: 0.035),
-                ),
-              ),
-
-              // 3. Diagonal Frosted Glass Upper Layer
-              Positioned.fill(
-                child: ClipPath(
-                  clipper: _DiagonalGlassClipper(),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.white.withValues(alpha: 0.13),
-                          Colors.white.withValues(alpha: 0.04),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
+              child: Stack(
+                children: [
+                  // 1. Heavy Inset Vault Door Body with Steel Bolts
+                  Positioned.fill(
+                    child: CustomPaint(
+                      painter: _VaultDoorPanelPainter(
+                        palette: p,
                       ),
-                      border: Border(
-                        bottom: BorderSide(
-                          color: Colors.white.withValues(alpha: 0.20),
-                          width: 1.0,
+                    ),
+                  ),
+
+                  // 2. Holographic Specular Light Sweep on Steel Frame
+                  Positioned.fill(
+                    child: FractionallySizedBox(
+                      widthFactor: 0.35,
+                      alignment: Alignment(shimmerValue * 4 - 2, 0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.transparent,
+                              Colors.white.withValues(alpha: 0.0),
+                              p.lightAccent.withValues(alpha: 0.08),
+                              Colors.white.withValues(alpha: 0.14),
+                              Colors.transparent,
+                            ],
+                            transform: const GradientRotation(0.42),
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ),
 
-              // 4. Holographic Shimmer Beam across the glass
-              AnimatedBuilder(
-                animation: _shimmer,
-                builder: (context, child) => Positioned.fill(
-                  child: FractionallySizedBox(
-                    widthFactor: 0.35,
-                    alignment: Alignment(_shimmer.value * 4 - 2, 0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.transparent,
-                            Colors.white.withValues(alpha: 0.0),
-                            p.lightAccent.withValues(alpha: 0.12),
-                            Colors.white.withValues(alpha: 0.18),
-                            Colors.transparent,
-                          ],
-                          transform: const GradientRotation(0.42),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-
-              // 5. Card Content Grid
-              Padding(
-                padding: const EdgeInsets.fromLTRB(18, 16, 18, 14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Header Bar: Charity Logo Pill + Glowing Status Badge
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  // 3. Vault UI Elements & Digital Display
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
+                        // Top Header Bar: Vault Brand + 3D Rotating Steering Wheel + Method Pill
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
+                            Row(
+                              children: [
+                                // 3D Rotary Vault Wheel
+                                SizedBox(
+                                  width: 36,
+                                  height: 36,
+                                  child: CustomPaint(
+                                    painter: _VaultSteeringWheelPainter(
+                                      angle: wheelRotationAngle,
+                                      accentColor: p.accent,
+                                      lightAccent: p.lightAccent,
+                                    ),
+                                  ),
+                                ),
+                                const Gap(10),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'مؤسسة الفجر الخيرية',
+                                      style: TextStyle(
+                                        color: p.lightAccent,
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: -0.2,
+                                      ),
+                                    ),
+                                    Row(
+                                      children: [
+                                        Container(
+                                          width: 6,
+                                          height: 6,
+                                          decoration: BoxDecoration(
+                                            color: p.accent,
+                                            shape: BoxShape.circle,
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: p.accent,
+                                                blurRadius: 4,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const Gap(4),
+                                        Text(
+                                          'خزنة الإيداع المصرفية المصفحة',
+                                          style: TextStyle(
+                                            color: Colors.white.withValues(alpha: 0.65),
+                                            fontSize: 9.5,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                             Container(
-                              padding: const EdgeInsets.all(6),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4.5,
+                              ),
                               decoration: BoxDecoration(
-                                color: Colors.black.withValues(alpha: 0.25),
-                                shape: BoxShape.circle,
+                                color: Colors.black.withValues(alpha: 0.4),
+                                borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
                                   color: p.accent.withValues(alpha: 0.5),
-                                  width: 1.2,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: p.accent.withValues(alpha: 0.2),
+                                    blurRadius: 6,
+                                  ),
+                                ],
+                              ),
+                              child: Text(
+                                _formatMethod(r.paymentMethod),
+                                style: TextStyle(
+                                  color: p.lightAccent,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w800,
                                 ),
                               ),
-                              child: Icon(
-                                Icons.verified_rounded,
-                                size: 14,
-                                color: p.lightAccent,
-                              ),
-                            ),
-                            const Gap(8),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'مؤسسة الفجر الخيرية',
-                                  style: TextStyle(
-                                    color: p.lightAccent,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w900,
-                                    letterSpacing: -0.2,
-                                  ),
-                                ),
-                                Text(
-                                  'سند تحويل مالي معتمد',
-                                  style: TextStyle(
-                                    color: Colors.white.withValues(alpha: 0.65),
-                                    fontSize: 9.5,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
                             ),
                           ],
                         ),
+                        const Gap(10),
+
+                        // OLED Vault Digital Screen for Amount
                         Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 4.5,
-                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                           decoration: BoxDecoration(
-                            color: p.badgeBg,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: p.badgeBorder),
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF030712), Color(0xFF0F172A)],
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                            ),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: p.accent.withValues(alpha: 0.55),
+                              width: 1.2,
+                            ),
                             boxShadow: [
                               BoxShadow(
-                                color: p.accent.withValues(alpha: 0.2),
+                                color: Colors.black.withValues(alpha: 0.6),
                                 blurRadius: 8,
+                                offset: const Offset(0, 3),
+                              ),
+                              BoxShadow(
+                                color: p.accent.withValues(alpha: 0.15),
+                                blurRadius: 10,
                               ),
                             ],
                           ),
-                          child: Text(
-                            _formatMethod(r.paymentMethod),
-                            style: TextStyle(
-                              color: p.lightAccent,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const Gap(10),
-
-                    // Amount Hero Section
-                    Center(
-                      child: Column(
-                        children: [
-                          Text(
-                            'المبلغ المستحق للصرف',
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.72),
-                              fontSize: 11.5,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const Gap(1),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.baseline,
-                            textBaseline: TextBaseline.alphabetic,
+                          child: Column(
                             children: [
                               Text(
-                                currencyFormatter.format(r.amount),
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 33,
-                                  fontWeight: FontWeight.w900,
-                                  letterSpacing: -0.5,
+                                'المبلغ المستحق للإيداع في الخزنة',
+                                style: TextStyle(
+                                  color: p.lightAccent.withValues(alpha: 0.8),
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
-                              const Gap(6),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 7,
-                                  vertical: 2,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: p.badgeBg,
-                                  borderRadius: BorderRadius.circular(6),
-                                  border: Border.all(
-                                    color: p.accent.withValues(alpha: 0.4),
-                                  ),
-                                ),
-                                child: Text(
-                                  'ج.م',
-                                  style: TextStyle(
-                                    color: p.lightAccent,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w900,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Gap(10),
-
-                    // Frosted Glass Info Sleeve
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 9,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.28),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.12),
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.15),
-                            blurRadius: 6,
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        children: [
-                          if (r.receiptImageUrl != null &&
-                              r.receiptImageUrl!.isNotEmpty) ...[
-                            _buildThumbnail(r.receiptImageUrl!, p),
-                            const Gap(12),
-                          ],
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.tag_rounded,
-                                      size: 13,
-                                      color: p.lightAccent,
-                                    ),
-                                    const Gap(4),
-                                    Expanded(
-                                      child: Text(
-                                        'رقم المرجع: ${r.referenceNumber}',
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w800,
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const Gap(3),
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.account_balance_wallet_rounded,
-                                      size: 13,
-                                      color: p.lightAccent,
-                                    ),
-                                    const Gap(4),
-                                    Text(
-                                      'الوسيلة: ${_formatMethod(r.paymentMethod)}',
-                                      style: TextStyle(
-                                        color: Colors.white.withValues(alpha: 0.85),
-                                        fontSize: 11.5,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const Gap(3),
-                                Text(
-                                  'تاريخ الإرسال: ${AppFormatters.formatDateTime(r.timestamp, context: context)}',
-                                  style: TextStyle(
-                                    color: Colors.white.withValues(alpha: 0.55),
-                                    fontSize: 10.5,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const Spacer(),
-
-                    // High-Contrast Primary Confirmation Action Button
-                    SizedBox(
-                      height: 46,
-                      child: ElevatedButton(
-                        onPressed: widget.isConfirming ? null : widget.onConfirm,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: p.btnBg,
-                          foregroundColor: Colors.white,
-                          elevation: 4,
-                          shadowColor: p.btnBg.withValues(alpha: 0.55),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                        ),
-                        child: widget.isConfirming
-                            ? const SizedBox(
-                                width: 22,
-                                height: 22,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2.5,
-                                  color: Colors.white,
-                                ),
-                              )
-                            : const Row(
+                              const Gap(2),
+                              Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.baseline,
+                                textBaseline: TextBaseline.alphabetic,
                                 children: [
-                                  Icon(Icons.check_circle_rounded, size: 20),
-                                  Gap(8),
                                   Text(
-                                    'تأكيد استلام الحوالة الآن',
-                                    style: TextStyle(
-                                      fontSize: 14,
+                                    currencyFormatter.format(r.amount),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 32,
                                       fontWeight: FontWeight.w900,
+                                      letterSpacing: -0.5,
+                                    ),
+                                  ),
+                                  const Gap(6),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 7,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: p.accent.withValues(alpha: 0.2),
+                                      borderRadius: BorderRadius.circular(6),
+                                      border: Border.all(
+                                        color: p.accent.withValues(alpha: 0.6),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'ج.م',
+                                      style: TextStyle(
+                                        color: p.lightAccent,
+                                        fontSize: 12.5,
+                                        fontWeight: FontWeight.w900,
+                                      ),
                                     ),
                                   ),
                                 ],
                               ),
-                      ),
+                            ],
+                          ),
+                        ),
+                        const Gap(10),
+
+                        // Vault Receipt Inspection Slot
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.35),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.12),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              if (r.receiptImageUrl != null &&
+                                  r.receiptImageUrl!.isNotEmpty) ...[
+                                _buildThumbnail(r.receiptImageUrl!, p),
+                                const Gap(12),
+                              ],
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.tag_rounded,
+                                          size: 13,
+                                          color: p.lightAccent,
+                                        ),
+                                        const Gap(4),
+                                        Expanded(
+                                          child: Text(
+                                            'رقم المرجع: ${r.referenceNumber}',
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w800,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const Gap(3),
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.account_balance_wallet_rounded,
+                                          size: 13,
+                                          color: p.lightAccent,
+                                        ),
+                                        const Gap(4),
+                                        Text(
+                                          'الوسيلة: ${_formatMethod(r.paymentMethod)}',
+                                          style: TextStyle(
+                                            color: Colors.white.withValues(alpha: 0.85),
+                                            fontSize: 11.5,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const Gap(3),
+                                    Text(
+                                      'تاريخ الإرسال: ${AppFormatters.formatDateTime(r.timestamp, context: context)}',
+                                      style: TextStyle(
+                                        color: Colors.white.withValues(alpha: 0.55),
+                                        fontSize: 10.5,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const Spacer(),
+
+                        // Electronic Vault Unlock Action Button
+                        SizedBox(
+                          height: 46,
+                          child: ElevatedButton(
+                            onPressed: widget.isConfirming ? null : widget.onConfirm,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: p.btnBg,
+                              foregroundColor: Colors.white,
+                              elevation: 5,
+                              shadowColor: p.btnBg.withValues(alpha: 0.65),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                            ),
+                            child: widget.isConfirming
+                                ? const SizedBox(
+                                    width: 22,
+                                    height: 22,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.5,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : const Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.lock_open_rounded, size: 20),
+                                      Gap(8),
+                                      Text(
+                                        'تأكيد استلام وإيداع في الخزنة',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w900,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -520,63 +510,278 @@ class _CashVoucherCardState extends State<CashVoucherCard>
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 📐 _DiagonalGlassClipper: Creates Angled Frosted Glass Overlay
+// 🛡️ _PhotorealisticVaultChassisPainter: Outer Steel Frame with Corner Bolts
 // ─────────────────────────────────────────────────────────────────────────────
 
-class _DiagonalGlassClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-    path.lineTo(0, size.height * 0.62);
-    path.lineTo(size.width, size.height * 0.48);
-    path.lineTo(size.width, 0);
-    path.close();
-    return path;
-  }
+class _PhotorealisticVaultChassisPainter extends CustomPainter {
+  final CashVoucherPalette palette;
+  final bool isTopCard;
 
-  @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// 📜 _GuillocheSecurityPatternPainter: Bank Security Waves
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _GuillocheSecurityPatternPainter extends CustomPainter {
-  final Color strokeColor;
-
-  const _GuillocheSecurityPatternPainter({required this.strokeColor});
+  const _PhotorealisticVaultChassisPainter({
+    required this.palette,
+    required this.isTopCard,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = strokeColor
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.0;
+    final rect = Offset.zero & size;
+    final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(24));
 
-    final path = Path();
-    for (double y = 20; y < size.height; y += 28) {
-      path.moveTo(0, y);
-      path.cubicTo(
-        size.width * 0.25,
-        y - 12,
-        size.width * 0.75,
-        y + 12,
-        size.width,
-        y,
-      );
-    }
-    canvas.drawPath(path, paint);
+    // 1. Chassis Outer Base Gradient (Heavy Brushed Steel & Titanium)
+    final chassisPaint = Paint()
+      ..shader = LinearGradient(
+        colors: [
+          palette.gradientStart,
+          palette.gradientEnd,
+          const Color(0xFF030712),
+        ],
+        stops: const [0.0, 0.65, 1.0],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ).createShader(rect);
+
+    canvas.drawRRect(rrect, chassisPaint);
+
+    // 2. Metallic Beveled Rim Border
+    final borderPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.2
+      ..shader = LinearGradient(
+        colors: [
+          palette.lightAccent.withValues(alpha: 0.8),
+          palette.accent.withValues(alpha: 0.4),
+          Colors.black.withValues(alpha: 0.7),
+          palette.accent.withValues(alpha: 0.6),
+        ],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ).createShader(rect);
+
+    canvas.drawRRect(rrect, borderPaint);
+
+    // 3. Four 3D Metallic Corner Rivets / Bolts
+    _drawRivet(canvas, const Offset(14, 14), palette);
+    _drawRivet(canvas, Offset(size.width - 14, 14), palette);
+    _drawRivet(canvas, Offset(14, size.height - 14), palette);
+    _drawRivet(canvas, Offset(size.width - 14, size.height - 14), palette);
+  }
+
+  void _drawRivet(Canvas canvas, Offset center, CashVoucherPalette p) {
+    const radius = 4.2;
+
+    // Drop Shadow
+    canvas.drawCircle(
+      center.translate(0, 1),
+      radius,
+      Paint()..color = Colors.black.withValues(alpha: 0.6),
+    );
+
+    // Metallic Rim
+    canvas.drawCircle(
+      center,
+      radius,
+      Paint()
+        ..shader = RadialGradient(
+          colors: [
+            p.lightAccent,
+            p.accent,
+            const Color(0xFF1E293B),
+          ],
+        ).createShader(Rect.fromCircle(center: center, radius: radius)),
+    );
+
+    // Center Recess
+    canvas.drawCircle(
+      center,
+      radius * 0.45,
+      Paint()..color = Colors.black.withValues(alpha: 0.8),
+    );
   }
 
   @override
-  bool shouldRepaint(covariant _GuillocheSecurityPatternPainter oldDelegate) {
-    return oldDelegate.strokeColor != strokeColor;
+  bool shouldRepaint(covariant _PhotorealisticVaultChassisPainter oldDelegate) {
+    return oldDelegate.palette != palette || oldDelegate.isTopCard != isTopCard;
   }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 🎨 Luxury Color Palettes for Layered Glass Vault
+// 🚪 _VaultDoorPanelPainter: Inset Heavy Vault Door with Steel Locking Pins
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _VaultDoorPanelPainter extends CustomPainter {
+  final CashVoucherPalette palette;
+
+  const _VaultDoorPanelPainter({required this.palette});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    const margin = 8.0;
+    final doorRect = Rect.fromLTWH(
+      margin,
+      margin,
+      size.width - margin * 2,
+      size.height - margin * 2,
+    );
+    final doorRRect = RRect.fromRectAndRadius(doorRect, const Radius.circular(18));
+
+    // 1. Inset Door Shadow (Deep 3D Cutout)
+    final shadowPaint = Paint()
+      ..color = Colors.black.withValues(alpha: 0.7)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.0;
+    canvas.drawRRect(doorRRect, shadowPaint);
+
+    // 2. Steel Locking Pins on the side borders
+    final pinPaint = Paint()
+      ..shader = LinearGradient(
+        colors: [
+          palette.lightAccent,
+          palette.accent,
+          const Color(0xFF0F172A),
+        ],
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+      ).createShader(doorRect);
+
+    // Left locking pins
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(margin - 4, size.height * 0.35, 4, 18),
+        const Radius.circular(2),
+      ),
+      pinPaint,
+    );
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(margin - 4, size.height * 0.65, 4, 18),
+        const Radius.circular(2),
+      ),
+      pinPaint,
+    );
+
+    // Right locking pins
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(size.width - margin, size.height * 0.35, 4, 18),
+        const Radius.circular(2),
+      ),
+      pinPaint,
+    );
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(size.width - margin, size.height * 0.65, 4, 18),
+        const Radius.circular(2),
+      ),
+      pinPaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _VaultDoorPanelPainter oldDelegate) {
+    return oldDelegate.palette != palette;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ⚙️ _VaultSteeringWheelPainter: 3D Rotary Vault Steering Wheel
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _VaultSteeringWheelPainter extends CustomPainter {
+  final double angle;
+  final Color accentColor;
+  final Color lightAccent;
+
+  const _VaultSteeringWheelPainter({
+    required this.angle,
+    required this.accentColor,
+    required this.lightAccent,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width / 2;
+
+    canvas.save();
+    canvas.translate(center.dx, center.dy);
+    canvas.rotate(angle);
+    canvas.translate(-center.dx, -center.dy);
+
+    // Drop Shadow
+    canvas.drawCircle(
+      center.translate(0, 2),
+      radius - 2,
+      Paint()
+        ..color = Colors.black.withValues(alpha: 0.6)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
+    );
+
+    // Outer Ring
+    final ringPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3.5
+      ..shader = SweepGradient(
+        colors: [
+          lightAccent,
+          accentColor,
+          const Color(0xFF0F172A),
+          lightAccent,
+        ],
+      ).createShader(Rect.fromCircle(center: center, radius: radius));
+
+    canvas.drawCircle(center, radius - 3, ringPaint);
+
+    // 3 Spokes (Tri-spoke handles)
+    final spokePaint = Paint()
+      ..strokeWidth = 2.4
+      ..shader = LinearGradient(
+        colors: [lightAccent, accentColor],
+      ).createShader(Rect.fromCircle(center: center, radius: radius));
+
+    for (int i = 0; i < 3; i++) {
+      final spokeAngle = (i * 2 * math.pi / 3);
+      final spokeEnd = Offset(
+        center.dx + (radius - 2) * math.cos(spokeAngle),
+        center.dy + (radius - 2) * math.sin(spokeAngle),
+      );
+      canvas.drawLine(center, spokeEnd, spokePaint);
+
+      // Spoke Handle Grips
+      canvas.drawCircle(
+        spokeEnd,
+        2.2,
+        Paint()..color = lightAccent,
+      );
+    }
+
+    // Center Hub with 3D Specular Highlight
+    canvas.drawCircle(
+      center,
+      radius * 0.35,
+      Paint()
+        ..shader = RadialGradient(
+          colors: [
+            Colors.white,
+            lightAccent,
+            accentColor,
+            const Color(0xFF0F172A),
+          ],
+        ).createShader(Rect.fromCircle(center: center, radius: radius * 0.35)),
+    );
+
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant _VaultSteeringWheelPainter oldDelegate) {
+    return oldDelegate.angle != angle ||
+        oldDelegate.accentColor != accentColor ||
+        oldDelegate.lightAccent != lightAccent;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 🎨 Luxury Vault Metallic Palettes
 // ─────────────────────────────────────────────────────────────────────────────
 
 class CashVoucherPalette {
@@ -601,7 +806,7 @@ class CashVoucherPalette {
   });
 
   static const List<CashVoucherPalette> all = [
-    // 1. Imperial Emerald Glass (الزمرد الإمبراطوري)
+    // 1. Imperial Emerald Titanium Vault (خزنة الزمرد الفولاذية)
     CashVoucherPalette(
       gradientStart: Color(0xFF064E3B),
       gradientEnd: Color(0xFF022C22),
@@ -609,10 +814,10 @@ class CashVoucherPalette {
       lightAccent: Color(0xFF6EE7B7),
       badgeBg: Color(0x3310B981),
       badgeBorder: Color(0x6610B981),
-      btnBg: Color(0xFF10B981),
+      btnBg: Color(0xFF059669),
       shadowColor: Color(0x66064E3B),
     ),
-    // 2. Royal Sapphire Glass (الياقوت الأزرق الملكي)
+    // 2. Royal Sapphire Cobalt Vault (خزنة الياقوت المصفحة)
     CashVoucherPalette(
       gradientStart: Color(0xFF1E3A8A),
       gradientEnd: Color(0xFF0F172A),
@@ -623,7 +828,7 @@ class CashVoucherPalette {
       btnBg: Color(0xFF2563EB),
       shadowColor: Color(0x661E3A8A),
     ),
-    // 3. Deep Royal Amber Glass (الكهرمان الذهبي)
+    // 3. Royal Brass & Gold Vault (خزنة الذهب الإمبراطوري)
     CashVoucherPalette(
       gradientStart: Color(0xFF78350F),
       gradientEnd: Color(0xFF451A03),
@@ -634,7 +839,7 @@ class CashVoucherPalette {
       btnBg: Color(0xFFD97706),
       shadowColor: Color(0x6678350F),
     ),
-    // 4. Imperial Amethyst Glass (الأرجواني الوقور)
+    // 4. Imperial Amethyst Night Vault (خزنة التيتانيوم الأرجواني)
     CashVoucherPalette(
       gradientStart: Color(0xFF4C1D95),
       gradientEnd: Color(0xFF2E1065),
@@ -645,7 +850,7 @@ class CashVoucherPalette {
       btnBg: Color(0xFF7C3AED),
       shadowColor: Color(0x664C1D95),
     ),
-    // 5. Midnight Forest Teal Glass (التيل الليلي الملكي)
+    // 5. Cyber Teal Steel Vault (خزنة الفولاذ الليلي)
     CashVoucherPalette(
       gradientStart: Color(0xFF134E4A),
       gradientEnd: Color(0xFF042F2E),
