@@ -5,21 +5,26 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 abstract class FirebaseParserUtils {
   /// Parses dynamic value to [DateTime], handling [Timestamp], [DateTime], [String] or returning [fallback].
   static DateTime parseDate(dynamic val, {DateTime? fallback}) {
-    if (val == null) return fallback ?? DateTime.now();
-    if (val is Timestamp) return val.toDate();
-    if (val is DateTime) return val;
+    if (val == null) return (fallback ?? DateTime.now()).toLocal();
+    if (val is Timestamp) return val.toDate().toLocal();
+    if (val is DateTime) return val.toLocal();
     if (val is String) {
-      return DateTime.tryParse(val.trim()) ?? (fallback ?? DateTime.now());
+      final parsed = DateTime.tryParse(val.trim());
+      if (parsed != null) return parsed.toLocal();
+      return (fallback ?? DateTime.now()).toLocal();
     }
-    return fallback ?? DateTime.now();
+    return (fallback ?? DateTime.now()).toLocal();
   }
 
   /// Parses nullable dynamic value to [DateTime] or null.
   static DateTime? parseNullableDate(dynamic val) {
     if (val == null) return null;
-    if (val is Timestamp) return val.toDate();
-    if (val is DateTime) return val;
-    if (val is String) return DateTime.tryParse(val.trim());
+    if (val is Timestamp) return val.toDate().toLocal();
+    if (val is DateTime) return val.toLocal();
+    if (val is String) {
+      final parsed = DateTime.tryParse(val.trim());
+      return parsed?.toLocal();
+    }
     return null;
   }
 

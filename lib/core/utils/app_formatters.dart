@@ -44,13 +44,14 @@ class AppFormatters {
     BuildContext? context,
     String? localeCode,
   }) {
+    final local = date.toLocal();
     final lang = resolveLocale(context, localeCode);
     if (lang == 'ar') {
-      final formatted = DateFormat('yyyy/MM/dd • hh:mm a', 'ar').format(date);
+      final formatted = DateFormat('yyyy/MM/dd • hh:mm a', 'ar').format(local);
       // \u200F is the Right-to-Left Mark (RLM) preventing text flip
       return '\u200F$formatted';
     } else {
-      return DateFormat('yyyy-MM-dd • hh:mm a', 'en').format(date);
+      return DateFormat('yyyy-MM-dd • hh:mm a', 'en').format(local);
     }
   }
 
@@ -62,11 +63,12 @@ class AppFormatters {
     BuildContext? context,
     String? localeCode,
   }) {
+    final local = date.toLocal();
     final lang = resolveLocale(context, localeCode);
     if (lang == 'ar') {
-      return DateFormat('yyyy/MM/dd', 'ar').format(date);
+      return DateFormat('yyyy/MM/dd', 'ar').format(local);
     } else {
-      return DateFormat('yyyy-MM-dd', 'en').format(date);
+      return DateFormat('yyyy-MM-dd', 'en').format(local);
     }
   }
 
@@ -76,11 +78,12 @@ class AppFormatters {
     BuildContext? context,
     String? localeCode,
   }) {
+    final local = date.toLocal();
     final lang = resolveLocale(context, localeCode);
     if (lang == 'ar') {
-      return '\u200F${DateFormat('hh:mm a', 'ar').format(date)}';
+      return '\u200F${DateFormat('hh:mm a', 'ar').format(local)}';
     } else {
-      return DateFormat('hh:mm a', 'en').format(date);
+      return DateFormat('hh:mm a', 'en').format(local);
     }
   }
 
@@ -90,8 +93,9 @@ class AppFormatters {
     BuildContext? context,
     String? localeCode,
   }) {
+    final local = date.toLocal();
     final lang = resolveLocale(context, localeCode);
-    return DateFormat('MMMM yyyy', lang).format(date);
+    return DateFormat('MMMM yyyy', lang).format(local);
   }
 
   /// Formats date in written format (e.g. `24 أغسطس 2026` or `24 August 2026`).
@@ -100,11 +104,12 @@ class AppFormatters {
     BuildContext? context,
     String? localeCode,
   }) {
+    final local = date.toLocal();
     final lang = resolveLocale(context, localeCode);
     if (lang == 'ar') {
-      return DateFormat('dd MMMM yyyy', 'ar').format(date);
+      return DateFormat('dd MMMM yyyy', 'ar').format(local);
     } else {
-      return DateFormat('dd MMMM yyyy', 'en').format(date);
+      return DateFormat('dd MMMM yyyy', 'en').format(local);
     }
   }
 
