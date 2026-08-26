@@ -264,12 +264,12 @@ class CardPrinterService {
                                       color: PdfColors.green800,
                                     ),
                                   ),
-                                  pw.SizedBox(height: 1),
+                                  pw.SizedBox(height: 2),
                                   pw.Text(
-                                    'قيد ٢٠٢٦ / فجر',
+                                    '٢٠٢٦',
                                     style: pw.TextStyle(
                                       font: font,
-                                      fontSize: 5.5,
+                                      fontSize: 6.5,
                                       color: PdfColors.green900,
                                     ),
                                   ),
