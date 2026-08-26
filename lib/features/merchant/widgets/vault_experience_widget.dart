@@ -575,11 +575,14 @@ class _VaultExperienceWidgetState extends State<VaultExperienceWidget>
         ),
         child: const Row(
           mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Icon(Icons.touch_app_rounded, size: 16, color: Color(0xFFFDE68A)),
             Gap(6),
             Text(
               'اضغط لفتح الخزنة',
+              textAlign: TextAlign.center,
               style: TextStyle(
                 color: Color(0xFFFDE68A),
                 fontSize: 12,

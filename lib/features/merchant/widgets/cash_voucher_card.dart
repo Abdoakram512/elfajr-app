@@ -49,7 +49,7 @@ class CashVoucherCard extends StatelessWidget {
         child: CustomPaint(
           painter: _VoucherBackgroundPainter(palette: p),
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(18, 14, 14, 14),
+            padding: const EdgeInsets.all(14),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -74,7 +74,9 @@ class CashVoucherCard extends StatelessWidget {
                         const Gap(6),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 2),
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: p.accentColor.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(6),
@@ -96,7 +98,9 @@ class CashVoucherCard extends StatelessWidget {
                     // Payment method pill
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 5),
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
                       decoration: BoxDecoration(
                         color: p.pillBg,
                         borderRadius: BorderRadius.circular(10),
@@ -134,8 +138,8 @@ class CashVoucherCard extends StatelessWidget {
                         _VoucherThumbnail(
                           imageUrl: r.receiptImageUrl!,
                           accentColor: p.accentColor,
-                          onTap: () => ReceiptImageViewerDialog.show(
-                              context, receipt),
+                          onTap: () =>
+                              ReceiptImageViewerDialog.show(context, receipt),
                         ),
                         const Gap(12),
                       ],
@@ -147,8 +151,11 @@ class CashVoucherCard extends StatelessWidget {
                           children: [
                             Row(
                               children: [
-                                Icon(Icons.tag_rounded,
-                                    size: 13, color: p.accentColor),
+                                Icon(
+                                  Icons.tag_rounded,
+                                  size: 13,
+                                  color: p.accentColor,
+                                ),
                                 const Gap(4),
                                 Expanded(
                                   child: Text(
@@ -167,9 +174,11 @@ class CashVoucherCard extends StatelessWidget {
                             const Gap(5),
                             Row(
                               children: [
-                                Icon(Icons.account_balance_wallet_rounded,
-                                    size: 12,
-                                    color: p.textSecondary),
+                                Icon(
+                                  Icons.account_balance_wallet_rounded,
+                                  size: 12,
+                                  color: p.textSecondary,
+                                ),
                                 const Gap(4),
                                 Text(
                                   methodLabel,
@@ -183,8 +192,10 @@ class CashVoucherCard extends StatelessWidget {
                             ),
                             const Gap(4),
                             Text(
-                              AppFormatters.formatDateTime(r.timestamp,
-                                  context: context),
+                              AppFormatters.formatDateTime(
+                                r.timestamp,
+                                context: context,
+                              ),
                               style: TextStyle(
                                 fontSize: 10.5,
                                 color: p.textMuted,
@@ -206,32 +217,41 @@ class CashVoucherCard extends StatelessWidget {
                       backgroundColor: p.btnColor,
                       foregroundColor: Colors.white,
                       elevation: 0,
+                      padding: EdgeInsets.zero,
+                      alignment: Alignment.center,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
                     child: isConfirming
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2.5,
-                              color: Colors.white,
+                        ? const Center(
+                            child: SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.5,
+                                color: Colors.white,
+                              ),
                             ),
                           )
-                        : const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.check_circle_rounded, size: 17),
-                              Gap(6),
-                              Text(
-                                'تأكيد استلام المبلغ',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w900,
+                        : const Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Icon(Icons.check_circle_rounded, size: 17),
+                                Gap(6),
+                                Text(
+                                  'تأكيد استلام المبلغ',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w900,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                   ),
                 ),
@@ -281,7 +301,11 @@ class _VoucherShapeClipper extends CustomClipper<Path> {
     // Right edge → bottom-right corner (rounded)
     path.lineTo(size.width, size.height - r);
     path.quadraticBezierTo(
-        size.width, size.height, size.width - r, size.height);
+      size.width,
+      size.height,
+      size.width - r,
+      size.height,
+    );
 
     // Bottom edge → bottom-left with diagonal cut
     path.lineTo(cut, size.height);
@@ -321,11 +345,7 @@ class _VoucherBackgroundPainter extends CustomPainter {
       rect,
       Paint()
         ..shader = LinearGradient(
-          colors: [
-            palette.gradStart,
-            palette.gradMid,
-            palette.gradEnd,
-          ],
+          colors: [palette.gradStart, palette.gradMid, palette.gradEnd],
           stops: const [0.0, 0.55, 1.0],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -378,7 +398,11 @@ class _VoucherBackgroundPainter extends CustomPainter {
       ..quadraticBezierTo(size.width - 1, 1, size.width - 1, cr)
       ..lineTo(size.width - 1, size.height - cr)
       ..quadraticBezierTo(
-          size.width - 1, size.height - 1, size.width - cr, size.height - 1)
+        size.width - 1,
+        size.height - 1,
+        size.width - cr,
+        size.height - 1,
+      )
       ..lineTo(cut + 1, size.height - 1)
       ..lineTo(1, size.height - cut - 1)
       ..lineTo(1, cut + 1)
@@ -409,9 +433,15 @@ class _VoucherBackgroundPainter extends CustomPainter {
 
     // Top-left cut accent
     canvas.drawLine(
-        const Offset(cut - 6, 6), const Offset(cut + 2, 6), accentPaint);
+      const Offset(cut - 6, 6),
+      const Offset(cut + 2, 6),
+      accentPaint,
+    );
     canvas.drawLine(
-        const Offset(6, cut - 6), const Offset(6, cut + 2), accentPaint);
+      const Offset(6, cut - 6),
+      const Offset(6, cut + 2),
+      accentPaint,
+    );
 
     // Bottom-left cut accent
     canvas.drawLine(
@@ -451,14 +481,8 @@ class _SecurityLinePainter extends CustomPainter {
     final path = Path();
     path.moveTo(0, size.height / 2);
     for (double x = 0; x < size.width; x += 8) {
-      path.quadraticBezierTo(
-        x + 2, 0,
-        x + 4, size.height / 2,
-      );
-      path.quadraticBezierTo(
-        x + 6, size.height,
-        x + 8, size.height / 2,
-      );
+      path.quadraticBezierTo(x + 2, 0, x + 4, size.height / 2);
+      path.quadraticBezierTo(x + 6, size.height, x + 8, size.height / 2);
     }
     canvas.drawPath(path, paint);
   }
@@ -489,11 +513,16 @@ class _VoucherThumbnail extends StatelessWidget {
     if (imageUrl.startsWith('data:image')) {
       try {
         final commaIdx = imageUrl.indexOf(',');
-        final base64Str =
-            commaIdx != -1 ? imageUrl.substring(commaIdx + 1) : imageUrl;
+        final base64Str = commaIdx != -1
+            ? imageUrl.substring(commaIdx + 1)
+            : imageUrl;
         final Uint8List bytes = base64Decode(base64Str);
-        imageWidget =
-            Image.memory(bytes, width: 52, height: 52, fit: BoxFit.cover);
+        imageWidget = Image.memory(
+          bytes,
+          width: 52,
+          height: 52,
+          fit: BoxFit.cover,
+        );
       } catch (_) {
         imageWidget = _fallback();
       }
@@ -534,8 +563,11 @@ class _VoucherThumbnail extends StatelessWidget {
                 width: 52,
                 height: 52,
                 color: Colors.black.withValues(alpha: 0.3),
-                child: const Icon(Icons.zoom_in_rounded,
-                    color: Colors.white, size: 18),
+                child: const Icon(
+                  Icons.zoom_in_rounded,
+                  color: Colors.white,
+                  size: 18,
+                ),
               ),
             ],
           ),
@@ -545,11 +577,11 @@ class _VoucherThumbnail extends StatelessWidget {
   }
 
   Widget _fallback() => Container(
-        width: 52,
-        height: 52,
-        color: Colors.black.withValues(alpha: 0.3),
-        child: const Icon(Icons.receipt_rounded, color: Colors.white70, size: 22),
-      );
+    width: 52,
+    height: 52,
+    color: Colors.black.withValues(alpha: 0.3),
+    child: const Icon(Icons.receipt_rounded, color: Colors.white70, size: 22),
+  );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
