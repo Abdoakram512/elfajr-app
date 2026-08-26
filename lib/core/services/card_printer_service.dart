@@ -213,9 +213,9 @@ class CardPrinterService {
                         ),
                       ),
                       pw.SizedBox(width: 10),
-                      // ── Official Round Stamp (Royal Blue Ink) ──
+                      // ── Official Round Stamp (Al-Fajr Signature Emerald) ──
                       pw.Transform.rotateBox(
-                        angle: -0.07,
+                        angle: -0.06,
                         child: pw.Container(
                           width: 82,
                           height: 82,
@@ -223,7 +223,7 @@ class CardPrinterService {
                           decoration: pw.BoxDecoration(
                             shape: pw.BoxShape.circle,
                             border: pw.Border.all(
-                              color: PdfColors.indigo900,
+                              color: PdfColors.green900,
                               width: 1.8,
                             ),
                           ),
@@ -231,7 +231,7 @@ class CardPrinterService {
                             decoration: pw.BoxDecoration(
                               shape: pw.BoxShape.circle,
                               border: pw.Border.all(
-                                color: PdfColors.indigo900,
+                                color: PdfColors.green900,
                                 width: 0.8,
                               ),
                             ),
@@ -244,24 +244,24 @@ class CardPrinterService {
                                     style: pw.TextStyle(
                                       font: font,
                                       fontSize: 6.2,
-                                      color: PdfColors.indigo900,
+                                      color: PdfColors.green900,
                                     ),
                                   ),
                                   pw.SizedBox(height: 2),
                                   pw.Text(
-                                    'معتمد رسمياً',
+                                    'مُـعـتَـمَـد',
                                     style: pw.TextStyle(
                                       font: font,
-                                      fontSize: 8,
-                                      color: PdfColors.indigo900,
+                                      fontSize: 9,
+                                      color: PdfColors.green900,
                                     ),
                                   ),
                                   pw.Text(
-                                    'المساعدات الاجتماعية',
+                                    'رَسْـمِـيّـاً',
                                     style: pw.TextStyle(
-                                      font: fontRegular,
-                                      fontSize: 5.8,
-                                      color: PdfColors.indigo800,
+                                      font: font,
+                                      fontSize: 6.2,
+                                      color: PdfColors.green800,
                                     ),
                                   ),
                                   pw.SizedBox(height: 1),
@@ -269,8 +269,8 @@ class CardPrinterService {
                                     'قيد ٢٠٢٦ / فجر',
                                     style: pw.TextStyle(
                                       font: font,
-                                      fontSize: 5.8,
-                                      color: PdfColors.indigo900,
+                                      fontSize: 5.5,
+                                      color: PdfColors.green900,
                                     ),
                                   ),
                                 ],
