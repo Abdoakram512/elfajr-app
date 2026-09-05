@@ -59,6 +59,8 @@ class AidCardModel extends Equatable {
   final String securityHash;
   final String? lastMonthlyCycle;
   final DateTime? lastRechargedAt;
+  final String? lastRedeemedMonthCycle;
+  final DateTime? lastCashRedemptionDate;
 
   const AidCardModel({
     required this.cardId,
@@ -79,10 +81,27 @@ class AidCardModel extends Equatable {
     required this.securityHash,
     this.lastMonthlyCycle,
     this.lastRechargedAt,
+    this.lastRedeemedMonthCycle,
+    this.lastCashRedemptionDate,
   });
 
   bool get isActive => status == AidCardStatus.active;
   bool get hasBalance => totalBalance > 0 || foodBasketsQuota > 0;
+
+  bool get hasRedeemedInCurrentMonth {
+    final now = DateTime.now();
+    final currentCycle = '${now.year}-${now.month.toString().padLeft(2, '0')}';
+    if (lastRedeemedMonthCycle == currentCycle) {
+      return true;
+    }
+    if (lastCashRedemptionDate != null) {
+      if (lastCashRedemptionDate!.year == now.year &&
+          lastCashRedemptionDate!.month == now.month) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   AidCardModel copyWith({
     String? cardId,
@@ -103,6 +122,8 @@ class AidCardModel extends Equatable {
     String? securityHash,
     String? lastMonthlyCycle,
     DateTime? lastRechargedAt,
+    String? lastRedeemedMonthCycle,
+    DateTime? lastCashRedemptionDate,
   }) {
     return AidCardModel(
       cardId: cardId ?? this.cardId,
@@ -123,6 +144,10 @@ class AidCardModel extends Equatable {
       securityHash: securityHash ?? this.securityHash,
       lastMonthlyCycle: lastMonthlyCycle ?? this.lastMonthlyCycle,
       lastRechargedAt: lastRechargedAt ?? this.lastRechargedAt,
+      lastRedeemedMonthCycle:
+          lastRedeemedMonthCycle ?? this.lastRedeemedMonthCycle,
+      lastCashRedemptionDate:
+          lastCashRedemptionDate ?? this.lastCashRedemptionDate,
     );
   }
 
@@ -147,6 +172,8 @@ class AidCardModel extends Equatable {
       'securityHash': securityHash,
       'lastMonthlyCycle': lastMonthlyCycle,
       'lastRechargedAt': lastRechargedAt?.toIso8601String(),
+      'lastRedeemedMonthCycle': lastRedeemedMonthCycle,
+      'lastCashRedemptionDate': lastCashRedemptionDate?.toIso8601String(),
     };
   }
 
@@ -173,6 +200,9 @@ class AidCardModel extends Equatable {
       securityHash: map['securityHash'] as String? ?? '',
       lastMonthlyCycle: map['lastMonthlyCycle'] as String?,
       lastRechargedAt: FirebaseParserUtils.parseNullableDate(map['lastRechargedAt']),
+      lastRedeemedMonthCycle: map['lastRedeemedMonthCycle'] as String?,
+      lastCashRedemptionDate:
+          FirebaseParserUtils.parseNullableDate(map['lastCashRedemptionDate']),
     );
   }
 
@@ -196,5 +226,7 @@ class AidCardModel extends Equatable {
     securityHash,
     lastMonthlyCycle,
     lastRechargedAt,
+    lastRedeemedMonthCycle,
+    lastCashRedemptionDate,
   ];
 }

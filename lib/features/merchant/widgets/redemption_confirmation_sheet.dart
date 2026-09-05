@@ -9,6 +9,7 @@ import '../../beneficiary/models/aid_card_model.dart';
 import '../view_models/redemption_cubit.dart';
 import '../view_models/redemption_state.dart';
 import 'beneficiary_card_summary.dart';
+import 'quota_exhausted_view.dart';
 import 'redemption_receipt_card.dart';
 
 class RedemptionConfirmationSheet extends StatefulWidget {
@@ -45,6 +46,9 @@ class _RedemptionConfirmationSheetState
 
   @override
   Widget build(BuildContext context) {
+    final isExhausted = widget.card.hasRedeemedInCurrentMonth ||
+        widget.card.totalBalance < _fixedRedemptionAmount;
+
     return BlocBuilder<RedemptionCubit, RedemptionState>(
       builder: (context, state) {
         final isSuccess = state is RedemptionSuccess;
@@ -87,16 +91,22 @@ class _RedemptionConfirmationSheetState
                         Icon(
                           isSuccess
                               ? Icons.check_circle_rounded
-                              : Icons.person_rounded,
+                              : (isExhausted
+                                  ? Icons.event_busy_rounded
+                                  : Icons.person_rounded),
                           color: isSuccess
                               ? AppColors.success
-                              : AppColors.primary,
+                              : (isExhausted
+                                  ? const Color(0xFFD97706)
+                                  : AppColors.primary),
                         ),
                         const Gap(8),
                         Text(
                           isSuccess
                               ? 'إيصال الصرف الموثق'
-                              : 'merchant.beneficiary_details'.tr(),
+                              : (isExhausted
+                                  ? 'merchant.quota_exhausted_title'.tr()
+                                  : 'merchant.beneficiary_details'.tr()),
                           style: const TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.bold,
@@ -113,28 +123,42 @@ class _RedemptionConfirmationSheetState
                       decoration: BoxDecoration(
                         color: isSuccess
                             ? AppColors.success.withValues(alpha: 0.15)
-                            : AppColors.primarySubtle,
+                            : (isExhausted
+                                ? const Color(0xFFFEF3C7)
+                                : AppColors.primarySubtle),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
-                            Icons.security_rounded,
+                            isSuccess
+                                ? Icons.security_rounded
+                                : (isExhausted
+                                    ? Icons.history_rounded
+                                    : Icons.security_rounded),
                             size: 13,
                             color: isSuccess
                                 ? AppColors.success
-                                : AppColors.primary,
+                                : (isExhausted
+                                    ? const Color(0xFFB45309)
+                                    : AppColors.primary),
                           ),
                           const Gap(4),
                           Text(
-                            isSuccess ? 'عملية مكتملة وموثقة' : 'صرف آمن موثق',
+                            isSuccess
+                                ? 'عملية مكتملة وموثقة'
+                                : (isExhausted
+                                    ? 'merchant.quota_exhausted_badge'.tr()
+                                    : 'صرف آمن موثق'),
                             style: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
                               color: isSuccess
                                   ? AppColors.success
-                                  : AppColors.primary,
+                                  : (isExhausted
+                                      ? const Color(0xFFB45309)
+                                      : AppColors.primary),
                             ),
                           ),
                         ],
@@ -152,8 +176,14 @@ class _RedemptionConfirmationSheetState
                     card: state.card,
                     onDone: () => Navigator.pop(context),
                   ),
+                ] else if (isExhausted) ...[
+                  // CASE 2: Monthly Quota Already Redeemed
+                  QuotaExhaustedView(
+                    card: widget.card,
+                    onClose: () => Navigator.pop(context),
+                  ),
                 ] else ...[
-                  // CASE 2: Beneficiary Card Summary
+                  // CASE 3: Beneficiary Card Summary + Redemption Form
                   BeneficiaryCardSummary(card: widget.card),
                   const Gap(14),
 

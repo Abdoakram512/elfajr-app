@@ -70,6 +70,28 @@ class MerchantRedemptionProcessor {
         final currentBaskets = (cardData['foodBasketsQuota'] as num?)?.toInt() ??
             ((cardData['quota'] as num?)?.toInt() ?? 0);
 
+        final lastRedeemedCycle = cardData['lastRedeemedMonthCycle'] as String?;
+        final lastRedemptionDateRaw = cardData['lastCashRedemptionDate'];
+        final now = DateTime.now();
+        final currentCycle = '${now.year}-${now.month.toString().padLeft(2, '0')}';
+
+        // Check if beneficiary has already redeemed in the current monthly cycle
+        if (lastRedeemedCycle == currentCycle) {
+          throw const AppException('merchant.monthly_quota_already_redeemed');
+        }
+
+        if (lastRedemptionDateRaw != null) {
+          DateTime? lastDate;
+          if (lastRedemptionDateRaw is Timestamp) {
+            lastDate = lastRedemptionDateRaw.toDate();
+          } else if (lastRedemptionDateRaw is String) {
+            lastDate = DateTime.tryParse(lastRedemptionDateRaw);
+          }
+          if (lastDate != null && lastDate.year == now.year && lastDate.month == now.month) {
+            throw const AppException('merchant.monthly_quota_already_redeemed');
+          }
+        }
+
         // Strict Balance & Quota Validation inside Transaction
         if (amount > currentBalance || foodBaskets > currentBaskets) {
           throw const AppException('merchant.insufficient_balance');
@@ -84,12 +106,14 @@ class MerchantRedemptionProcessor {
         final city = cardData['residence'] as String? ?? (cardData['city'] as String? ?? 'الرياض');
 
         // [WRITE PHASE] Atomic updates committed together
-        // 1. Decrement balance on aid card
+        // 1. Decrement balance and record redemption cycle on aid card
         transaction.update(cardRef, {
           'totalBalance': remainingBalance,
           'balance': remainingBalance,
           'foodBasketsQuota': remainingBaskets,
           'quota': remainingBaskets,
+          'lastRedeemedMonthCycle': currentCycle,
+          'lastCashRedemptionDate': FieldValue.serverTimestamp(),
           'updatedAt': FieldValue.serverTimestamp(),
         });
 

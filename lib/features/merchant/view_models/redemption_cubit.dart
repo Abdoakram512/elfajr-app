@@ -78,6 +78,16 @@ class RedemptionCubit extends Cubit<RedemptionState> {
       return false;
     }
 
+    if (currentCard.hasRedeemedInCurrentMonth) {
+      emit(
+        RedemptionFailure(
+          'merchant.monthly_quota_already_redeemed',
+          card: currentCard,
+        ),
+      );
+      return false;
+    }
+
     if (amount <= 0) {
       emit(
         RedemptionCardLoaded(

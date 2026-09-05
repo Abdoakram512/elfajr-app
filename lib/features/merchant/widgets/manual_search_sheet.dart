@@ -8,6 +8,7 @@ import '../../../../core/widgets/primary_button.dart';
 import '../view_models/redemption_cubit.dart';
 import '../view_models/redemption_state.dart';
 import 'beneficiary_card_summary.dart';
+import 'quota_exhausted_view.dart';
 import 'redemption_receipt_card.dart';
 
 class ManualSearchSheet extends StatefulWidget {
@@ -80,6 +81,10 @@ class _ManualSearchSheetState extends State<ManualSearchSheet> {
                     ? state.card
                     : (state is RedemptionFailure ? state.card : null)));
 
+        final isExhausted = loadedCard != null &&
+            (loadedCard.hasRedeemedInCurrentMonth ||
+                loadedCard.totalBalance < _fixedRedemptionAmount);
+
         final searchError = state is RedemptionFailure && state.card == null
             ? state.errorMessage
             : null;
@@ -116,8 +121,18 @@ class _ManualSearchSheetState extends State<ManualSearchSheet> {
                     Row(
                       children: [
                         Icon(
-                          isSuccess ? Icons.check_circle_rounded : Icons.person_search_rounded,
-                          color: isSuccess ? AppColors.success : AppColors.primary,
+                          isSuccess
+                              ? Icons.check_circle_rounded
+                              : (isExhausted
+                                  ? Icons.event_busy_rounded
+                                  : (loadedCard == null
+                                      ? Icons.person_search_rounded
+                                      : Icons.person_rounded)),
+                          color: isSuccess
+                              ? AppColors.success
+                              : (isExhausted
+                                  ? const Color(0xFFD97706)
+                                  : AppColors.primary),
                         ),
                         const Gap(8),
                         Text(
@@ -125,7 +140,9 @@ class _ManualSearchSheetState extends State<ManualSearchSheet> {
                               ? 'merchant.manual_search_ext.verified_receipt'.tr()
                               : (loadedCard == null
                                   ? 'merchant.search_manual_title'.tr()
-                                  : 'merchant.beneficiary_details'.tr()),
+                                  : (isExhausted
+                                      ? 'merchant.quota_exhausted_title'.tr()
+                                      : 'merchant.beneficiary_details'.tr())),
                           style: const TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.bold,
@@ -189,8 +206,15 @@ class _ManualSearchSheetState extends State<ManualSearchSheet> {
                     isLoading: isSearching,
                     onPressed: _onSearch,
                   ),
+                ] else if (isExhausted) ...[
+                  // CASE 3: Monthly Quota Already Redeemed / Exhausted
+                  QuotaExhaustedView(
+                    card: loadedCard,
+                    onClose: () => Navigator.pop(context),
+                    onSearchAnother: _onReset,
+                  ),
                 ] else ...[
-                  // CASE 3: Card Found -> Summary + Fixed 30 EGP Redemption
+                  // CASE 4: Active Card Found -> Summary + Fixed 30 EGP Redemption
                   BeneficiaryCardSummary(card: loadedCard),
                   const Gap(14),
 
