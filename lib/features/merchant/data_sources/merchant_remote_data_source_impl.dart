@@ -119,12 +119,16 @@ class MerchantRemoteDataSourceImpl implements MerchantRemoteDataSource {
           'totalTransactions': (data['totalTransactions'] as num?)?.toInt() ?? 0,
           'totalDisbursed': (data['totalDisbursed'] as num?)?.toDouble() ?? 0.0,
           'totalBaskets': (data['totalBaskets'] as num?)?.toInt() ?? 0,
+          'allocatedBudget': (data['allocatedBudget'] as num?)?.toDouble() ??
+              (data['budget'] as num?)?.toDouble() ??
+              0.0,
         };
       }
       return {
         'totalTransactions': 0,
         'totalDisbursed': 0.0,
         'totalBaskets': 0,
+        'allocatedBudget': 0.0,
       };
     });
   }

@@ -41,6 +41,8 @@ class MerchantDashboardCubit extends Cubit<MerchantDashboardState> {
             (stats['totalDisbursed'] as num?)?.toDouble() ?? 0.0,
         todayTransactionsCount:
             (stats['totalTransactions'] as num?)?.toInt() ?? 0,
+        allocatedBudget:
+            (stats['allocatedBudget'] as num?)?.toDouble() ?? 0.0,
       ));
     });
   }

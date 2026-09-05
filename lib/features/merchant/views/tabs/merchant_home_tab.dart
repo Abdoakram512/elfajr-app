@@ -28,14 +28,21 @@ class MerchantHomeTab extends StatelessWidget {
 
     return BlocBuilder<MerchantDashboardCubit, MerchantDashboardState>(
       builder: (context, state) {
-        final allocatedBudget = merchant?.allocatedBudget ?? 0.0;
+        final effectiveBudget = state.allocatedBudget > 0
+            ? state.allocatedBudget
+            : (merchant?.allocatedBudget ?? 0.0);
         final disbursedAmount = state.todayDispensedAmount;
-        final remainingLiquidity = (allocatedBudget - disbursedAmount) > 0
-            ? (allocatedBudget - disbursedAmount)
+        final remainingLiquidity = (effectiveBudget - disbursedAmount) > 0
+            ? (effectiveBudget - disbursedAmount)
+            : 0.0;
+        final burnPercentage = effectiveBudget > 0
+            ? (disbursedAmount / effectiveBudget).clamp(0.0, 1.0)
             : 0.0;
         final isLowLiquidity =
-            allocatedBudget > 0 &&
-            ((remainingLiquidity / allocatedBudget) <= 0.15);
+            effectiveBudget > 0 && ((remainingLiquidity / effectiveBudget) <= 0.15);
+
+        final monthYearStr = DateFormat('MMMM yyyy', context.locale.languageCode)
+            .format(DateTime.now());
 
         return Scaffold(
           backgroundColor: AppColors.backgroundLight,
@@ -131,8 +138,8 @@ class MerchantHomeTab extends StatelessWidget {
                               ),
                               child: Text(
                                 context.locale.languageCode == 'ar'
-                                    ? 'English'
-                                    : 'العربية',
+                                     ? 'English'
+                                     : 'العربية',
                                 style: const TextStyle(
                                   fontSize: 12.5,
                                   fontWeight: FontWeight.bold,
@@ -144,112 +151,339 @@ class MerchantHomeTab extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const Gap(20),
+                    const Gap(18),
 
                     // ── Primary QR Scanner Card ─────────────────────────────
                     const MerchantScannerCard(),
                     const Gap(18),
 
-                    // ── Summary KPI Cards (Side-by-Side) ────────────────────
-                    Row(
-                      children: [
-                        // Card 1 (Right in RTL): Total Dispensed
-                        Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 18,
-                              vertical: 18,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: const Color(0xFFF1F5F9),
-                                width: 1.5,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.02),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'dashboard.merchant.today_dispensed'.tr(),
-                                  style: const TextStyle(
-                                    fontSize: 12.5,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.textSecondaryLight,
-                                  ),
-                                ),
-                                const Gap(10),
-                                Text(
-                                  '${currencyFormatter.format(state.todayDispensedAmount)} ${'common.currency'.tr()}',
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w900,
-                                    color: Color(0xFF0A734D),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                    // ── Official Financial Custody Card ─────────────────────
+                    Container(
+                      padding: const EdgeInsets.all(18),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(22),
+                        border: Border.all(
+                          color: const Color(0xFFE2E8F0),
+                          width: 1.5,
                         ),
-                        const Gap(14),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.03),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Top Header: Title & Cycle Badge
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF0A734D).withValues(alpha: 0.1),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: const Icon(
+                                      Icons.account_balance_wallet_rounded,
+                                      color: Color(0xFF0A734D),
+                                      size: 20,
+                                    ),
+                                  ),
+                                  const Gap(10),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'dashboard.merchant.wallet_title'.tr(),
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w900,
+                                          color: AppColors.textPrimaryLight,
+                                        ),
+                                      ),
+                                      Text(
+                                        'dashboard.merchant.wallet_cycle_note'.tr(),
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w500,
+                                          color: AppColors.textSecondaryLight,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF1F5F9),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                                ),
+                                child: Text(
+                                  monthYearStr,
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xFF475569),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const Gap(16),
 
-                        // Card 2 (Left in RTL): Today's Count
-                        Expanded(
-                          child: Container(
+                          // Highlight Box: Remaining Liquidity
+                          Container(
+                            width: double.infinity,
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 18,
-                              vertical: 18,
+                              horizontal: 16,
+                              vertical: 14,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: const Color(0xFFF1F5F9),
-                                width: 1.5,
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFFF0FDF4), Color(0xFFDCFCE7)],
+                                begin: Alignment.topRight,
+                                end: Alignment.bottomLeft,
                               ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.02),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: const Color(0xFF86EFAC), width: 1.2),
                             ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
-                                  'dashboard.merchant.today_txns'.tr(),
-                                  style: const TextStyle(
-                                    fontSize: 12.5,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.textSecondaryLight,
-                                  ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'dashboard.merchant.remaining_liquidity'.tr(),
+                                      style: const TextStyle(
+                                        fontSize: 12.5,
+                                        fontWeight: FontWeight.w700,
+                                        color: Color(0xFF166534),
+                                      ),
+                                    ),
+                                    const Gap(4),
+                                    Row(
+                                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                                      textBaseline: TextBaseline.alphabetic,
+                                      children: [
+                                        Text(
+                                          currencyFormatter.format(remainingLiquidity),
+                                          style: const TextStyle(
+                                            fontSize: 26,
+                                            fontWeight: FontWeight.w900,
+                                            color: Color(0xFF0A734D),
+                                            letterSpacing: -0.5,
+                                          ),
+                                        ),
+                                        const Gap(6),
+                                        Text(
+                                          'common.currency'.tr(),
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: Color(0xFF15803D),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
-                                const Gap(10),
-                                Text(
-                                  '${state.todayTransactionsCount}',
-                                  style: const TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.w900,
-                                    color: Color(0xFFD97706),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(10),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(alpha: 0.04),
+                                        blurRadius: 4,
+                                      ),
+                                    ],
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(
+                                        Icons.check_circle_outline_rounded,
+                                        size: 14,
+                                        color: Color(0xFF0A734D),
+                                      ),
+                                      const Gap(4),
+                                      Text(
+                                        'dashboard.merchant.remaining_ready_hint'.tr(),
+                                        style: const TextStyle(
+                                          fontSize: 10.5,
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(0xFF0A734D),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                        ),
-                      ],
+                          const Gap(14),
+
+                          // Custody Breakdown (Allocated vs Disbursed)
+                          Row(
+                            children: [
+                              // Allocated Budget Card
+                              Expanded(
+                                child: Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFF8FAFC),
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'dashboard.merchant.allocated_budget'.tr(),
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w600,
+                                          color: Color(0xFF64748B),
+                                        ),
+                                      ),
+                                      const Gap(6),
+                                      Text(
+                                        '${currencyFormatter.format(effectiveBudget)} ${'common.currency'.tr()}',
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w900,
+                                          color: Color(0xFF1E293B),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              const Gap(10),
+
+                              // Disbursed Amount Card
+                              Expanded(
+                                child: Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFF8FAFC),
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'dashboard.merchant.disbursed_amount'.tr(),
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w600,
+                                          color: Color(0xFF64748B),
+                                        ),
+                                      ),
+                                      const Gap(6),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            '${currencyFormatter.format(disbursedAmount)} ${'common.currency'.tr()}',
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w900,
+                                              color: Color(0xFFD97706),
+                                            ),
+                                          ),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFFFEF3C7),
+                                              borderRadius: BorderRadius.circular(6),
+                                            ),
+                                            child: Text(
+                                              '${state.todayTransactionsCount}',
+                                              style: const TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w900,
+                                                color: Color(0xFF92400E),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const Gap(14),
+
+                          // Custody Burn Rate Progress Bar
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'dashboard.merchant.custody_burn_rate'.tr(),
+                                    style: const TextStyle(
+                                      fontSize: 11.5,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFF64748B),
+                                    ),
+                                  ),
+                                  Text(
+                                    '${(burnPercentage * 100).toStringAsFixed(1)}%',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w800,
+                                      color: burnPercentage > 0.85
+                                          ? const Color(0xFFDC2626)
+                                          : const Color(0xFF0A734D),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const Gap(6),
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(6),
+                                child: LinearProgressIndicator(
+                                  value: burnPercentage,
+                                  minHeight: 7,
+                                  backgroundColor: const Color(0xFFE2E8F0),
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    burnPercentage > 0.85
+                                        ? const Color(0xFFDC2626)
+                                        : (burnPercentage > 0.6
+                                            ? const Color(0xFFD97706)
+                                            : const Color(0xFF0A734D)),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                    const Gap(18),
+                    const Gap(16),
 
                     // ── Critical Liquidity Alert Banner (if needed) ─────────
                     if (isLowLiquidity) ...[
@@ -257,28 +491,29 @@ class MerchantHomeTab extends StatelessWidget {
                         width: double.infinity,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 14,
-                          vertical: 10,
+                          vertical: 12,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.red.shade50,
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: Colors.red.shade200),
+                          color: const Color(0xFFFEF2F2),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: const Color(0xFFFECACA)),
                         ),
                         child: Row(
                           children: [
                             const Icon(
                               Icons.warning_amber_rounded,
-                              color: Colors.red,
-                              size: 20,
+                              color: Color(0xFFDC2626),
+                              size: 22,
                             ),
-                            const Gap(8),
+                            const Gap(10),
                             Expanded(
                               child: Text(
                                 'dashboard.merchant.low_liquidity_alert'.tr(),
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.red.shade800,
+                                  color: Color(0xFF991B1B),
+                                  height: 1.3,
                                 ),
                               ),
                             ),

@@ -23,27 +23,19 @@ class RedemptionConfirmationSheet extends StatefulWidget {
 
 class _RedemptionConfirmationSheetState
     extends State<RedemptionConfirmationSheet> {
-  final _amountController = TextEditingController(text: '30');
   final _notesController = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-    _amountController.text = '30';
-  }
+  static const double _fixedRedemptionAmount = 30.0;
 
   @override
   void dispose() {
-    _amountController.dispose();
     _notesController.dispose();
     super.dispose();
   }
 
   void _onConfirmRedemption() {
-    final amount = double.tryParse(_amountController.text.trim()) ?? 30.0;
-
     context.read<RedemptionCubit>().confirmRedemption(
-      amount: amount,
+      amount: _fixedRedemptionAmount,
       foodBaskets: 0,
       notes: _notesController.text.trim().isEmpty
           ? null
@@ -163,58 +155,119 @@ class _RedemptionConfirmationSheetState
                 ] else ...[
                   // CASE 2: Beneficiary Card Summary
                   BeneficiaryCardSummary(card: widget.card),
+                  const Gap(14),
 
-                  // Automatic Fixed Amount Policy Banner
+                  // Fixed 30 EGP Amount Card
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 10,
+                      horizontal: 16,
+                      vertical: 14,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.emerald50,
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: AppColors.emerald200),
+                      color: const Color(0xFFF0FDF4),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: const Color(0xFFBBF7D0), width: 1.5),
                     ),
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Icon(
-                          Icons.verified_rounded,
-                          color: AppColors.emerald600,
-                          size: 18,
-                        ),
-                        const Gap(8),
-                        Expanded(
-                          child: Text(
-                            'merchant.fixed_amount_badge'.tr(),
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.emerald800,
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF0A734D).withValues(alpha: 0.12),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.payments_rounded,
+                                color: Color(0xFF0A734D),
+                                size: 22,
+                              ),
                             ),
+                            const Gap(12),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'merchant.fixed_amount_label'.tr(),
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w800,
+                                    color: Color(0xFF14532D),
+                                  ),
+                                ),
+                                Text(
+                                  'merchant.fixed_amount_desc'.tr(),
+                                  style: const TextStyle(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF166534),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF0A734D),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            children: [
+                              const Text(
+                                '30.00',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              const Gap(4),
+                              Text(
+                                'common.currency'.tr(),
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white70,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const Gap(10),
 
-                  CustomTextField(
-                    controller: _amountController,
-                    label: 'merchant.enter_deduction_amount'.tr(),
-                    hint: '30.0',
-                    prefixIcon: Icons.payments_outlined,
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
-                    ),
-                  ),
                   if (amountError != null) ...[
-                    const Gap(6),
-                    Text(
-                      amountError.tr(),
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.error,
+                    const Gap(8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: AppColors.error.withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.error_outline_rounded, color: AppColors.error, size: 18),
+                          const Gap(8),
+                          Expanded(
+                            child: Text(
+                              amountError.tr(),
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.error,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -228,10 +281,10 @@ class _RedemptionConfirmationSheetState
                     prefixIcon: Icons.notes_rounded,
                   ),
 
-                  const Gap(16),
+                  const Gap(18),
 
                   PrimaryButton(
-                    text: 'merchant.confirm_redemption'.tr(),
+                    text: 'merchant.confirm_redemption_fixed'.tr(),
                     isLoading: isSubmitting,
                     onPressed: _onConfirmRedemption,
                   ),
