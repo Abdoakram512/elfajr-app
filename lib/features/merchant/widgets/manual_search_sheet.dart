@@ -37,14 +37,12 @@ class ManualSearchSheet extends StatefulWidget {
 class _ManualSearchSheetState extends State<ManualSearchSheet> {
   final _searchController = TextEditingController();
   final _amountController = TextEditingController();
-  final _pinController = TextEditingController();
   final _notesController = TextEditingController();
 
   @override
   void dispose() {
     _searchController.dispose();
     _amountController.dispose();
-    _pinController.dispose();
     _notesController.dispose();
     super.dispose();
   }
@@ -59,7 +57,6 @@ class _ManualSearchSheetState extends State<ManualSearchSheet> {
     widget.cubit.confirmRedemption(
       amount: amount,
       foodBaskets: 0,
-      enteredPin: _pinController.text,
       notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
     );
   }
@@ -67,7 +64,6 @@ class _ManualSearchSheetState extends State<ManualSearchSheet> {
   void _onReset() {
     _searchController.clear();
     _amountController.clear();
-    _pinController.clear();
     _notesController.clear();
     widget.cubit.reset();
   }
@@ -87,7 +83,6 @@ class _ManualSearchSheetState extends State<ManualSearchSheet> {
                     ? state.card
                     : (state is RedemptionFailure ? state.card : null)));
 
-        final pinError = state is RedemptionCardLoaded ? state.pinError : null;
         final searchError = state is RedemptionFailure && state.card == null
             ? state.errorMessage
             : null;
@@ -212,68 +207,6 @@ class _ManualSearchSheetState extends State<ManualSearchSheet> {
                   ),
 
                   const Gap(14),
-
-                  // Anti-Fraud In-Person Security PIN
-                  Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: AppColors.backgroundLight,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: pinError != null ? AppColors.error : AppColors.borderLight,
-                        width: pinError != null ? 1.5 : 1.0,
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            const Icon(Icons.verified_user_rounded, size: 16, color: AppColors.primary),
-                            const Gap(6),
-                            Text(
-                              'merchant.security_verification_title'.tr(),
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimaryLight,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const Gap(6),
-                        Text(
-                          'merchant.security_verification_desc'.tr(),
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: AppColors.textSecondaryLight,
-                            height: 1.3,
-                          ),
-                        ),
-                        const Gap(8),
-                        CustomTextField(
-                          controller: _pinController,
-                          label: 'merchant.security_pin_label'.tr(),
-                          hint: 'merchant.security_pin_hint'.tr(),
-                          prefixIcon: Icons.pin_outlined,
-                          keyboardType: TextInputType.number,
-                        ),
-                        if (pinError != null) ...[
-                          const Gap(6),
-                          Text(
-                            pinError.tr(),
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.error,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-
-                  const Gap(12),
 
                   CustomTextField(
                     controller: _notesController,

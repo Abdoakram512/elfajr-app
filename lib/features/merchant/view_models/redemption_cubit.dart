@@ -1,7 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../app/service_locator.dart';
-import '../../../../core/errors/failure.dart';
-import '../../../../core/utils/app_validators.dart';
 import '../../auth/view_models/auth_cubit.dart';
 import '../../auth/view_models/auth_state.dart';
 import '../../beneficiary/models/aid_card_model.dart';
@@ -64,7 +62,6 @@ class RedemptionCubit extends Cubit<RedemptionState> {
   Future<bool> confirmRedemption({
     required double amount,
     int foodBaskets = 0,
-    required String enteredPin,
     String? notes,
   }) async {
     final currentState = state;
@@ -98,17 +95,6 @@ class RedemptionCubit extends Cubit<RedemptionState> {
           amountError: 'merchant.insufficient_balance',
         ),
       );
-      return false;
-    }
-
-    // Security PIN Verification (Guard Pattern)
-    try {
-      AppValidators.guardSecurityPin(
-        enteredPin: enteredPin,
-        actualNationalId: currentCard.nationalId,
-      );
-    } on AppException catch (e) {
-      emit(RedemptionCardLoaded(card: currentCard, pinError: e.message));
       return false;
     }
 

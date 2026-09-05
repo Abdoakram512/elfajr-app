@@ -24,7 +24,6 @@ class RedemptionConfirmationSheet extends StatefulWidget {
 class _RedemptionConfirmationSheetState
     extends State<RedemptionConfirmationSheet> {
   final _amountController = TextEditingController(text: '30');
-  final _pinController = TextEditingController();
   final _notesController = TextEditingController();
 
   @override
@@ -36,7 +35,6 @@ class _RedemptionConfirmationSheetState
   @override
   void dispose() {
     _amountController.dispose();
-    _pinController.dispose();
     _notesController.dispose();
     super.dispose();
   }
@@ -47,7 +45,6 @@ class _RedemptionConfirmationSheetState
     context.read<RedemptionCubit>().confirmRedemption(
       amount: amount,
       foodBaskets: 0,
-      enteredPin: _pinController.text,
       notes: _notesController.text.trim().isEmpty
           ? null
           : _notesController.text.trim(),
@@ -60,7 +57,6 @@ class _RedemptionConfirmationSheetState
       builder: (context, state) {
         final isSuccess = state is RedemptionSuccess;
         final isSubmitting = state is RedemptionSubmitting;
-        final pinError = state is RedemptionCardLoaded ? state.pinError : null;
         final amountError = state is RedemptionCardLoaded
             ? state.amountError
             : null;
@@ -224,74 +220,6 @@ class _RedemptionConfirmationSheetState
                   ],
 
                   const Gap(14),
-
-                  // Anti-Fraud In-Person Security PIN Check
-                  Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: AppColors.backgroundLight,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: pinError != null
-                            ? AppColors.error
-                            : AppColors.borderLight,
-                        width: pinError != null ? 1.5 : 1.0,
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.verified_user_rounded,
-                              size: 16,
-                              color: AppColors.primary,
-                            ),
-                            const Gap(6),
-                            Text(
-                              'merchant.security_verification_title'.tr(),
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimaryLight,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const Gap(6),
-                        Text(
-                          'merchant.security_verification_desc'.tr(),
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: AppColors.textSecondaryLight,
-                            height: 1.3,
-                          ),
-                        ),
-                        const Gap(8),
-                        CustomTextField(
-                          controller: _pinController,
-                          label: 'merchant.security_pin_label'.tr(),
-                          hint: 'merchant.security_pin_hint'.tr(),
-                          prefixIcon: Icons.pin_outlined,
-                          keyboardType: TextInputType.number,
-                        ),
-                        if (pinError != null) ...[
-                          const Gap(6),
-                          Text(
-                            pinError.tr(),
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.error,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-
-                  const Gap(12),
 
                   CustomTextField(
                     controller: _notesController,
