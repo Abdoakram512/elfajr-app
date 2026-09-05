@@ -57,6 +57,8 @@ class AidCardModel extends Equatable {
   final DateTime? activatedAt;
   final DateTime expiresAt;
   final String securityHash;
+  final String? lastMonthlyCycle;
+  final DateTime? lastRechargedAt;
 
   const AidCardModel({
     required this.cardId,
@@ -75,6 +77,8 @@ class AidCardModel extends Equatable {
     this.activatedAt,
     required this.expiresAt,
     required this.securityHash,
+    this.lastMonthlyCycle,
+    this.lastRechargedAt,
   });
 
   bool get isActive => status == AidCardStatus.active;
@@ -97,6 +101,8 @@ class AidCardModel extends Equatable {
     DateTime? activatedAt,
     DateTime? expiresAt,
     String? securityHash,
+    String? lastMonthlyCycle,
+    DateTime? lastRechargedAt,
   }) {
     return AidCardModel(
       cardId: cardId ?? this.cardId,
@@ -115,6 +121,8 @@ class AidCardModel extends Equatable {
       activatedAt: activatedAt ?? this.activatedAt,
       expiresAt: expiresAt ?? this.expiresAt,
       securityHash: securityHash ?? this.securityHash,
+      lastMonthlyCycle: lastMonthlyCycle ?? this.lastMonthlyCycle,
+      lastRechargedAt: lastRechargedAt ?? this.lastRechargedAt,
     );
   }
 
@@ -137,6 +145,8 @@ class AidCardModel extends Equatable {
       'activatedAt': activatedAt?.toIso8601String(),
       'expiresAt': expiresAt.toIso8601String(),
       'securityHash': securityHash,
+      'lastMonthlyCycle': lastMonthlyCycle,
+      'lastRechargedAt': lastRechargedAt?.toIso8601String(),
     };
   }
 
@@ -161,6 +171,8 @@ class AidCardModel extends Equatable {
         fallback: DateTime.now().add(const Duration(days: 365)),
       ),
       securityHash: map['securityHash'] as String? ?? '',
+      lastMonthlyCycle: map['lastMonthlyCycle'] as String?,
+      lastRechargedAt: FirebaseParserUtils.parseNullableDate(map['lastRechargedAt']),
     );
   }
 
@@ -182,5 +194,7 @@ class AidCardModel extends Equatable {
     activatedAt,
     expiresAt,
     securityHash,
+    lastMonthlyCycle,
+    lastRechargedAt,
   ];
 }

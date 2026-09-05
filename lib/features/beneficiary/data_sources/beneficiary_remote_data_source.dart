@@ -75,11 +75,50 @@ class BeneficiaryRemoteDataSourceImpl implements BeneficiaryRemoteDataSource {
     late StreamController<AidCardModel?> controller;
     final List<StreamSubscription> subscriptions = [];
 
+    Future<void> autoSyncMonthlyQuota(
+      AidCardModel card,
+      DocumentReference<Map<String, dynamic>> docRef,
+    ) async {
+      if (card.status != AidCardStatus.active) return;
+      final now = DateTime.now();
+      final currentCycle = '${now.year}-${now.month.toString().padLeft(2, '0')}';
+
+      if (card.lastMonthlyCycle == currentCycle) return;
+
+      try {
+        final newBalance = card.totalBalance + 30.0;
+        final newQuota = card.foodBasketsQuota + 1;
+        final nowIso = now.toIso8601String();
+
+        await docRef.update({
+          'balance': newBalance,
+          'totalBalance': newBalance,
+          'foodBasketsQuota': newQuota,
+          'lastMonthlyCycle': currentCycle,
+          'lastRechargedAt': nowIso,
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+
+        if (card.beneficiaryId.isNotEmpty) {
+          await _firestore.collection('users').doc(card.beneficiaryId).update({
+            'balance': newBalance,
+            'totalBalance': newBalance,
+            'foodBasketsQuota': newQuota,
+            'lastMonthlyCycle': currentCycle,
+            'lastRechargedAt': nowIso,
+          });
+        }
+      } catch (_) {
+        // Silently catch to avoid disrupting stream
+      }
+    }
+
     void handleDoc(DocumentSnapshot<Map<String, dynamic>> doc) {
       if (controller.isClosed) return;
       if (doc.exists && doc.data() != null) {
         final card = AidCardModel.fromMap(doc.data()!, documentId: doc.id);
         controller.add(card);
+        autoSyncMonthlyQuota(card, doc.reference);
       }
     }
 
@@ -89,6 +128,7 @@ class BeneficiaryRemoteDataSourceImpl implements BeneficiaryRemoteDataSource {
         final doc = docs.first;
         final card = AidCardModel.fromMap(doc.data(), documentId: doc.id);
         controller.add(card);
+        autoSyncMonthlyQuota(card, doc.reference);
       }
     }
 
